@@ -2,9 +2,21 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>xdp.es | Servidor DNS Cifrado</title>
-    <meta name="description" content="Servidor DNS recursivo público con DoH, DoT, DNSSEC y filtrado de publicidad y rastreadores.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xdp.es | Servidor DNS Cifrado de Alto Rendimiento</title>
+    <meta name="description" content="Servidor DNS recursivo público y seguro con DoH (DNS over HTTPS), DoT (DNS over TLS), DNSSEC y bloqueo de publicidad y telemetría.">
+    <link rel="canonical" href="https://xdp.es/">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph & Social -->
+    <meta property="og:title" content="xdp.es | Servidor DNS Cifrado de Alto Rendimiento">
+    <meta property="og:description" content="Servidor DNS recursivo público con soporte nativo DoH, DoT, DNSSEC y filtrado de publicidad.">
+    <meta property="og:url" content="https://xdp.es/">
+    <meta property="og:type" content="website">
+
+    <!-- Theme Color for Mobile Browsers -->
+    <meta name="theme-color" content="#0e0f12" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
 
     <!-- Inline script to prevent theme flashing (FOIT) -->
     <script>
@@ -18,9 +30,16 @@
         })();
     </script>
 
+    <!-- Font Optimization (Preconnect + Non-blocking Asynchronous Load) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    </noscript>
+
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="index.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20100%20100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
 </head>
@@ -32,7 +51,7 @@
                 <h1>xdp.es DNS</h1>
                 <nav class="theme-switcher" role="group" aria-label="Seleccionar tema de color">
                     <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Activar modo claro">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <circle cx="12" cy="12" r="5"></circle>
                             <line x1="12" y1="1" x2="12" y2="3"></line>
                             <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -46,13 +65,13 @@
                         <span class="theme-text">Claro</span>
                     </button>
                     <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Activar modo oscuro">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                         <span class="theme-text">Oscuro</span>
                     </button>
                     <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático según el sistema" aria-label="Activar modo automático">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                             <line x1="8" y1="21" x2="16" y2="21"></line>
                             <line x1="12" y1="17" x2="12" y2="21"></line>
@@ -74,7 +93,7 @@
                     <p class="desc">Cifrado de extremo a extremo a través de HTTPS. Compatible con navegadores modernos, Windows 11, iOS y Android.</p>
                     <div class="endpoint-box">
                         <span class="label desktop-only">URL DoH:</span>
-                        <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('https://dns.xdp.es/dns-query', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('https://dns.xdp.es/dns-query', this)" aria-label="Copiar URL DoH">
+                        <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('https://dns.xdp.es/dns-query', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('https://dns.xdp.es/dns-query', this)" aria-label="Copiar URL DoH https://dns.xdp.es/dns-query">
                             <code class="code-val">https://dns.xdp.es/dns-query</code>
                             <span class="tooltip">Click para copiar</span>
                         </div>
@@ -91,7 +110,7 @@
                     <p class="desc">Protocolo estándar TLS para DNS privado. Ideal para la función <em>DNS Privado</em> en Android y routers avanzados.</p>
                     <div class="endpoint-box">
                         <span class="label desktop-only">Hostname DoT:</span>
-                        <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('dns.xdp.es', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('dns.xdp.es', this)" aria-label="Copiar Hostname DoT">
+                        <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('dns.xdp.es', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('dns.xdp.es', this)" aria-label="Copiar Hostname DoT dns.xdp.es">
                             <code class="code-val">dns.xdp.es</code>
                             <span class="tooltip">Click para copiar</span>
                         </div>
@@ -109,14 +128,14 @@
                     <div class="ip-grid">
                         <div class="ip-item">
                             <span class="label">IPv4</span>
-                            <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('85.208.114.51', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('85.208.114.51', this)" aria-label="Copiar dirección IPv4">
+                            <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('85.208.114.51', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('85.208.114.51', this)" aria-label="Copiar dirección IPv4 85.208.114.51">
                                 <code class="code-val">85.208.114.51</code>
                                 <span class="tooltip">Click para copiar</span>
                             </div>
                         </div>
                         <div class="ip-item">
                             <span class="label">IPv6</span>
-                            <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('2a0e:97c0:c40::51', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('2a0e:97c0:c40::51', this)" aria-label="Copiar dirección IPv6">
+                            <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('2a0e:97c0:c40::51', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('2a0e:97c0:c40::51', this)" aria-label="Copiar dirección IPv6 2a0e:97c0:c40::51">
                                 <code class="code-val">2a0e:97c0:c40::51</code>
                                 <span class="tooltip">Click para copiar</span>
                             </div>
@@ -133,14 +152,14 @@
                 <div class="card-content">
                     <p class="desc">Descarga e instala perfiles de configuración automática para iPhone, iPad y equipos Mac.</p>
                     <div class="profile-list">
-                        <a href="dns_xdp_es_doh.mobileconfig" class="profile-btn" download aria-label="Descargar perfil DoH con bloqueo de anuncios para iOS y macOS">
+                        <a href="dns_xdp_es_doh.mobileconfig" class="profile-btn" download aria-label="Descargar perfil de configuración DoH con bloqueo de anuncios para dispositivos Apple">
                             <div class="profile-info">
                                 <span class="profile-label">DoH + Bloqueo de Anuncios</span>
                                 <span class="profile-sub">DNS over HTTPS</span>
                             </div>
                             <span class="profile-link">.mobileconfig &darr;</span>
                         </a>
-                        <a href="dns_xdp_es_dot.mobileconfig" class="profile-btn" download aria-label="Descargar perfil DoT con bloqueo de anuncios para iOS y macOS">
+                        <a href="dns_xdp_es_dot.mobileconfig" class="profile-btn" download aria-label="Descargar perfil de configuración DoT con bloqueo de anuncios para dispositivos Apple">
                             <div class="profile-info">
                                 <span class="profile-label">DoT + Bloqueo de Anuncios</span>
                                 <span class="profile-sub">DNS over TLS</span>
@@ -216,7 +235,7 @@ DNSSEC=allow-downgrade</code></pre>
             <section class="card" aria-labelledby="heading-stats">
                 <div class="card-header">
                     <h2 id="heading-stats">Estadísticas de Resolución (24h)</h2>
-                    <a href="/stats" class="text-link" style="font-size: 0.85rem; font-weight: 500; text-decoration: none;">Ver métricas &rarr;</a>
+                    <a href="/stats" class="text-link" style="font-size: 0.85rem; font-weight: 500; text-decoration: none;" aria-label="Ver todas las métricas y estadísticas detalladas">Ver métricas &rarr;</a>
                 </div>
                 <div class="card-content">
                     <div class="stats-grid">
@@ -238,8 +257,8 @@ DNSSEC=allow-downgrade</code></pre>
         </main>
     </div>
 
-    <!-- Scripts -->
-    <script src="theme.js"></script>
-    <script src="index.js"></script>
+    <!-- Scripts with defer to prevent render blocking -->
+    <script src="theme.js" defer></script>
+    <script src="index.js" defer></script>
 </body>
 </html>
