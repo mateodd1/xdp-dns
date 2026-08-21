@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +7,11 @@
     <meta name="description" content="Servidor DNS recursivo público y seguro con DoH (DNS over HTTPS), DoT (DNS over TLS), DNSSEC y bloqueo de publicidad y telemetría.">
     <link rel="canonical" href="https://xdp.es/">
     <meta name="robots" content="index, follow">
+
+    <!-- Agentic & AI Machine-Readable Discovery -->
+    <link rel="help" type="text/markdown" href="/llms.txt" title="LLM & AI Agent Context">
+    <link rel="service-desc" type="application/json" href="/openapi.json" title="OpenAPI 3.1 Specification">
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 
     <!-- Open Graph & Social -->
     <meta property="og:title" content="xdp.es | Servidor DNS Cifrado de Alto Rendimiento">
@@ -17,6 +22,32 @@
     <!-- Theme Color for Mobile Browsers -->
     <meta name="theme-color" content="#0e0f12" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+
+    <!-- Structured Data for Agents & Search Engines (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://xdp.es/#website",
+          "url": "https://xdp.es/",
+          "name": "xdp.es DNS",
+          "description": "Servidor DNS recursivo público de alto rendimiento con cifrado DoH, DoT y DNSSEC.",
+          "inLanguage": "es"
+        },
+        {
+          "@type": "WebAPI",
+          "@id": "https://xdp.es/#webapi",
+          "name": "xdp.es DNS over HTTPS & Stats API",
+          "description": "Endpoints públicos de resolución DNS cifrada (RFC 8484) y telemetría anónima.",
+          "documentation": "https://xdp.es/llms.txt",
+          "termsOfService": "https://xdp.es/",
+          "endpointUrl": "https://dns.xdp.es/dns-query"
+        }
+      ]
+    }
+    </script>
 
     <!-- Inline script to prevent theme flashing (FOIT) -->
     <script>
@@ -49,8 +80,8 @@
         <header>
             <div class="header-top">
                 <h1>xdp.es DNS</h1>
-                <nav class="theme-switcher" role="group" aria-label="Seleccionar tema de color">
-                    <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Activar modo claro">
+                <nav class="theme-switcher" role="group" aria-label="Seleccionar tema de color" data-agent-role="theme-control">
+                    <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Activar modo claro" data-agent-action="set-light-theme">
                         <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <circle cx="12" cy="12" r="5"></circle>
                             <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -64,13 +95,13 @@
                         </svg>
                         <span class="theme-text">Claro</span>
                     </button>
-                    <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Activar modo oscuro">
+                    <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Activar modo oscuro" data-agent-action="set-dark-theme">
                         <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                         <span class="theme-text">Oscuro</span>
                     </button>
-                    <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático según el sistema" aria-label="Activar modo automático">
+                    <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático según el sistema" aria-label="Activar modo automático" data-agent-action="set-auto-theme">
                         <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                             <line x1="8" y1="21" x2="16" y2="21"></line>
@@ -85,7 +116,7 @@
         <!-- Main Content -->
         <main>
             <!-- DoH (DNS over HTTPS) -->
-            <section class="card" aria-labelledby="heading-doh">
+            <section class="card" aria-labelledby="heading-doh" data-agent-protocol="doh" data-endpoint-url="https://dns.xdp.es/dns-query">
                 <div class="card-header">
                     <h2 id="heading-doh">DoH <span class="badge">HTTPS</span></h2>
                 </div>
@@ -93,8 +124,8 @@
                     <p class="desc">Cifrado de extremo a extremo a través de HTTPS. Compatible con navegadores modernos, Windows 11, iOS y Android.</p>
                     <div class="endpoint-box">
                         <span class="label desktop-only">URL DoH:</span>
-                        <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('https://dns.xdp.es/dns-query', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('https://dns.xdp.es/dns-query', this)" aria-label="Copiar URL DoH https://dns.xdp.es/dns-query">
-                            <code class="code-val">https://dns.xdp.es/dns-query</code>
+                        <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('https://dns.xdp.es/dns-query', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('https://dns.xdp.es/dns-query', this)" aria-label="Copiar URL DoH https://dns.xdp.es/dns-query" data-agent-action="copy-doh-endpoint">
+                            <code class="code-val" id="doh-endpoint-value">https://dns.xdp.es/dns-query</code>
                             <span class="tooltip">Click para copiar</span>
                         </div>
                     </div>
@@ -102,7 +133,7 @@
             </section>
 
             <!-- DoT (DNS over TLS) -->
-            <section class="card" aria-labelledby="heading-dot">
+            <section class="card" aria-labelledby="heading-dot" data-agent-protocol="dot" data-endpoint-hostname="dns.xdp.es" data-endpoint-port="853">
                 <div class="card-header">
                     <h2 id="heading-dot">DoT <span class="badge">TLS</span></h2>
                 </div>
@@ -110,8 +141,8 @@
                     <p class="desc">Protocolo estándar TLS para DNS privado. Ideal para la función <em>DNS Privado</em> en Android y routers avanzados.</p>
                     <div class="endpoint-box">
                         <span class="label desktop-only">Hostname DoT:</span>
-                        <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('dns.xdp.es', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('dns.xdp.es', this)" aria-label="Copiar Hostname DoT dns.xdp.es">
-                            <code class="code-val">dns.xdp.es</code>
+                        <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('dns.xdp.es', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('dns.xdp.es', this)" aria-label="Copiar Hostname DoT dns.xdp.es" data-agent-action="copy-dot-hostname">
+                            <code class="code-val" id="dot-hostname-value">dns.xdp.es</code>
                             <span class="tooltip">Click para copiar</span>
                         </div>
                     </div>
@@ -119,24 +150,24 @@
             </section>
 
             <!-- Standard DNS (UDP / TCP) -->
-            <section class="card" aria-labelledby="heading-standard-dns">
+            <section class="card" aria-labelledby="heading-standard-dns" data-agent-protocol="dns-plain">
                 <div class="card-header">
                     <h2 id="heading-standard-dns">DNS Estándar <span class="badge badge-secondary">UDP / TCP</span></h2>
                 </div>
                 <div class="card-content">
                     <p class="desc">Resolución directa con validación DNSSEC y ultra-baja latencia.</p>
                     <div class="ip-grid">
-                        <div class="ip-item">
+                        <div class="ip-item" data-ip-version="ipv4">
                             <span class="label">IPv4</span>
-                            <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('85.208.114.51', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('85.208.114.51', this)" aria-label="Copiar dirección IPv4 85.208.114.51">
-                                <code class="code-val">85.208.114.51</code>
+                            <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('85.208.114.51', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('85.208.114.51', this)" aria-label="Copiar dirección IPv4 85.208.114.51" data-agent-action="copy-ipv4">
+                                <code class="code-val" id="ipv4-value">85.208.114.51</code>
                                 <span class="tooltip">Click para copiar</span>
                             </div>
                         </div>
-                        <div class="ip-item">
+                        <div class="ip-item" data-ip-version="ipv6">
                             <span class="label">IPv6</span>
-                            <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('2a0e:97c0:c40::51', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('2a0e:97c0:c40::51', this)" aria-label="Copiar dirección IPv6 2a0e:97c0:c40::51">
-                                <code class="code-val">2a0e:97c0:c40::51</code>
+                            <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('2a0e:97c0:c40::51', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('2a0e:97c0:c40::51', this)" aria-label="Copiar dirección IPv6 2a0e:97c0:c40::51" data-agent-action="copy-ipv6">
+                                <code class="code-val" id="ipv6-value">2a0e:97c0:c40::51</code>
                                 <span class="tooltip">Click para copiar</span>
                             </div>
                         </div>
@@ -145,21 +176,21 @@
             </section>
 
             <!-- Apple Profiles (iOS / macOS) -->
-            <section class="card" aria-labelledby="heading-profiles">
+            <section class="card" aria-labelledby="heading-profiles" data-agent-category="apple-profiles">
                 <div class="card-header">
                     <h2 id="heading-profiles">Perfiles Apple <span class="badge">iOS &bull; macOS</span></h2>
                 </div>
                 <div class="card-content">
                     <p class="desc">Descarga e instala perfiles de configuración automática para iPhone, iPad y equipos Mac.</p>
                     <div class="profile-list">
-                        <a href="dns_xdp_es_doh.mobileconfig" class="profile-btn" download aria-label="Descargar perfil de configuración DoH con bloqueo de anuncios para dispositivos Apple">
+                        <a href="dns_xdp_es_doh.mobileconfig" class="profile-btn" download aria-label="Descargar perfil de configuración DoH con bloqueo de anuncios para dispositivos Apple" data-agent-action="download-doh-mobileconfig">
                             <div class="profile-info">
                                 <span class="profile-label">DoH + Bloqueo de Anuncios</span>
                                 <span class="profile-sub">DNS over HTTPS</span>
                             </div>
                             <span class="profile-link">.mobileconfig &darr;</span>
                         </a>
-                        <a href="dns_xdp_es_dot.mobileconfig" class="profile-btn" download aria-label="Descargar perfil de configuración DoT con bloqueo de anuncios para dispositivos Apple">
+                        <a href="dns_xdp_es_dot.mobileconfig" class="profile-btn" download aria-label="Descargar perfil de configuración DoT con bloqueo de anuncios para dispositivos Apple" data-agent-action="download-dot-mobileconfig">
                             <div class="profile-info">
                                 <span class="profile-label">DoT + Bloqueo de Anuncios</span>
                                 <span class="profile-sub">DNS over TLS</span>
@@ -171,21 +202,21 @@
             </section>
 
             <!-- Quick Setup Guide -->
-            <section class="card" aria-labelledby="heading-guide">
+            <section class="card" aria-labelledby="heading-guide" data-agent-category="setup-guides">
                 <div class="card-header">
                     <h2 id="heading-guide">Guía de Configuración</h2>
                 </div>
                 <div class="card-content">
                     <div class="guide-tabs" role="tablist" aria-label="Plataformas de configuración">
-                        <button type="button" class="guide-tab active" data-platform="android" role="tab" aria-selected="true" aria-controls="guide-android" onclick="switchGuide('android', this)">Android</button>
-                        <button type="button" class="guide-tab" data-platform="ios" role="tab" aria-selected="false" aria-controls="guide-ios" onclick="switchGuide('ios', this)">iOS / Mac</button>
-                        <button type="button" class="guide-tab" data-platform="windows" role="tab" aria-selected="false" aria-controls="guide-windows" onclick="switchGuide('windows', this)">Windows 11</button>
-                        <button type="button" class="guide-tab" data-platform="linux" role="tab" aria-selected="false" aria-controls="guide-linux" onclick="switchGuide('linux', this)">Linux</button>
-                        <button type="button" class="guide-tab" data-platform="browser" role="tab" aria-selected="false" aria-controls="guide-browser" onclick="switchGuide('browser', this)">Navegadores</button>
+                        <button type="button" class="guide-tab active" data-platform="android" role="tab" aria-selected="true" aria-controls="guide-android" onclick="switchGuide('android', this)" data-agent-tab="android">Android</button>
+                        <button type="button" class="guide-tab" data-platform="ios" role="tab" aria-selected="false" aria-controls="guide-ios" onclick="switchGuide('ios', this)" data-agent-tab="ios">iOS / Mac</button>
+                        <button type="button" class="guide-tab" data-platform="windows" role="tab" aria-selected="false" aria-controls="guide-windows" onclick="switchGuide('windows', this)" data-agent-tab="windows">Windows 11</button>
+                        <button type="button" class="guide-tab" data-platform="linux" role="tab" aria-selected="false" aria-controls="guide-linux" onclick="switchGuide('linux', this)" data-agent-tab="linux">Linux</button>
+                        <button type="button" class="guide-tab" data-platform="browser" role="tab" aria-selected="false" aria-controls="guide-browser" onclick="switchGuide('browser', this)" data-agent-tab="browser">Navegadores</button>
                     </div>
 
                     <!-- Android Guide -->
-                    <div id="guide-android" class="guide-panel active" role="tabpanel" aria-labelledby="heading-guide">
+                    <div id="guide-android" class="guide-panel active" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="android">
                         <ol class="steps-list">
                             <li>Ve a <strong>Ajustes</strong> &rarr; <strong>Redes e Internet / Conexiones</strong> &rarr; <strong>Más ajustes de conexión</strong>.</li>
                             <li>Pulsa sobre <strong>DNS privado</strong> (Private DNS).</li>
@@ -195,7 +226,7 @@
                     </div>
 
                     <!-- iOS / Mac Guide -->
-                    <div id="guide-ios" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide">
+                    <div id="guide-ios" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="ios">
                         <ol class="steps-list">
                             <li>Descarga el perfil <a href="dns_xdp_es_doh.mobileconfig" class="text-link">.mobileconfig (DoH)</a> desde el navegador Safari.</li>
                             <li>Abre <strong>Ajustes</strong> y pulsa en <em>"Perfil descargado"</em> en la parte superior.</li>
@@ -204,7 +235,7 @@
                     </div>
 
                     <!-- Windows 11 Guide -->
-                    <div id="guide-windows" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide">
+                    <div id="guide-windows" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="windows">
                         <ol class="steps-list">
                             <li>Abre <strong>Configuración</strong> &rarr; <strong>Red e Internet</strong> &rarr; <strong>Wi-Fi o Ethernet</strong>.</li>
                             <li>En <em>"Asignación de DNS"</em>, pulsa <strong>Editar</strong> y selecciona <strong>Manual</strong>.</li>
@@ -214,7 +245,7 @@
                     </div>
 
                     <!-- Linux Guide -->
-                    <div id="guide-linux" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide">
+                    <div id="guide-linux" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="linux">
                         <p>Para `systemd-resolved`, edita el archivo <code class="code-inline">/etc/systemd/resolved.conf</code>:</p>
                         <pre class="code-block"><code>[Resolve]
 DNS=85.208.114.51#dns.xdp.es 2a0e:97c0:c40::51#dns.xdp.es
@@ -224,7 +255,7 @@ DNSSEC=allow-downgrade</code></pre>
                     </div>
 
                     <!-- Browser Guide -->
-                    <div id="guide-browser" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide">
+                    <div id="guide-browser" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="browser">
                         <p><strong>Firefox:</strong> Ajustes &rarr; Privacidad y Seguridad &rarr; DNS sobre HTTPS &rarr; Protección máxima &rarr; Proveedor personalizado: <code class="code-inline">https://dns.xdp.es/dns-query</code></p>
                         <p><strong>Chrome / Brave / Edge:</strong> Configuración &rarr; Privacidad y Seguridad &rarr; Usar DNS seguro &rarr; Con: Personalizado &rarr; <code class="code-inline">https://dns.xdp.es/dns-query</code></p>
                     </div>
@@ -232,22 +263,22 @@ DNSSEC=allow-downgrade</code></pre>
             </section>
 
             <!-- Resolution Stats Summary -->
-            <section class="card" aria-labelledby="heading-stats">
+            <section class="card" aria-labelledby="heading-stats" data-agent-category="live-telemetry">
                 <div class="card-header">
                     <h2 id="heading-stats">Estadísticas de Resolución (24h)</h2>
-                    <a href="/stats" class="text-link" style="font-size: 0.85rem; font-weight: 500; text-decoration: none;" aria-label="Ver todas las métricas y estadísticas detalladas">Ver métricas &rarr;</a>
+                    <a href="/stats" class="text-link" style="font-size: 0.85rem; font-weight: 500; text-decoration: none;" aria-label="Ver todas las métricas y estadísticas detalladas" data-agent-action="navigate-to-stats">Ver métricas &rarr;</a>
                 </div>
                 <div class="card-content">
                     <div class="stats-grid">
-                        <div class="stat-item">
+                        <div class="stat-item" data-metric="total-queries-24h">
                             <span class="stat-num" id="stat-total">...</span>
                             <span class="stat-lbl">Consultas procesadas</span>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-item" data-metric="blocked-queries-24h">
                             <span class="stat-num" id="stat-blocked">...</span>
                             <span class="stat-lbl">Consultas bloqueadas</span>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-item" data-metric="block-percentage-24h">
                             <span class="stat-num" id="stat-percent">...</span>
                             <span class="stat-lbl">Tasa de bloqueo</span>
                         </div>

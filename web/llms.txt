@@ -1,0 +1,37 @@
+# xdp.es DNS - High-Performance Recursive Resolver
+
+> xdp.es provides a public, high-speed, zero-logging recursive DNS resolver with full DNSSEC validation, Ad/Malware blocking, and modern encryption protocols (DNS over HTTPS and DNS over TLS).
+
+## Quick Endpoints
+
+- **DNS over HTTPS (DoH)**: `https://dns.xdp.es/dns-query` (RFC 8484, HTTP/2 & HTTP/3 QUIC)
+- **DNS over TLS (DoT)**: `dns.xdp.es` (Port 853, TLS 1.3)
+- **Standard IPv4 DNS**: `85.208.114.51` (Port 53 UDP/TCP)
+- **Standard IPv6 DNS**: `2a0e:97c0:c40::51` (Port 53 UDP/TCP)
+- **Live Anonymized Metrics API**: `https://xdp.es/stats.json`
+- **Interactive Dashboard**: `https://xdp.es/stats`
+- **OpenAPI 3.1 Spec**: `https://xdp.es/openapi.json`
+
+## Machine & Agent Usage
+
+### 1. DNS over HTTPS (DoH)
+- Send `GET https://dns.xdp.es/dns-query?dns=<base64url-encoded-query>` with `Accept: application/dns-message`
+- Or send `POST https://dns.xdp.es/dns-query` with binary payload and `Content-Type: application/dns-message`
+
+### 2. Live Metrics API (`/stats.json`)
+- `GET https://xdp.es/stats.json` returns real-time JSON containing 24-hour and 30-day resolution statistics:
+  - `stats_24h.total`: Total queries processed in the last 24 hours.
+  - `stats_24h.blocked`: Total queries filtered/blocked.
+  - `stats_24h.blocked_pct`: Percentage of queries blocked.
+  - `stats_24h.cached`: Total queries resolved from in-memory cache.
+  - `stats_24h.cached_pct`: Cache hit ratio.
+  - `stats_24h.avg_duration`: Average resolution latency in milliseconds.
+  - `stats_24h.top_asns`: List of top autonomous systems by traffic volume with IPv4/IPv6 splits.
+  - `stats_24h.top_query_types`: Breakdown of DNS query types (A, AAAA, HTTPS, DS, etc.).
+
+### 3. Apple Device Auto-Configuration
+- **DoH Mobileconfig Profile**: `https://xdp.es/dns_xdp_es_doh.mobileconfig`
+- **DoT Mobileconfig Profile**: `https://xdp.es/dns_xdp_es_dot.mobileconfig`
+
+## Full Documentation & Specifications
+- For full agent specification and schema details, see: `https://xdp.es/llms-full.txt`

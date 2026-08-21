@@ -1,10 +1,32 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Estadísticas | xdp.es DNS</title>
-    <meta name="description" content="Estadísticas de resolución DNS, origen por ASN y métricas anónimas en tiempo real.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas en Tiempo Real | xdp.es DNS</title>
+    <meta name="description" content="Métricas en vivo, origen por ASN, tasa de bloqueo de malware y estadísticas de resolución DNS anónimas.">
+    <link rel="canonical" href="https://xdp.es/stats">
+    <meta name="robots" content="index, follow">
+
+    <!-- Agentic & Machine-Readable Discovery -->
+    <link rel="help" type="text/markdown" href="/llms.txt" title="LLM & AI Agent Context">
+    <link rel="service-desc" type="application/json" href="/openapi.json" title="OpenAPI 3.1 Specification">
+
+    <!-- Structured Data for Agents & Search Engines (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Dataset",
+      "name": "xdp.es DNS Telemetry & Resolution Metrics",
+      "description": "Estadísticas de resolución y rendimiento en 24h y 30d del resolver DNS recursivo xdp.es.",
+      "url": "https://xdp.es/stats",
+      "distribution": {
+        "@type": "DataDownload",
+        "encodingFormat": "application/json",
+        "contentUrl": "https://xdp.es/stats.json"
+      }
+    }
+    </script>
 
     <!-- Anti-FOIT Instant Theme Loader -->
     <script>
@@ -20,7 +42,6 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20100%20100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
 
     <style>
@@ -35,7 +56,7 @@
             --accent-dim: rgba(0, 210, 255, 0.12);
             --text-primary: #f3f4f6;
             --text-secondary: #9ca3af;
-            --text-muted: #6b7280;
+            --text-muted: #94a3b8;
             --text-heading: #ffffff;
             --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.25);
             --guide-tab-active-text: #0c0d0e;
@@ -511,11 +532,11 @@
         <!-- Page Header -->
         <header>
             <div class="header-top">
-                <a href="/" class="back-link" aria-label="Volver al inicio">
+                <a href="/" class="back-link" aria-label="Volver a la página principal" data-agent-action="navigate-home">
                     &larr; Volver al inicio
                 </a>
                 <nav class="theme-switcher" role="group" aria-label="Seleccionar tema">
-                    <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro">
+                    <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro" data-agent-action="set-light-theme">
                         <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="5"></circle>
                             <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -529,13 +550,13 @@
                         </svg>
                         <span class="theme-text">Claro</span>
                     </button>
-                    <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro">
+                    <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro" data-agent-action="set-dark-theme">
                         <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                         <span class="theme-text">Oscuro</span>
                     </button>
-                    <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático según el sistema" aria-label="Automático">
+                    <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático según el sistema" aria-label="Automático" data-agent-action="set-auto-theme">
                         <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                             <line x1="8" y1="21" x2="16" y2="21"></line>
@@ -551,30 +572,30 @@
 
         <!-- Timeframe Tabs -->
         <nav class="tabs-container" role="tablist" aria-label="Intervalo de tiempo">
-            <button type="button" class="tab-btn active" data-interval="24h" onclick="switchTab('24h')">Últimas 24 Horas</button>
-            <button type="button" class="tab-btn" data-interval="30d" onclick="switchTab('30d')">Últimos 30 Días</button>
+            <button type="button" class="tab-btn active" data-interval="24h" onclick="switchTab('24h')" data-agent-tab="interval-24h">Últimas 24 Horas</button>
+            <button type="button" class="tab-btn" data-interval="30d" onclick="switchTab('30d')" data-agent-tab="interval-30d">Últimos 30 Días</button>
         </nav>
 
         <main>
             <!-- 24 Hours Pane -->
-            <section id="pane-24h" class="tab-pane active" role="tabpanel">
+            <section id="pane-24h" class="tab-pane active" role="tabpanel" data-agent-panel="24h-telemetry">
                 <div class="metrics-grid">
-                    <div class="metric-card">
+                    <div class="metric-card" data-agent-metric="total-queries">
                         <span class="metric-title">Total Consultas</span>
                         <span class="metric-value" id="val-total-24h">...</span>
                         <span class="metric-sub">Peticiones procesadas</span>
                     </div>
-                    <div class="metric-card">
+                    <div class="metric-card" data-agent-metric="blocked-queries">
                         <span class="metric-title">Consultas Bloqueadas</span>
                         <span class="metric-value cyan" id="val-blocked-24h">...</span>
                         <span class="metric-sub" id="sub-blocked-24h">-</span>
                     </div>
-                    <div class="metric-card">
+                    <div class="metric-card" data-agent-metric="cached-queries">
                         <span class="metric-title">Acierto en Caché</span>
                         <span class="metric-value" id="val-cached-24h">...</span>
                         <span class="metric-sub" id="sub-cached-24h">-</span>
                     </div>
-                    <div class="metric-card">
+                    <div class="metric-card" data-agent-metric="avg-latency">
                         <span class="metric-title">Latencia Media</span>
                         <span class="metric-value" id="val-latency-24h">...</span>
                         <span class="metric-sub">Tiempo medio de resolución</span>
@@ -584,13 +605,13 @@
                 <div class="dashboard-grid">
                     <div class="table-card">
                         <h3>Origen de las Solicitudes (ASN)</h3>
-                        <div class="stats-list" id="list-asns-24h">
+                        <div class="stats-list" id="list-asns-24h" data-agent-list="top-asns-24h">
                             <div class="empty-msg">Cargando datos...</div>
                         </div>
                     </div>
                     <div class="table-card">
                         <h3>Distribución por Tipo de Registro</h3>
-                        <div class="stats-list" id="list-types-24h">
+                        <div class="stats-list" id="list-types-24h" data-agent-list="top-query-types-24h">
                             <div class="empty-msg">Cargando datos...</div>
                         </div>
                     </div>
@@ -598,24 +619,24 @@
             </section>
 
             <!-- 30 Days Pane -->
-            <section id="pane-30d" class="tab-pane" role="tabpanel">
+            <section id="pane-30d" class="tab-pane" role="tabpanel" data-agent-panel="30d-telemetry">
                 <div class="metrics-grid">
-                    <div class="metric-card">
+                    <div class="metric-card" data-agent-metric="total-queries-30d">
                         <span class="metric-title">Total Consultas</span>
                         <span class="metric-value" id="val-total-30d">...</span>
                         <span class="metric-sub">Peticiones procesadas</span>
                     </div>
-                    <div class="metric-card">
+                    <div class="metric-card" data-agent-metric="blocked-queries-30d">
                         <span class="metric-title">Consultas Bloqueadas</span>
                         <span class="metric-value cyan" id="val-blocked-30d">...</span>
                         <span class="metric-sub" id="sub-blocked-30d">-</span>
                     </div>
-                    <div class="metric-card">
+                    <div class="metric-card" data-agent-metric="cached-queries-30d">
                         <span class="metric-title">Acierto en Caché</span>
                         <span class="metric-value" id="val-cached-30d">...</span>
                         <span class="metric-sub" id="sub-cached-30d">-</span>
                     </div>
-                    <div class="metric-card">
+                    <div class="metric-card" data-agent-metric="avg-latency-30d">
                         <span class="metric-title">Latencia Media</span>
                         <span class="metric-value" id="val-latency-30d">...</span>
                         <span class="metric-sub">Tiempo medio de resolución</span>
@@ -625,13 +646,13 @@
                 <div class="dashboard-grid">
                     <div class="table-card">
                         <h3>Origen de las Solicitudes (ASN)</h3>
-                        <div class="stats-list" id="list-asns-30d">
+                        <div class="stats-list" id="list-asns-30d" data-agent-list="top-asns-30d">
                             <div class="empty-msg">Cargando datos...</div>
                         </div>
                     </div>
                     <div class="table-card">
                         <h3>Distribución por Tipo de Registro</h3>
-                        <div class="stats-list" id="list-types-30d">
+                        <div class="stats-list" id="list-types-30d" data-agent-list="top-query-types-30d">
                             <div class="empty-msg">Cargando datos...</div>
                         </div>
                     </div>
@@ -639,7 +660,7 @@
             </section>
 
             <!-- Active User Connection -->
-            <section class="connection-card" id="connection-status">
+            <section class="connection-card" id="connection-status" data-agent-component="client-ip-detector">
                 <div class="connection-left">
                     <div class="connection-icon-wrapper">
                         <div class="status-dot pulsing" id="conn-dot"></div>
@@ -766,7 +787,6 @@
         }
 
         function loadStatsData() {
-            // Try fetching /stats.json, fallback to stats.json
             fetch('/stats.json')
                 .catch(() => fetch('stats.json'))
                 .then(r => {

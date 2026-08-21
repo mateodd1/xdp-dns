@@ -1,0 +1,120 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "xdp.es DNS Services & Real-Time Metrics API",
+    "description": "API and endpoints for querying encrypted DNS (DoH/DoT) and accessing anonymous recursive resolver statistics.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://xdp.es",
+      "description": "Main Web and Telemetry Host"
+    },
+    {
+      "url": "https://dns.xdp.es",
+      "description": "Dedicated DoH Endpoint Host"
+    }
+  ],
+  "paths": {
+    "/dns-query": {
+      "get": {
+        "summary": "Resolve DNS Query over HTTPS (DoH - RFC 8484)",
+        "description": "Executes a DNS lookup via DNS-over-HTTPS using wireformat encoded in base64url.",
+        "servers": [
+          { "url": "https://dns.xdp.es" }
+        ],
+        "parameters": [
+          {
+            "name": "dns",
+            "in": "query",
+            "required": true,
+            "description": "Base64URL-encoded DNS wireformat query packet",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "DNS binary response packet (RFC 8484)",
+            "content": {
+              "application/dns-message": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Resolve DNS Query over HTTPS (POST RFC 8484)",
+        "description": "Send binary DNS query payload directly in request body.",
+        "servers": [
+          { "url": "https://dns.xdp.es" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/dns-message": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "DNS binary response packet",
+            "content": {
+              "application/dns-message": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats.json": {
+      "get": {
+        "summary": "Get Anonymized Resolver Telemetry and Statistics",
+        "description": "Returns 24-hour and 30-day aggregated performance metrics, query counts, blocked malware/ad percentages, and top ASNs.",
+        "responses": {
+          "200": {
+            "description": "Metrics JSON object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stats_24h": {
+                      "type": "object",
+                      "properties": {
+                        "total": { "type": "integer" },
+                        "blocked": { "type": "integer" },
+                        "blocked_pct": { "type": "number" },
+                        "cached": { "type": "integer" },
+                        "cached_pct": { "type": "number" },
+                        "avg_duration": { "type": "number" },
+                        "top_asns": { "type": "array" },
+                        "top_query_types": { "type": "array" }
+                      }
+                    },
+                    "stats_30d": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

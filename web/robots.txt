@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Allow: /stats
+Allow: /stats.json
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /openapi.json
+
+Sitemap: https://xdp.es/sitemap.xml

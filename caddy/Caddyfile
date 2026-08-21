@@ -17,8 +17,14 @@
 # Dedicated DoH & DoT Subdomain (dns.xdp.es)
 # Specific site block: handles /dns-query for DoH, /stats* for anonymous dashboard, redirects everything else to https://xdp.es/
 dns.xdp.es {
-    # DoH (DNS-over-HTTPS) Endpoint
+    # RFC 8484 DoH & RFC 9462 DDR Discovery Endpoint
     handle /dns-query* {
+        reverse_proxy 127.0.0.1:4000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+        }
+    }
+    handle /.well-known/dns-query* {
         reverse_proxy 127.0.0.1:4000 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
@@ -44,11 +50,11 @@ dns.xdp.es {
         file_server
     }
 
-    # Static assets required for UI
-    @assets path *.css *.js *.json *.ico *.png *.svg *.mobileconfig
+    # Static assets & Machine-readable files
+    @assets path *.css *.js *.json *.ico *.png *.svg *.mobileconfig *.txt *.xml
     handle @assets {
         root * /var/www/xdp.es
-        header Cache-Control "public, max-age=31536000, immutable"
+        header Cache-Control "public, max-age=86400"
         file_server
     }
 
@@ -78,6 +84,11 @@ dns.xdp.es {
 xdp.es, http://85.208.114.51, http://127.0.0.1, http://localhost {
     root * /var/www/xdp.es
 
+    # RFC 9462 DDR Discovery Endpoint
+    handle /.well-known/dns-query* {
+        redir https://dns.xdp.es{uri} permanent
+    }
+
     # Apple .mobileconfig profile MIME types & caching
     @mobileconfig path *.mobileconfig
     header @mobileconfig Content-Type "application/x-apple-aspen-config"
@@ -91,10 +102,18 @@ xdp.es, http://85.208.114.51, http://127.0.0.1, http://localhost {
         file_server
     }
 
-    # Explicit UTF-8 Content-Type and 1-Year Immutable Cache headers for static assets
+    # Explicit UTF-8 Content-Type and Cache headers for static assets & machine-readable specs
     @json path *.json
     header @json Content-Type "application/json; charset=utf-8"
     header @json Cache-Control "public, max-age=3600"
+
+    @txt path *.txt
+    header @txt Content-Type "text/markdown; charset=utf-8"
+    header @txt Cache-Control "public, max-age=86400"
+
+    @xml path *.xml
+    header @xml Content-Type "application/xml; charset=utf-8"
+    header @xml Cache-Control "public, max-age=86400"
 
     @js path *.js
     header @js Content-Type "application/javascript; charset=utf-8"
