@@ -1,97 +1,29 @@
 # xdp.es DNS Comprehensive AI & LLM Agent Documentation
 
-## System Architecture
+> Full specification, protocol reference, and configuration instructions for the xdp.es public recursive DNS resolver.
 
-xdp.es runs a layered DNS architecture optimized for minimal latency, maximum concurrency, and strict privacy:
+## Overview & Architecture
 
-1. **Edge Reverse Proxy**: Caddy terminating TLS 1.3, HTTP/2, and HTTP/3 (QUIC) on port 443.
-2. **Filtering & Metric Engine**: Blocky handling DoH on local port 4000 and DoT on port 853 with daily-updated threat intelligence feeds (StevenBlack, OISD, URLhaus).
-3. **Recursive DNS Engine**: Unbound multi-threaded root recursive resolver on 127.0.0.1:53 with DNSSEC root anchor validation, QNAME minimisation, 768MB tiered cache, and anti-amplification rate limiting.
+- [Main Service](https://xdp.es/): Canonical home page and overview.
+- [Telemetry Dashboard](https://xdp.es/stats): Live graphical dashboard.
+- [JSON Metrics](https://xdp.es/stats.json): Real-time metrics API endpoint.
+- [OpenAPI Schema](https://xdp.es/openapi.json): Machine-readable OpenAPI 3.1.0 API definition.
+- [Compact LLMs Summary](https://xdp.es/llms.txt): Quick summary for LLM agents.
 
-## Endpoint Reference for Automated Agents
+## Protocols & Endpoints
 
 ### 1. DNS-over-HTTPS (DoH)
-- **URL**: `https://dns.xdp.es/dns-query`
-- **Standard**: RFC 8484
-- **Supported HTTP Versions**: HTTP/1.1, HTTP/2, HTTP/3 (QUIC)
-- **Request Headers**:
-  - `Accept: application/dns-message` (or `application/dns-json` via Blocky)
-  - `Content-Type: application/dns-message` (for POST requests)
-- **Example cURL Command**:
-  ```bash
-  # Query A record for example.com using DoH binary wire format
-  curl -H "accept: application/dns-message" "https://dns.xdp.es/dns-query?dns=AAABAAABAAAAAAAAA3d3dwdleGFtcGxlA2NvbQAAAQAB" --output -
-  ```
+- [DoH Query URL](https://dns.xdp.es/dns-query): Standard RFC 8484 endpoint.
+- Protocols: HTTP/1.1, HTTP/2, HTTP/3 (QUIC) on port 443.
+- Request Methods: `GET ?dns=<base64url>` or `POST` with binary `application/dns-message`.
 
 ### 2. DNS-over-TLS (DoT)
-- **Hostname**: `dns.xdp.es`
-- **Port**: `853`
-- **Standard**: RFC 7858 / RFC 8310
-- **Example kdig Command**:
-  ```bash
-  kdig @dns.xdp.es +tls-host=dns.xdp.es example.com
-  ```
+- [DoT Hostname](https://xdp.es/): `dns.xdp.es` on port 853 (RFC 7858 / RFC 8310).
 
-### 3. Standard Recursive DNS (UDP/TCP)
-- **IPv4**: `85.208.114.51` (Port 53)
-- **IPv6**: `2a0e:97c0:c40::51` (Port 53)
-- **Example dig Command**:
-  ```bash
-  dig @85.208.114.51 example.com +dnssec
-  ```
+### 3. Plain Recursive DNS
+- [IPv4 Resolver](https://xdp.es/): `85.208.114.51` on port 53 UDP/TCP with DNSSEC root anchor validation.
+- [IPv6 Resolver](https://xdp.es/): `2a0e:97c0:c40::51` on port 53 UDP/TCP with DNSSEC root anchor validation.
 
-### 4. Telemetry & Metrics API (`/stats.json`)
-- **URL**: `https://xdp.es/stats.json` or `https://dns.xdp.es/stats.json`
-- **Method**: `GET`
-- **Response Format**: `application/json; charset=utf-8`
-- **Cache Policy**: `public, max-age=15, must-revalidate`
-- **JSON Schema**:
-  ```json
-  {
-    "stats_24h": {
-      "total": "integer (total queries)",
-      "blocked": "integer (total filtered)",
-      "blocked_pct": "float (block percentage)",
-      "cached": "integer (cache hits)",
-      "cached_pct": "float (cache hit ratio)",
-      "avg_duration": "float (average resolution duration in ms)",
-      "top_asns": [
-        {
-          "asn": "string (e.g. AS12345)",
-          "name": "string (ISP / Organization name)",
-          "count": "integer",
-          "percent": "float",
-          "ipv4_percent": "float",
-          "ipv6_percent": "float"
-        }
-      ],
-      "top_query_types": [
-        {
-          "name": "string (A, AAAA, HTTPS, DS, DNSKEY, PTR, TXT, etc.)",
-          "count": "integer",
-          "percent": "float"
-        }
-      ]
-    },
-    "stats_30d": { ... }
-  }
-  ```
-
-### 5. Automated OS Configuration Scripts
-
-#### Linux `systemd-resolved`
-```ini
-# /etc/systemd/resolved.conf
-[Resolve]
-DNS=85.208.114.51#dns.xdp.es 2a0e:97c0:c40::51#dns.xdp.es
-DNSOverTLS=yes
-DNSSEC=allow-downgrade
-```
-Command to reload:
-```bash
-sudo systemctl restart systemd-resolved
-```
-
-#### Apple iOS / macOS (.mobileconfig)
-- DoH Profile: `https://xdp.es/dns_xdp_es_doh.mobileconfig`
-- DoT Profile: `https://xdp.es/dns_xdp_es_dot.mobileconfig`
+### 4. Apple Configuration Profiles
+- [DoH Profile (.mobileconfig)](https://xdp.es/dns_xdp_es_doh.mobileconfig): Installs encrypted DNS over HTTPS on iOS, iPadOS, and macOS.
+- [DoT Profile (.mobileconfig)](https://xdp.es/dns_xdp_es_dot.mobileconfig): Installs encrypted DNS over TLS on iOS, iPadOS, and macOS.
