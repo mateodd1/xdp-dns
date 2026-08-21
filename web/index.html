@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>xdp.es | Servidor DNS Cifrado</title>
+    <meta name="description" content="Servidor DNS público con DoH, DoT, DNSSEC y bloqueo de publicidad y rastreadores.">
+    <script>
+        (function() {
+            try {
+                var theme = localStorage.getItem('xdp_theme') || 'auto';
+                var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var effectiveTheme = theme === 'auto' ? (prefersDark ? 'dark' : 'light') : theme;
+                document.documentElement.setAttribute('data-theme', effectiveTheme);
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20100%20100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <h1>xdp.es DNS</h1>
+                <div class="theme-switcher" role="group" aria-label="Seleccionar tema">
+                    <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <span class="theme-text">Claro</span>
+                    </button>
+                    <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <span class="theme-text">Oscuro</span>
+                    </button>
+                    <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático (navegador)" aria-label="Automático">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                        <span class="theme-text">Auto</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- DoH Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>DoH <span class="badge">HTTPS</span></h2>
+                </div>
+                <div class="card-content">
+                    <p class="desc">Cifrado de extremo a extremo a través de HTTPS. Compatible con navegadores modernos, Windows 11, iOS y Android.</p>
+                    <div class="endpoint-box">
+                        <span class="label desktop-only">URL DoH:</span>
+                        <div class="copyable-wrapper" onclick="copyEndpoint('https://dns.xdp.es/dns-query', this)">
+                            <code class="code-val">https://dns.xdp.es/dns-query</code>
+                            <span class="tooltip">Click para copiar</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DoT Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>DoT <span class="badge">TLS</span></h2>
+                </div>
+                <div class="card-content">
+                    <p class="desc">Protocolo estándar TLS para DNS privado. Ideal para la función <em>DNS Privado</em> en Android y routers avanzados.</p>
+                    <div class="endpoint-box">
+                        <span class="label desktop-only">Hostname DoT:</span>
+                        <div class="copyable-wrapper" onclick="copyEndpoint('dns.xdp.es', this)">
+                            <code class="code-val">dns.xdp.es</code>
+                            <span class="tooltip">Click para copiar</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Standard DNS Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>DNS Estándar <span class="badge badge-secondary">UDP / TCP</span></h2>
+                </div>
+                <div class="card-content">
+                    <p class="desc">Resolución directa con validación DNSSEC y baja latencia.</p>
+                    <div class="ip-grid">
+                        <div class="ip-item">
+                            <span class="label">IPv4</span>
+                            <div class="copyable-wrapper" onclick="copyEndpoint('85.208.114.51', this)">
+                                <code class="code-val">85.208.114.51</code>
+                                <span class="tooltip">Click para copiar</span>
+                            </div>
+                        </div>
+                        <div class="ip-item">
+                            <span class="label">IPv6</span>
+                            <div class="copyable-wrapper" onclick="copyEndpoint('2a0e:97c0:c40::51', this)">
+                                <code class="code-val">2a0e:97c0:c40::51</code>
+                                <span class="tooltip">Click para copiar</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- iOS & macOS Profiles Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Perfiles Apple <span class="badge">iOS &bull; macOS</span></h2>
+                </div>
+                <div class="card-content">
+                    <p class="desc">Descarga e instala perfiles de configuración automática para iPhone, iPad y computadoras Mac.</p>
+                    <div class="profile-list">
+                        <a href="dns_xdp_es_doh.mobileconfig" class="profile-btn" download>
+                            <div class="profile-info">
+                                <span class="profile-label">DoH + Bloqueo de Anuncios</span>
+                                <span class="profile-sub">DNS over HTTPS</span>
+                            </div>
+                            <span class="profile-link">.mobileconfig &darr;</span>
+                        </a>
+                        <a href="dns_xdp_es_dot.mobileconfig" class="profile-btn" download>
+                            <div class="profile-info">
+                                <span class="profile-label">DoT + Bloqueo de Anuncios</span>
+                                <span class="profile-sub">DNS over TLS</span>
+                            </div>
+                            <span class="profile-link">.mobileconfig &darr;</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Setup Guide Accordion/Tabs -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Guía de Configuración</h2>
+                </div>
+                <div class="card-content">
+                    <div class="guide-tabs">
+                        <button class="guide-tab" data-platform="android" onclick="switchGuide('android', this)">Android</button>
+                        <button class="guide-tab" data-platform="ios" onclick="switchGuide('ios', this)">iOS / Mac</button>
+                        <button class="guide-tab" data-platform="windows" onclick="switchGuide('windows', this)">Windows 11</button>
+                        <button class="guide-tab" data-platform="linux" onclick="switchGuide('linux', this)">Linux</button>
+                        <button class="guide-tab" data-platform="browser" onclick="switchGuide('browser', this)">Navegadores</button>
+                    </div>
+
+                    <div id="guide-android" class="guide-panel">
+                        <ol class="steps-list">
+                            <li>Ve a <strong>Ajustes</strong> &rarr; <strong>Redes e Internet / Conexiones</strong> &rarr; <strong>Más ajustes de conexión</strong>.</li>
+                            <li>Pulsa sobre <strong>DNS privado</strong> (Private DNS).</li>
+                            <li>Selecciona <em>"Nombre de host del proveedor de DNS privado"</em>.</li>
+                            <li>Escribe: <code class="code-inline">dns.xdp.es</code> y pulsa <strong>Guardar</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <div id="guide-ios" class="guide-panel">
+                        <ol class="steps-list">
+                            <li>Descarga el perfil <a href="dns_xdp_es_doh.mobileconfig" class="text-link">.mobileconfig (DoH)</a> desde Safari.</li>
+                            <li>Abre <strong>Ajustes</strong> y pulsa en <em>"Perfil descargado"</em> en la parte superior.</li>
+                            <li>Pulsa <strong>Instalar</strong> en la esquina superior derecha y confirma con tu código.</li>
+                        </ol>
+                    </div>
+
+                    <div id="guide-windows" class="guide-panel">
+                        <ol class="steps-list">
+                            <li>Abre <strong>Configuración</strong> &rarr; <strong>Red e Internet</strong> &rarr; <strong>Wi-Fi o Ethernet</strong>.</li>
+                            <li>En <em>"Asignación de DNS"</em>, pulsa <strong>Editar</strong> y selecciona <strong>Manual</strong>.</li>
+                            <li>Activa <strong>IPv4</strong>, ingresa DNS preferido: <code class="code-inline">85.208.114.51</code>.</li>
+                            <li>En <em>"Cifrado DNS"</em>, elige <strong>Solo cifrado (DNS a través de HTTPS)</strong> y plantilla: <code class="code-inline">https://dns.xdp.es/dns-query</code>.</li>
+                        </ol>
+                    </div>
+
+                    <div id="guide-linux" class="guide-panel">
+                        <p>Para `systemd-resolved` edita <code class="code-inline">/etc/systemd/resolved.conf</code>:</p>
+                        <pre class="code-block"><code>[Resolve]
+DNS=85.208.114.51#dns.xdp.es 2a0e:97c0:c40::51#dns.xdp.es
+DNSOverTLS=yes
+DNSSEC=allow-downgrade</code></pre>
+                        <p>Luego reinicia el servicio con: <code class="code-inline">systemctl restart systemd-resolved</code></p>
+                    </div>
+
+                    <div id="guide-browser" class="guide-panel">
+                        <p><strong>Firefox:</strong> Ajustes &rarr; Privacidad y Seguridad &rarr; DNS sobre HTTPS &rarr; Protección máxima &rarr; Proveedor personalizado: <code class="code-inline">https://dns.xdp.es/dns-query</code></p>
+                        <p><strong>Chrome / Brave / Edge:</strong> Configuración &rarr; Privacidad y Seguridad &rarr; Usar DNS seguro &rarr; Con: Personalizado &rarr; <code class="code-inline">https://dns.xdp.es/dns-query</code></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Estadísticas de Resolución (24h)</h2>
+                    <a href="/stats" class="text-link" style="font-size: 0.85rem; font-weight: 500; text-decoration: none;">Ver métricas &rarr;</a>
+                </div>
+                <div class="card-content">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-num" id="stat-total">...</span>
+                            <span class="stat-lbl">Consultas procesadas</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-num" id="stat-blocked">...</span>
+                            <span class="stat-lbl">Consultas bloqueadas</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-num" id="stat-percent">...</span>
+                            <span class="stat-lbl">Tasa de bloqueo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="theme.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>

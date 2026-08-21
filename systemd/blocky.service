@@ -1,0 +1,16 @@
+[Unit]
+Description=Blocky DNS-over-HTTPS & DNS-over-TLS Ad-Blocking Resolver
+After=network.target unbound.service
+Wants=unbound.service
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/blocky --config /root/xpd-dns/blocky/config.yml
+Restart=always
+RestartSec=3s
+LimitNOFILE=1048576
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target

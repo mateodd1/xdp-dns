@@ -1,0 +1,132 @@
+# /root/xpd-dns/caddy/Caddyfile
+# Caddy configuration for xdp.es, wildcard subdomains (*.xdp.es) and dns.xdp.es DoH endpoint
+
+{
+    email admin@xdp.es
+    # Enable HTTP/3 (QUIC) for ultra-low latency DoH
+    servers {
+        protocols h1 h2 h3
+    }
+    # On-demand TLS to automatically issue certs for any requested subdomain
+    on_demand_tls {
+        interval 2m
+        burst 5
+    }
+}
+
+# Dedicated DoH & DoT Subdomain (dns.xdp.es)
+# Specific site block: handles /dns-query for DoH, /stats* for anonymous dashboard, redirects everything else to https://xdp.es/
+dns.xdp.es {
+    # DoH (DNS-over-HTTPS) Endpoint
+    handle /dns-query* {
+        reverse_proxy 127.0.0.1:4000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    # Public stats.json endpoint (Explicit UTF-8)
+    @stats path /stats.json /stats/stats.json
+    handle @stats {
+        root * /var/www/xdp.es
+        header Content-Type "application/json; charset=utf-8"
+        header Cache-Control "public, max-age=15, must-revalidate"
+        file_server
+    }
+
+    # Dedicated Stats Page (/stats or /stats/) (Explicit UTF-8)
+    handle /stats* {
+        root * /var/www/xdp.es
+        header Content-Type "text/html; charset=utf-8"
+        try_files {path} {path}/index.html /stats/index.html
+        file_server
+    }
+
+    # Root and any other path redirects to main landing page https://xdp.es/
+    handle {
+        redir https://xdp.es/ permanent
+    }
+
+    encode zstd gzip
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Accept"
+    }
+
+    log {
+        output file /var/log/caddy/dns.xdp.es.access.log {
+            roll_size 20mb
+            roll_keep 5
+        }
+    }
+}
+
+# Main Canonical Landing Page (xdp.es)
+xdp.es, http://85.208.114.51, http://127.0.0.1, http://localhost {
+    root * /var/www/xdp.es
+
+    # Apple .mobileconfig profile MIME types
+    @mobileconfig path *.mobileconfig
+    header @mobileconfig Content-Type "application/x-apple-aspen-config"
+
+    # Public stats.json endpoint (Explicit UTF-8)
+    @stats path /stats.json /stats/stats.json
+    handle @stats {
+        header Content-Type "application/json; charset=utf-8"
+        header Cache-Control "public, max-age=15, must-revalidate"
+        file_server
+    }
+
+    # Explicit UTF-8 Content-Type headers for static assets
+    @json path *.json
+    header @json Content-Type "application/json; charset=utf-8"
+    @js path *.js
+    header @js Content-Type "application/javascript; charset=utf-8"
+    @css path *.css
+    header @css Content-Type "text/css; charset=utf-8"
+
+    # Serve landing page, /stats, or existing static files
+    @static file {
+        try_files {path} {path}/index.html /stats/index.html
+    }
+    handle @static {
+        file_server
+    }
+
+    # Any non-existing file or unknown subpath redirects to https://xdp.es/
+    handle {
+        redir https://xdp.es/ 302
+    }
+
+    # Security and Performance Headers
+    encode zstd gzip
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Accept"
+    }
+
+    log {
+        output file /var/log/caddy/xdp.es.access.log {
+            roll_size 20mb
+            roll_keep 5
+        }
+    }
+}
+
+# Wildcard Subdomains (*.xdp.es) -> Redirect all other subdomains (e.g. test.xdp.es, www.xdp.es) to https://xdp.es
+http://*.xdp.es, *.xdp.es {
+    tls {
+        on_demand
+    }
+    redir https://xdp.es{uri} permanent
+}

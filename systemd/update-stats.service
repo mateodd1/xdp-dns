@@ -1,0 +1,7 @@
+[Unit]
+Description=Update DNS Landing Page Stats from Blocky Metrics
+After=blocky.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/xpd-dns/scripts/update-stats.py

@@ -1,0 +1,55 @@
+# /root/xpd-dns/docker-compose.yml
+# Docker Compose configuration for xdp.es Public Encrypted & Recursive DNS Stack
+
+version: '3.8'
+
+services:
+  # 1. Unbound Recursive Resolver (Core DNS Engine)
+  unbound:
+    image: mvance/unbound:latest
+    container_name: xdp-unbound
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./unbound/unbound.conf:/opt/unbound/etc/unbound/unbound.conf:ro
+    environment:
+      - TZ=UTC
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+
+  # 2. Blocky (DoH & DoT Encrypted Front-End + Ad/Tracker Blocker)
+  blocky:
+    image: spx01/blocky:latest
+    container_name: xdp-blocky
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      - unbound
+    volumes:
+      - ./blocky/config.yml:/app/config.yml:ro
+      - ./certs:/etc/ssl/certs:ro
+    environment:
+      - TZ=UTC
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+
+  # 3. Caddy Web Server & TLS Proxy (Landing page + HTTP/2 & HTTP/3 DoH)
+  caddy:
+    image: caddy:latest
+    container_name: xdp-caddy
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./web:/var/www/xdp.es:ro
+      - ./caddy_data:/data
+      - ./caddy_config:/config
+      - ./logs/caddy:/var/log/caddy
+    environment:
+      - DOMAIN=${DOMAIN:-xdp.es}
+      - DOH_DOMAIN=${DOH_DOMAIN:-dns.xdp.es}
+      - ACME_EMAIL=${ACME_EMAIL:-admin@xdp.es}

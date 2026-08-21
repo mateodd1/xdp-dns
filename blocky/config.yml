@@ -1,0 +1,65 @@
+# /root/xpd-dns/blocky/config.yml
+# Blocky Configuration for DoH & DoT frontend with HaGeZi Multi Ad/Tracker Blocking
+# Strictly resolves via local Unbound recursive resolver (VPS IP: 85.208.114.51 / 2a0e:97c0:c40::51)
+
+ports:
+  # Internal DNS port
+  dns: 127.0.0.1:5353
+  # DoT Listener on port 853 (TLS)
+  tls: 853
+  # HTTP listener on port 4000 (serves DoH at /dns-query, Prometheus metrics at /metrics, and REST API)
+  http: 4000
+
+# TLS Certificate for DoT (Port 853 - Let's Encrypt)
+certFile: /etc/letsencrypt/live/dns.xdp.es/fullchain.pem
+keyFile: /etc/letsencrypt/live/dns.xdp.es/privkey.pem
+minTlsServeVersion: "1.2"
+
+# Upstream Resolvers (100% Local Unbound Recursive Resolver)
+upstreams:
+  groups:
+    default:
+      - tcp+udp:127.0.0.1:53
+  strategy: strict
+  timeout: 4s
+
+# Bootstrap DNS (Local Unbound)
+bootstrapDns:
+  - 127.0.0.1:53
+
+# High-Performance Caching & Aggressive Prefetching
+caching:
+  minTime: 10m
+  maxTime: 24h
+  prefetching: true
+  prefetchExpires: 4h
+  prefetchThreshold: 1
+  cacheTimeNegative: 15m
+
+# Adblock, Tracking & Malware Filtering (HaGeZi Multi Normal)
+blocking:
+  denylists:
+    ads:
+      - https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/multi.txt
+  clientGroupsBlock:
+    default:
+      - ads
+  blockType: zeroIp
+  blockTTL: 1m
+  loading:
+    refreshPeriod: 24h
+    downloads:
+      timeout: 60s
+      cooldown: 10s
+      attempts: 3
+
+# Prometheus Metrics for Live Stats (Scraped by stats updater)
+prometheus:
+  enable: true
+  path: /metrics
+
+# Logging Configuration
+log:
+  level: info
+  format: text
+  timestamp: true

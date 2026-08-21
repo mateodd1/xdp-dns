@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Estadísticas | xdp.es DNS</title>
+    <meta name="description" content="Estadísticas de resolución DNS, origen por ASN y métricas anónimas en tiempo real.">
+    <script>
+        (function() {
+            try {
+                var theme = localStorage.getItem('xdp_theme') || 'auto';
+                var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var effectiveTheme = theme === 'auto' ? (prefersDark ? 'dark' : 'light') : theme;
+                document.documentElement.setAttribute('data-theme', effectiveTheme);
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/index.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20100%20100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+    <style>
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            gap: 6px;
+            transition: opacity 0.2s ease;
+        }
+
+        .back-link:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 4px;
+            margin-bottom: 20px;
+        }
+
+        /* Tabs Selector */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            background: none;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            padding: 8px 18px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-heading);
+            background-color: var(--bg-code);
+        }
+
+        .tab-btn.active {
+            color: var(--guide-tab-active-text);
+            background-color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* 4-Column Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: left;
+            box-shadow: var(--shadow-card);
+            transition: border-color 0.2s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .metric-card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .metric-title {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 4px;
+            display: block;
+            letter-spacing: -0.02em;
+        }
+
+        .metric-value.cyan {
+            color: var(--accent);
+        }
+
+        .metric-sub {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        /* Two Column Dashboard Grid for Tables */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .table-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+            transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .table-card h3 {
+            margin: 0 0 14px 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-heading);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stats-row-item {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            background-color: var(--bg-main);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: background-color 0.25s ease, border-color 0.25s ease;
+        }
+
+        .row-bg-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background-color: var(--accent-dim);
+            z-index: 1;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .item-left {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding-right: 10px;
+            overflow: hidden;
+        }
+
+        .item-name {
+            color: var(--text-primary);
+            font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.82rem;
+            word-break: break-all;
+        }
+
+        .item-sub {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .item-count {
+            position: relative;
+            z-index: 2;
+            font-weight: 600;
+            color: var(--text-heading);
+            white-space: nowrap;
+            font-size: 0.8rem;
+        }
+
+        .empty-msg {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            text-align: center;
+            padding: 16px 0;
+        }
+
+        /* Active Connection Status Card */
+        .connection-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow-card);
+            transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .connection-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .connection-icon-wrapper {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: var(--text-muted);
+        }
+
+        .status-dot.pulsing {
+            background-color: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+            animation: pulse-dot 1.8s infinite;
+        }
+
+        .status-dot.ipv4 {
+            background-color: #00bcd4;
+            box-shadow: 0 0 10px rgba(0, 188, 212, 0.6);
+        }
+
+        .status-dot.ipv6 {
+            background-color: #a855f7;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+        }
+
+        @keyframes pulse-dot {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+
+        .connection-text-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .connection-card-title {
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .connection-card-desc {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .connection-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+            text-align: right;
+        }
+
+        .connection-ip {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: SFMono-Regular, Consolas, monospace;
+            word-break: break-all;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 0 14px;
+                margin: 20px auto 36px;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .connection-card {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 14px;
+            }
+            .connection-right {
+                align-items: flex-start;
+                text-align: left;
+                width: 100%;
+                border-top: 1px solid var(--border);
+                padding-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 860px;">
+        <header>
+            <div class="header-top" style="margin-bottom: 12px;">
+                <a href="/" class="back-link">
+                    &larr; Volver al inicio
+                </a>
+                <div class="theme-switcher" role="group" aria-label="Seleccionar tema">
+                    <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <span class="theme-text">Claro</span>
+                    </button>
+                    <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <span class="theme-text">Oscuro</span>
+                    </button>
+                    <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático (navegador)" aria-label="Automático">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                        <span class="theme-text">Auto</span>
+                    </button>
+                </div>
+            </div>
+            <h1>xdp.es DNS</h1>
+            <div class="subtitle">Estadísticas de resolución DNS y métricas en tiempo real</div>
+        </header>
+
+        <!-- Timeframe Tabs -->
+        <div class="tabs-container">
+            <button class="tab-btn active" data-interval="24h" onclick="switchTab('24h')">Últimas 24 Horas</button>
+            <button class="tab-btn" data-interval="30d" onclick="switchTab('30d')">Últimos 30 Días</button>
+        </div>
+
+        <main>
+            <!-- 24 Hours Pane -->
+            <div id="pane-24h" class="tab-pane active">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-title">Total Consultas</span>
+                        <span class="metric-value" id="val-total-24h">...</span>
+                        <span class="metric-sub">Peticiones procesadas</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Consultas Bloqueadas</span>
+                        <span class="metric-value cyan" id="val-blocked-24h">...</span>
+                        <span class="metric-sub" id="sub-blocked-24h">-</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Acierto en Caché</span>
+                        <span class="metric-value" id="val-cached-24h">...</span>
+                        <span class="metric-sub" id="sub-cached-24h">-</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Latencia Media</span>
+                        <span class="metric-value" id="val-latency-24h">...</span>
+                        <span class="metric-sub">Tiempo medio de resolución</span>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="table-card">
+                        <h3>Origen de las Solicitudes (ASN)</h3>
+                        <div class="stats-list" id="list-asns-24h">
+                            <div class="empty-msg">Cargando datos...</div>
+                        </div>
+                    </div>
+                    <div class="table-card">
+                        <h3>Distribución por Tipo de Registro</h3>
+                        <div class="stats-list" id="list-types-24h">
+                            <div class="empty-msg">Cargando datos...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 30 Days Pane -->
+            <div id="pane-30d" class="tab-pane">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-title">Total Consultas</span>
+                        <span class="metric-value" id="val-total-30d">...</span>
+                        <span class="metric-sub">Peticiones procesadas</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Consultas Bloqueadas</span>
+                        <span class="metric-value cyan" id="val-blocked-30d">...</span>
+                        <span class="metric-sub" id="sub-blocked-30d">-</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Acierto en Caché</span>
+                        <span class="metric-value" id="val-cached-30d">...</span>
+                        <span class="metric-sub" id="sub-cached-30d">-</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Latencia Media</span>
+                        <span class="metric-value" id="val-latency-30d">...</span>
+                        <span class="metric-sub">Tiempo medio de resolución</span>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="table-card">
+                        <h3>Origen de las Solicitudes (ASN)</h3>
+                        <div class="stats-list" id="list-asns-30d">
+                            <div class="empty-msg">Cargando datos...</div>
+                        </div>
+                    </div>
+                    <div class="table-card">
+                        <h3>Distribución por Tipo de Registro</h3>
+                        <div class="stats-list" id="list-types-30d">
+                            <div class="empty-msg">Cargando datos...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Connection Detector -->
+            <div class="connection-card" id="connection-status">
+                <div class="connection-left">
+                    <div class="connection-icon-wrapper">
+                        <div class="status-dot pulsing" id="conn-dot"></div>
+                    </div>
+                    <div class="connection-text-group">
+                        <span class="connection-card-title">Tu Conexión</span>
+                        <span class="connection-card-desc" id="conn-desc">Detectando red...</span>
+                    </div>
+                </div>
+                <div class="connection-right">
+                    <span class="connection-ip" id="conn-ip">Comprobando...</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/theme.js"></script>
+    <script>
+        function switchTab(interval) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.tab-btn[data-interval="${interval}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            const activePane = document.getElementById(`pane-${interval}`);
+            if (activePane) activePane.classList.add('active');
+        }
+
+        function renderStatsList(elementId, items, isAsn = false) {
+            const container = document.getElementById(elementId);
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                container.innerHTML = '<div class="empty-msg">Sin consultas registradas.</div>';
+                return;
+            }
+
+            const maxCount = Math.max(...items.map(i => i.count));
+
+            items.forEach(item => {
+                const percent = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
+                const row = document.createElement('div');
+                row.className = 'stats-row-item';
+
+                const bgBar = document.createElement('div');
+                bgBar.className = 'row-bg-bar';
+                bgBar.style.width = '0%';
+                row.appendChild(bgBar);
+
+                const itemLeft = document.createElement('div');
+                itemLeft.className = 'item-left';
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'item-name';
+                nameSpan.innerText = item.name;
+                itemLeft.appendChild(nameSpan);
+
+                if (isAsn && item.ipv4_percent !== undefined && item.ipv6_percent !== undefined) {
+                    const subSpan = document.createElement('span');
+                    subSpan.className = 'item-sub';
+                    subSpan.innerText = `IPv4: ${item.ipv4_percent}% • IPv6: ${item.ipv6_percent}%`;
+                    itemLeft.appendChild(subSpan);
+                }
+
+                row.appendChild(itemLeft);
+
+                const countSpan = document.createElement('span');
+                countSpan.className = 'item-count';
+                if (item.percent !== undefined) {
+                    countSpan.innerText = `${item.percent}% (${Number(item.count).toLocaleString()})`;
+                } else {
+                    countSpan.innerText = Number(item.count).toLocaleString();
+                }
+                row.appendChild(countSpan);
+                container.appendChild(row);
+
+                setTimeout(() => {
+                    bgBar.style.width = `${percent}%`;
+                }, 50);
+            });
+        }
+
+        function loadStatsData() {
+            fetch('/stats.json')
+                .then(r => {
+                    if (!r.ok) throw new Error('Network response not ok');
+                    return r.json();
+                })
+                .then(data => {
+                    const s24 = data.stats_24h || {};
+                    const s30 = data.stats_30d || {};
+
+                    // 24h
+                    document.getElementById('val-total-24h').innerText = Number(s24.total || 0).toLocaleString();
+                    document.getElementById('val-blocked-24h').innerText = Number(s24.blocked || 0).toLocaleString();
+                    document.getElementById('sub-blocked-24h').innerText = `${s24.blocked_pct || 0}% tasa de bloqueo`;
+                    document.getElementById('val-cached-24h').innerText = `${s24.cached_pct || 0}%`;
+                    document.getElementById('sub-cached-24h').innerText = `${Number(s24.cached || 0).toLocaleString()} en caché`;
+                    document.getElementById('val-latency-24h').innerText = `${s24.avg_duration || 0} ms`;
+
+                    renderStatsList('list-asns-24h', s24.top_asns, true);
+                    renderStatsList('list-types-24h', s24.top_query_types, false);
+
+                    // 30d
+                    document.getElementById('val-total-30d').innerText = Number(s30.total || 0).toLocaleString();
+                    document.getElementById('val-blocked-30d').innerText = Number(s30.blocked || 0).toLocaleString();
+                    document.getElementById('sub-blocked-30d').innerText = `${s30.blocked_pct || 0}% tasa de bloqueo`;
+                    document.getElementById('val-cached-30d').innerText = `${s30.cached_pct || 0}%`;
+                    document.getElementById('sub-cached-30d').innerText = `${Number(s30.cached || 0).toLocaleString()} en caché`;
+                    document.getElementById('val-latency-30d').innerText = `${s30.avg_duration || 0} ms`;
+
+                    renderStatsList('list-asns-30d', s30.top_asns, true);
+                    renderStatsList('list-types-30d', s30.top_query_types, false);
+                })
+                .catch(err => {
+                    console.error('Error al cargar stats:', err);
+                });
+        }
+
+        function detectUserConnection() {
+            const dot = document.getElementById('conn-dot');
+            const desc = document.getElementById('conn-desc');
+            const ipEl = document.getElementById('conn-ip');
+
+            fetch('https://ipwho.is/')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.success) {
+                        const ip = data.ip || '-';
+                        const isV6 = ip.includes(':');
+                        
+                        if (dot) {
+                            dot.className = 'status-dot ' + (isV6 ? 'ipv6' : 'ipv4');
+                        }
+                        
+                        let asnDisplay = '';
+                        if (data.connection && data.connection.asn) {
+                            asnDisplay = `AS${data.connection.asn} • `;
+                        }
+                        
+                        // Select the organization behind the IP (fallback to ISP if org is empty)
+                        let orgName = (data.connection && (data.connection.org || data.connection.isp)) || 'Organización';
+                        
+                        if (desc) {
+                            desc.innerText = `${asnDisplay}${orgName}`;
+                        }
+                        if (ipEl) {
+                            ipEl.innerText = ip;
+                        }
+                    } else {
+                        fallbackDetect();
+                    }
+                })
+                .catch(() => {
+                    fallbackDetect();
+                });
+
+            function fallbackDetect() {
+                fetch('https://ipapi.co/json/')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data && data.ip) {
+                            const ip = data.ip;
+                            const isV6 = ip.includes(':');
+                            if (dot) dot.className = 'status-dot ' + (isV6 ? 'ipv6' : 'ipv4');
+                            
+                            let asnDisplay = data.asn ? `${data.asn} • ` : '';
+                            let orgName = data.org || data.carrier || 'Organización';
+                            
+                            if (desc) desc.innerText = `${asnDisplay}${orgName}`;
+                            if (ipEl) ipEl.innerText = ip;
+                        }
+                    })
+                    .catch(() => {
+                        if (desc) desc.innerText = 'Conexión Activa';
+                        if (ipEl) ipEl.innerText = '-';
+                    });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStatsData();
+            detectUserConnection();
+            setInterval(loadStatsData, 30000);
+        });
+    </script>
+</body>
+</html>

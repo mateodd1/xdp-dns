@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PayloadContent</key>
+    <array>
+        <dict>
+            <key>DNSSettings</key>
+            <dict>
+                <key>DNSProtocol</key>
+                <string>TLS</string>
+                <key>ServerName</key>
+                <string>dns.xdp.es</string>
+                <key>ServerAddresses</key>
+                <array>
+                    <string>85.208.114.51</string>
+                    <string>2a0e:97c0:c40::51</string>
+                </array>
+            </dict>
+            <key>PayloadDescription</key>
+            <string>Configura DNS cifrado mediante TLS (DoT) para dns.xdp.es con bloqueo de publicidad y rastreo.</string>
+            <key>PayloadDisplayName</key>
+            <string>xdp.es DNS DoT</string>
+            <key>PayloadIdentifier</key>
+            <string>es.xdp.dns.dot</string>
+            <key>PayloadType</key>
+            <string>com.apple.dnsSettings.managed</string>
+            <key>PayloadUUID</key>
+            <string>29c66914-7243-4dc9-98ee-629df21ba48c</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+        </dict>
+    </array>
+    <key>PayloadDescription</key>
+    <string>Configura DNS cifrado mediante TLS (DoT) en dns.xdp.es con protección contra anuncios y rastreo.</string>
+    <key>PayloadDisplayName</key>
+    <string>xdp.es DNS Cifrado (DoT)</string>
+    <key>PayloadIdentifier</key>
+    <string>es.xdp.dns.dot.root</string>
+    <key>PayloadOrganization</key>
+    <string>xdp.es</string>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>b37ef854-8c81-4ba2-9366-a3675a34fceb</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+</dict>
+</plist>
