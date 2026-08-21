@@ -46,19 +46,19 @@ dns.xdp.es {
         root * /var/www/xdp.es
         header Content-Type "text/html; charset=utf-8"
         header Cache-Control "public, max-age=60, must-revalidate"
-        try_files {path} {path}/index.html /stats/index.html
+        rewrite * /stats/index.html
         file_server
     }
 
-    # Static assets & Machine-readable files
-    @assets path *.css *.js *.json *.ico *.png *.svg *.mobileconfig *.txt *.xml
+    # Known Static assets & Machine-readable files
+    @assets path /index.css /index.js /theme.js /stats.js /llms.txt /llms-full.txt /openapi.json /robots.txt /sitemap.xml /favicon.ico *.mobileconfig *.svg *.png *.ico *.css *.js
     handle @assets {
         root * /var/www/xdp.es
         header Cache-Control "public, max-age=86400"
         file_server
     }
 
-    # Root and any other path redirects to main landing page https://xdp.es/
+    # Fallback: All other paths, subdirectories or root on dns.xdp.es redirect to main landing page https://xdp.es/
     handle {
         redir https://xdp.es/ permanent
     }
@@ -86,13 +86,8 @@ xdp.es, http://85.208.114.51, http://127.0.0.1, http://localhost {
 
     # RFC 9462 DDR Discovery Endpoint
     handle /.well-known/dns-query* {
-        redir https://dns.xdp.es{uri} permanent
+        redir https://dns.xdp.es/dns-query permanent
     }
-
-    # Apple .mobileconfig profile MIME types & caching
-    @mobileconfig path *.mobileconfig
-    header @mobileconfig Content-Type "application/x-apple-aspen-config"
-    header @mobileconfig Cache-Control "public, max-age=86400"
 
     # Public stats.json endpoint (Explicit UTF-8)
     @stats path /stats.json /stats/stats.json
@@ -102,39 +97,54 @@ xdp.es, http://85.208.114.51, http://127.0.0.1, http://localhost {
         file_server
     }
 
-    # Explicit UTF-8 Content-Type and Cache headers for static assets & machine-readable specs
-    @json path *.json
-    header @json Content-Type "application/json; charset=utf-8"
-    header @json Cache-Control "public, max-age=3600"
-
-    @txt path *.txt
-    header @txt Content-Type "text/markdown; charset=utf-8"
-    header @txt Cache-Control "public, max-age=86400"
-
-    @xml path *.xml
-    header @xml Content-Type "application/xml; charset=utf-8"
-    header @xml Cache-Control "public, max-age=86400"
-
-    @js path *.js
-    header @js Content-Type "application/javascript; charset=utf-8"
-    header @js Cache-Control "public, max-age=31536000, immutable"
-
-    @css path *.css
-    header @css Content-Type "text/css; charset=utf-8"
-    header @css Cache-Control "public, max-age=31536000, immutable"
-
-    @html path / /stats /stats/ *.html
-    header @html Cache-Control "public, max-age=60, must-revalidate"
-
-    # Serve landing page, /stats, or existing static files
-    @static file {
-        try_files {path} {path}/index.html /stats/index.html
-    }
-    handle @static {
+    # Dedicated Stats Page (/stats or /stats/)
+    @stats_page path /stats /stats/ /stats/index.html
+    handle @stats_page {
+        header Content-Type "text/html; charset=utf-8"
+        header Cache-Control "public, max-age=60, must-revalidate"
+        rewrite * /stats/index.html
         file_server
     }
 
-    # Any non-existing file or unknown subpath redirects to https://xdp.es/
+    # Known Static Assets & Machine-Readable Files
+    @known_assets path /index.css /index.js /theme.js /stats.js /llms.txt /llms-full.txt /openapi.json /robots.txt /sitemap.xml /favicon.ico *.mobileconfig *.svg *.png *.ico
+    handle @known_assets {
+        @css path *.css
+        header @css Content-Type "text/css; charset=utf-8"
+        header @css Cache-Control "public, max-age=31536000, immutable"
+
+        @js path *.js
+        header @js Content-Type "application/javascript; charset=utf-8"
+        header @js Cache-Control "public, max-age=31536000, immutable"
+
+        @json path *.json
+        header @json Content-Type "application/json; charset=utf-8"
+        header @json Cache-Control "public, max-age=3600"
+
+        @txt path *.txt
+        header @txt Content-Type "text/markdown; charset=utf-8"
+        header @txt Cache-Control "public, max-age=86400"
+
+        @xml path *.xml
+        header @xml Content-Type "application/xml; charset=utf-8"
+        header @xml Cache-Control "public, max-age=86400"
+
+        @mobileconfig path *.mobileconfig
+        header @mobileconfig Content-Type "application/x-apple-aspen-config"
+        header @mobileconfig Cache-Control "public, max-age=86400"
+
+        file_server
+    }
+
+    # Root Home Landing Page
+    @home path / /index.html
+    handle @home {
+        header Cache-Control "public, max-age=60, must-revalidate"
+        rewrite * /index.html
+        file_server
+    }
+
+    # Catch-all: Redirect ALL other subdirectories, unknown paths and 404s to the main domain https://xdp.es/
     handle {
         redir https://xdp.es/ 302
     }
@@ -159,10 +169,10 @@ xdp.es, http://85.208.114.51, http://127.0.0.1, http://localhost {
     }
 }
 
-# Wildcard Subdomains (*.xdp.es) -> Redirect all other subdomains (e.g. test.xdp.es, www.xdp.es) to https://xdp.es
+# Wildcard Subdomains (*.xdp.es) -> Redirect all other subdomains to the main domain https://xdp.es/
 http://*.xdp.es, *.xdp.es {
     tls {
         on_demand
     }
-    redir https://xdp.es{uri} permanent
+    redir https://xdp.es/ permanent
 }
