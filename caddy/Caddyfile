@@ -22,8 +22,6 @@ dns.xdp.es {
         reverse_proxy 127.0.0.1:4000 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
-            header_up X-Forwarded-For {remote_host}
-            header_up X-Forwarded-Proto {scheme}
         }
     }
 
@@ -36,11 +34,18 @@ dns.xdp.es {
         file_server
     }
 
-    # Dedicated Stats Page (/stats or /stats/) (Explicit UTF-8)
-    handle /stats* {
+    # Dedicated Stats Page (/stats or /stats/)
+    @stats_page path /stats /stats/ /stats/index.html
+    handle @stats_page {
         root * /var/www/xdp.es
-        header Content-Type "text/html; charset=utf-8"
         try_files {path} {path}/index.html /stats/index.html
+        file_server
+    }
+
+    # Static assets required for UI
+    @assets path *.css *.js *.json *.ico *.png *.svg *.mobileconfig
+    handle @assets {
+        root * /var/www/xdp.es
         file_server
     }
 

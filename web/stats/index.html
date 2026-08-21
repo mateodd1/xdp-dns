@@ -6,7 +6,7 @@
     <title>Estadísticas | xdp.es DNS</title>
     <meta name="description" content="Estadísticas de resolución DNS, origen por ASN y métricas anónimas en tiempo real.">
 
-    <!-- Inline script to prevent theme flashing (FOIT) -->
+    <!-- Anti-FOIT Instant Theme Loader -->
     <script>
         (function() {
             try {
@@ -21,20 +21,502 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/index.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20100%20100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+
+    <style>
+        /* Theme Variables */
+        :root, [data-theme="dark"] {
+            --bg-main: #0e0f12;
+            --bg-card: #16171b;
+            --bg-code: #20222a;
+            --border: #252832;
+            --border-hover: #373c4b;
+            --accent: #00d2ff;
+            --accent-dim: rgba(0, 210, 255, 0.12);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --text-heading: #ffffff;
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.25);
+            --guide-tab-active-text: #0c0d0e;
+            --theme-toggle-bg: #16171b;
+            --theme-toggle-border: #252832;
+            --theme-toggle-btn-active-bg: #252832;
+            --theme-toggle-btn-active-color: #00d2ff;
+            color-scheme: dark;
+        }
+
+        [data-theme="light"] {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-code: #f1f5f9;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --accent: #0284c7;
+            --accent-dim: rgba(2, 132, 199, 0.1);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --text-heading: #0f172a;
+            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+            --guide-tab-active-text: #ffffff;
+            --theme-toggle-bg: #f1f5f9;
+            --theme-toggle-border: #e2e8f0;
+            --theme-toggle-btn-active-bg: #ffffff;
+            --theme-toggle-btn-active-color: #0284c7;
+            color-scheme: light;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 'Inter', Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 44px auto;
+            padding: 0 20px;
+        }
+
+        header {
+            margin-bottom: 24px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 16px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            gap: 6px;
+            transition: opacity 0.2s ease;
+        }
+
+        .back-link:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        header h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: var(--text-heading);
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        /* Theme Switcher */
+        .theme-switcher {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--theme-toggle-bg);
+            border: 1px solid var(--theme-toggle-border);
+            border-radius: 20px;
+            padding: 3px;
+            gap: 2px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+            transition: background-color 0.25s ease, border-color 0.25s ease;
+        }
+
+        .theme-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .theme-btn:hover {
+            color: var(--text-heading);
+        }
+
+        .theme-btn.active {
+            background-color: var(--theme-toggle-btn-active-bg);
+            color: var(--theme-toggle-btn-active-color);
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Timeframe Tabs */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            background: none;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            padding: 8px 18px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-heading);
+            background-color: var(--bg-code);
+        }
+
+        .tab-btn.active {
+            color: var(--guide-tab-active-text);
+            background-color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(3px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 4-Column Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: left;
+            box-shadow: var(--shadow-card);
+            transition: border-color 0.2s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .metric-card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .metric-title {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 4px;
+            display: block;
+            letter-spacing: -0.02em;
+        }
+
+        .metric-value.cyan {
+            color: var(--accent);
+        }
+
+        .metric-sub {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        /* Two Column Dashboard Grid for Tables */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .table-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+            transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .table-card h3 {
+            margin: 0 0 14px 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-heading);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stats-row-item {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            background-color: var(--bg-main);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: background-color 0.25s ease, border-color 0.25s ease;
+        }
+
+        .row-bg-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background-color: var(--accent-dim);
+            z-index: 1;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .item-left {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding-right: 10px;
+            overflow: hidden;
+        }
+
+        .item-name {
+            color: var(--text-primary);
+            font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.82rem;
+            word-break: break-all;
+        }
+
+        .item-sub {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .item-count {
+            position: relative;
+            z-index: 2;
+            font-weight: 600;
+            color: var(--text-heading);
+            white-space: nowrap;
+            font-size: 0.8rem;
+        }
+
+        .empty-msg {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            text-align: center;
+            padding: 16px 0;
+        }
+
+        /* Active Connection Status Card */
+        .connection-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow-card);
+            transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .connection-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .connection-icon-wrapper {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: var(--text-muted);
+        }
+
+        .status-dot.pulsing {
+            background-color: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+            animation: pulse-dot 1.8s infinite;
+        }
+
+        .status-dot.ipv4 {
+            background-color: #00bcd4;
+            box-shadow: 0 0 10px rgba(0, 188, 212, 0.6);
+        }
+
+        .status-dot.ipv6 {
+            background-color: #a855f7;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+        }
+
+        @keyframes pulse-dot {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+
+        .connection-text-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .connection-card-title {
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .connection-card-desc {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .connection-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+            text-align: right;
+        }
+
+        .connection-ip {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: SFMono-Regular, Consolas, monospace;
+            word-break: break-all;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 0 14px;
+                margin: 20px auto 36px;
+            }
+            header h1 {
+                font-size: 1.75rem;
+            }
+            .theme-btn .theme-text {
+                display: none;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .connection-card {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 14px;
+            }
+            .connection-right {
+                align-items: flex-start;
+                text-align: left;
+                width: 100%;
+                border-top: 1px solid var(--border);
+                padding-top: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container" style="max-width: 860px;">
+    <div class="container">
         <!-- Page Header -->
         <header>
-            <div class="header-top" style="margin-bottom: 12px;">
-                <a href="/" class="back-link" aria-label="Volver a la página principal">
+            <div class="header-top">
+                <a href="/" class="back-link" aria-label="Volver al inicio">
                     &larr; Volver al inicio
                 </a>
-                <nav class="theme-switcher" role="group" aria-label="Seleccionar tema de color">
-                    <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Activar modo claro">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <nav class="theme-switcher" role="group" aria-label="Seleccionar tema">
+                    <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="5"></circle>
                             <line x1="12" y1="1" x2="12" y2="3"></line>
                             <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -47,14 +529,14 @@
                         </svg>
                         <span class="theme-text">Claro</span>
                     </button>
-                    <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Activar modo oscuro">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                         <span class="theme-text">Oscuro</span>
                     </button>
-                    <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático según el sistema" aria-label="Activar modo automático">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático según el sistema" aria-label="Automático">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                             <line x1="8" y1="21" x2="16" y2="21"></line>
                             <line x1="12" y1="17" x2="12" y2="21"></line>
@@ -64,19 +546,18 @@
                 </nav>
             </div>
             <h1>xdp.es DNS</h1>
-            <p class="subtitle">Estadísticas de resolución DNS y métricas en tiempo real</p>
+            <div class="subtitle">Estadísticas de resolución DNS y métricas en tiempo real</div>
         </header>
 
         <!-- Timeframe Tabs -->
-        <nav class="tabs-container" role="tablist" aria-label="Intervalo de estadísticas">
-            <button type="button" class="tab-btn active" data-interval="24h" role="tab" aria-selected="true" aria-controls="pane-24h" onclick="switchTab('24h')">Últimas 24 Horas</button>
-            <button type="button" class="tab-btn" data-interval="30d" role="tab" aria-selected="false" aria-controls="pane-30d" onclick="switchTab('30d')">Últimos 30 Días</button>
+        <nav class="tabs-container" role="tablist" aria-label="Intervalo de tiempo">
+            <button type="button" class="tab-btn active" data-interval="24h" onclick="switchTab('24h')">Últimas 24 Horas</button>
+            <button type="button" class="tab-btn" data-interval="30d" onclick="switchTab('30d')">Últimos 30 Días</button>
         </nav>
 
-        <!-- Main Dashboard View -->
         <main>
             <!-- 24 Hours Pane -->
-            <section id="pane-24h" class="tab-pane active" role="tabpanel" aria-label="Estadísticas de las últimas 24 horas">
+            <section id="pane-24h" class="tab-pane active" role="tabpanel">
                 <div class="metrics-grid">
                     <div class="metric-card">
                         <span class="metric-title">Total Consultas</span>
@@ -117,7 +598,7 @@
             </section>
 
             <!-- 30 Days Pane -->
-            <section id="pane-30d" class="tab-pane" role="tabpanel" aria-label="Estadísticas de los últimos 30 días">
+            <section id="pane-30d" class="tab-pane" role="tabpanel">
                 <div class="metrics-grid">
                     <div class="metric-card">
                         <span class="metric-title">Total Consultas</span>
@@ -157,8 +638,8 @@
                 </div>
             </section>
 
-            <!-- Active User Connection Status -->
-            <section class="connection-card" id="connection-status" aria-label="Estado de tu conexión">
+            <!-- Active User Connection -->
+            <section class="connection-card" id="connection-status">
                 <div class="connection-left">
                     <div class="connection-icon-wrapper">
                         <div class="status-dot pulsing" id="conn-dot"></div>
@@ -175,8 +656,240 @@
         </main>
     </div>
 
-    <!-- Scripts -->
-    <script src="/theme.js"></script>
-    <script src="/stats.js"></script>
+    <!-- Self-Contained Dashboard Scripts -->
+    <script>
+        // Theme Management
+        const THEME_KEY = 'xdp_theme';
+
+        function getStoredTheme() {
+            try {
+                return localStorage.getItem(THEME_KEY) || 'auto';
+            } catch (e) {
+                return 'auto';
+            }
+        }
+
+        function applyTheme(theme) {
+            const root = document.documentElement;
+            if (theme === 'auto') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+            } else {
+                root.setAttribute('data-theme', theme);
+            }
+            updateThemeUI(theme);
+        }
+
+        function setTheme(theme) {
+            try {
+                localStorage.setItem(THEME_KEY, theme);
+            } catch (e) {}
+            applyTheme(theme);
+        }
+
+        function updateThemeUI(activeTheme) {
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                const val = btn.getAttribute('data-theme-val');
+                if (val === activeTheme) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Tab Switching
+        function switchTab(interval) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.tab-btn[data-interval="${interval}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            const activePane = document.getElementById(`pane-${interval}`);
+            if (activePane) activePane.classList.add('active');
+        }
+
+        // Stats Rendering
+        function renderStatsList(elementId, items, isAsn = false) {
+            const container = document.getElementById(elementId);
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                container.innerHTML = '<div class="empty-msg">Sin consultas registradas.</div>';
+                return;
+            }
+
+            const maxCount = Math.max(...items.map(i => i.count));
+
+            items.forEach(item => {
+                const percent = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
+                const row = document.createElement('div');
+                row.className = 'stats-row-item';
+
+                const bgBar = document.createElement('div');
+                bgBar.className = 'row-bg-bar';
+                bgBar.style.width = '0%';
+                row.appendChild(bgBar);
+
+                const itemLeft = document.createElement('div');
+                itemLeft.className = 'item-left';
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'item-name';
+                nameSpan.innerText = item.name;
+                itemLeft.appendChild(nameSpan);
+
+                if (isAsn && item.ipv4_percent !== undefined && item.ipv6_percent !== undefined) {
+                    const subSpan = document.createElement('span');
+                    subSpan.className = 'item-sub';
+                    subSpan.innerText = `IPv4: ${item.ipv4_percent}% • IPv6: ${item.ipv6_percent}%`;
+                    itemLeft.appendChild(subSpan);
+                }
+
+                row.appendChild(itemLeft);
+
+                const countSpan = document.createElement('span');
+                countSpan.className = 'item-count';
+                if (item.percent !== undefined) {
+                    countSpan.innerText = `${item.percent}% (${Number(item.count).toLocaleString()})`;
+                } else {
+                    countSpan.innerText = Number(item.count).toLocaleString();
+                }
+                row.appendChild(countSpan);
+                container.appendChild(row);
+
+                setTimeout(() => {
+                    bgBar.style.width = `${percent}%`;
+                }, 50);
+            });
+        }
+
+        function loadStatsData() {
+            // Try fetching /stats.json, fallback to stats.json
+            fetch('/stats.json')
+                .catch(() => fetch('stats.json'))
+                .then(r => {
+                    if (!r.ok) throw new Error('Network response not ok');
+                    return r.json();
+                })
+                .then(data => {
+                    const s24 = data.stats_24h || {};
+                    const s30 = data.stats_30d || {};
+
+                    // 24 Hours
+                    const elTotal24 = document.getElementById('val-total-24h');
+                    const elBlocked24 = document.getElementById('val-blocked-24h');
+                    const elSubBlocked24 = document.getElementById('sub-blocked-24h');
+                    const elCached24 = document.getElementById('val-cached-24h');
+                    const elSubCached24 = document.getElementById('sub-cached-24h');
+                    const elLatency24 = document.getElementById('val-latency-24h');
+
+                    if (elTotal24) elTotal24.innerText = Number(s24.total || 0).toLocaleString();
+                    if (elBlocked24) elBlocked24.innerText = Number(s24.blocked || 0).toLocaleString();
+                    if (elSubBlocked24) elSubBlocked24.innerText = `${s24.blocked_pct || 0}% tasa de bloqueo`;
+                    if (elCached24) elCached24.innerText = `${s24.cached_pct || 0}%`;
+                    if (elSubCached24) elSubCached24.innerText = `${Number(s24.cached || 0).toLocaleString()} en caché`;
+                    if (elLatency24) elLatency24.innerText = `${s24.avg_duration || 0} ms`;
+
+                    renderStatsList('list-asns-24h', s24.top_asns, true);
+                    renderStatsList('list-types-24h', s24.top_query_types, false);
+
+                    // 30 Days
+                    const elTotal30 = document.getElementById('val-total-30d');
+                    const elBlocked30 = document.getElementById('val-blocked-30d');
+                    const elSubBlocked30 = document.getElementById('sub-blocked-30d');
+                    const elCached30 = document.getElementById('val-cached-30d');
+                    const elSubCached30 = document.getElementById('sub-cached-30d');
+                    const elLatency30 = document.getElementById('val-latency-30d');
+
+                    if (elTotal30) elTotal30.innerText = Number(s30.total || 0).toLocaleString();
+                    if (elBlocked30) elBlocked30.innerText = Number(s30.blocked || 0).toLocaleString();
+                    if (elSubBlocked30) elSubBlocked30.innerText = `${s30.blocked_pct || 0}% tasa de bloqueo`;
+                    if (elCached30) elCached30.innerText = `${s30.cached_pct || 0}%`;
+                    if (elSubCached30) elSubCached30.innerText = `${Number(s30.cached || 0).toLocaleString()} en caché`;
+                    if (elLatency30) elLatency30.innerText = `${s30.avg_duration || 0} ms`;
+
+                    renderStatsList('list-asns-30d', s30.top_asns, true);
+                    renderStatsList('list-types-30d', s30.top_query_types, false);
+                })
+                .catch(err => {
+                    console.error('Error al cargar datos de stats:', err);
+                });
+        }
+
+        function detectUserConnection() {
+            const dot = document.getElementById('conn-dot');
+            const desc = document.getElementById('conn-desc');
+            const ipEl = document.getElementById('conn-ip');
+
+            fetch('https://ipwho.is/')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.success) {
+                        const ip = data.ip || '-';
+                        const isV6 = ip.includes(':');
+                        
+                        if (dot) {
+                            dot.className = 'status-dot ' + (isV6 ? 'ipv6' : 'ipv4');
+                        }
+                        
+                        let asnDisplay = '';
+                        if (data.connection && data.connection.asn) {
+                            asnDisplay = `AS${data.connection.asn} • `;
+                        }
+                        
+                        let orgName = (data.connection && (data.connection.org || data.connection.isp)) || 'Organización';
+                        
+                        if (desc) desc.innerText = `${asnDisplay}${orgName}`;
+                        if (ipEl) ipEl.innerText = ip;
+                    } else {
+                        fallbackDetect();
+                    }
+                })
+                .catch(() => {
+                    fallbackDetect();
+                });
+
+            function fallbackDetect() {
+                fetch('https://ipapi.co/json/')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data && data.ip) {
+                            const ip = data.ip;
+                            const isV6 = ip.includes(':');
+                            if (dot) dot.className = 'status-dot ' + (isV6 ? 'ipv6' : 'ipv4');
+                            
+                            let asnDisplay = data.asn ? `${data.asn} • ` : '';
+                            let orgName = data.org || data.carrier || 'Organización';
+                            
+                            if (desc) desc.innerText = `${asnDisplay}${orgName}`;
+                            if (ipEl) ipEl.innerText = ip;
+                        }
+                    })
+                    .catch(() => {
+                        if (desc) desc.innerText = 'Conexión Activa';
+                        if (ipEl) ipEl.innerText = '-';
+                    });
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateThemeUI(getStoredTheme());
+            loadStatsData();
+            detectUserConnection();
+            setInterval(loadStatsData, 30000);
+        });
+
+        // Listen for OS theme changes
+        try {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if (getStoredTheme() === 'auto') {
+                    applyTheme('auto');
+                }
+            });
+        } catch (e) {}
+    </script>
 </body>
 </html>
