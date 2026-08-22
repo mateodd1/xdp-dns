@@ -34,27 +34,29 @@ const translations = {
         "guide.tab_browser": "Navegadores",
 
         // Guide Steps - Android
-        "guide.android.s1": "Ajustes → Conexiones / Redes e Internet → Más ajustes",
-        "guide.android.s2": "DNS privado → Nombre de host",
-        "guide.android.s3": "Escribir: <code class=\"code-inline\">dns.xdp.es</code> y guardar",
+        "guide.android.s1": "Ve a <strong>Ajustes</strong> → <strong>Redes e Internet / Conexiones</strong> → <strong>Más ajustes de conexión</strong>.",
+        "guide.android.s2": "Pulsa sobre <strong>DNS privado</strong> (Private DNS).",
+        "guide.android.s3": "Selecciona <em>\"Nombre de host del proveedor de DNS privado\"</em>.",
+        "guide.android.s4": "Escribe: <code class=\"code-inline\">dns.xdp.es</code> y pulsa <strong>Guardar</strong>.",
 
         // Guide Steps - iOS
-        "guide.ios.s1": "Descargar el <a href=\"dns_xdp_es_doh.mobileconfig\" class=\"text-link\">perfil .mobileconfig (DoH)</a> en Safari.",
-        "guide.ios.s2": "Ajustes → Perfil descargado",
-        "guide.ios.s3": "Pulsar Instalar y confirmar.",
+        "guide.ios.s1": "Descarga el perfil <a href=\"dns_xdp_es_doh.mobileconfig\" class=\"text-link\">.mobileconfig (DoH)</a> desde el navegador Safari.",
+        "guide.ios.s2": "Abre <strong>Ajustes</strong> y pulsa en <em>\"Perfil descargado\"</em> en la parte superior.",
+        "guide.ios.s3": "Pulsa <strong>Instalar</strong> en la esquina superior derecha y confirma con tu código de desbloqueo.",
 
         // Guide Steps - Windows
-        "guide.windows.s1": "Configuración → Red e Internet → Wi-Fi / Ethernet",
-        "guide.windows.s2": "Asignación de DNS → Manual (IPv4: <code class=\"code-inline\">85.208.114.51</code>)",
-        "guide.windows.s3": "Cifrado DNS → Solo cifrado (DoH) con plantilla: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
+        "guide.windows.s1": "Abre <strong>Configuración</strong> → <strong>Red e Internet</strong> → <strong>Wi-Fi o Ethernet</strong>.",
+        "guide.windows.s2": "En <em>\"Asignación de DNS\"</em>, pulsa <strong>Editar</strong> y selecciona <strong>Manual</strong>.",
+        "guide.windows.s3": "Activa <strong>IPv4</strong> e introduce como DNS preferido: <code class=\"code-inline\">85.208.114.51</code>.",
+        "guide.windows.s4": "En <em>\"Cifrado DNS\"</em>, selecciona <strong>Solo cifrado (DNS a través de HTTPS)</strong> y como plantilla: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>.",
 
         // Guide Steps - Linux
-        "guide.linux.desc": "En <code class=\"code-inline\">/etc/systemd/resolved.conf</code>:",
-        "guide.linux.reload": "Reiniciar servicio: <code class=\"code-inline\">systemctl restart systemd-resolved</code>",
+        "guide.linux.desc": "Para <code>systemd-resolved</code>, edita el archivo <code class=\"code-inline\">/etc/systemd/resolved.conf</code>:",
+        "guide.linux.reload": "A continuación, reinicia el servicio con: <code class=\"code-inline\">systemctl restart systemd-resolved</code>",
 
         // Guide Steps - Browsers
-        "guide.browser.ff": "<strong>Firefox:</strong> Ajustes → Privacidad y Seguridad → DNS sobre HTTPS → Personalizado: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
-        "guide.browser.chrome": "<strong>Chrome / Brave / Edge:</strong> Configuración → Privacidad → Usar DNS seguro → Personalizado: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
+        "guide.browser.ff": "<strong>Firefox:</strong> Ajustes → Privacidad y Seguridad → DNS sobre HTTPS → Protección máxima → Proveedor personalizado: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
+        "guide.browser.chrome": "<strong>Chrome / Brave / Edge:</strong> Configuración → Privacidad y Seguridad → Usar DNS seguro → Con: Personalizado → <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
 
         // Stats Summary
         "stats.summary_title": "Estadísticas (24h)",
@@ -123,27 +125,29 @@ const translations = {
         "guide.tab_browser": "Browsers",
 
         // Guide Steps - Android
-        "guide.android.s1": "Settings → Connections / Network & Internet → More connection settings",
-        "guide.android.s2": "Private DNS → Private DNS provider hostname",
-        "guide.android.s3": "Enter: <code class=\"code-inline\">dns.xdp.es</code> and save",
+        "guide.android.s1": "Go to <strong>Settings</strong> → <strong>Network & Internet / Connections</strong> → <strong>More connection settings</strong>.",
+        "guide.android.s2": "Tap on <strong>Private DNS</strong>.",
+        "guide.android.s3": "Select <em>\"Private DNS provider hostname\"</em>.",
+        "guide.android.s4": "Enter: <code class=\"code-inline\">dns.xdp.es</code> and tap <strong>Save</strong>.",
 
         // Guide Steps - iOS
-        "guide.ios.s1": "Download the <a href=\"dns_xdp_es_doh.mobileconfig\" class=\"text-link\">.mobileconfig (DoH) profile</a> in Safari.",
-        "guide.ios.s2": "Settings → Profile Downloaded",
-        "guide.ios.s3": "Tap Install and confirm.",
+        "guide.ios.s1": "Download the <a href=\"dns_xdp_es_doh.mobileconfig\" class=\"text-link\">.mobileconfig (DoH)</a> profile using Safari.",
+        "guide.ios.s2": "Open <strong>Settings</strong> and tap <em>\"Profile Downloaded\"</em> near the top.",
+        "guide.ios.s3": "Tap <strong>Install</strong> in the top-right corner and confirm with your passcode.",
 
         // Guide Steps - Windows
-        "guide.windows.s1": "Settings → Network & Internet → Wi-Fi / Ethernet",
-        "guide.windows.s2": "DNS assignment → Manual (IPv4: <code class=\"code-inline\">85.208.114.51</code>)",
-        "guide.windows.s3": "DNS encryption → Encrypted only (DoH) template: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
+        "guide.windows.s1": "Open <strong>Settings</strong> → <strong>Network & Internet</strong> → <strong>Wi-Fi or Ethernet</strong>.",
+        "guide.windows.s2": "Under <em>\"DNS server assignment\"</em>, click <strong>Edit</strong> and select <strong>Manual</strong>.",
+        "guide.windows.s3": "Turn on <strong>IPv4</strong> and enter preferred DNS: <code class=\"code-inline\">85.208.114.51</code>.",
+        "guide.windows.s4": "Under <em>\"DNS encryption\"</em>, select <strong>Encrypted only (DNS over HTTPS)</strong> and template: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>.",
 
         // Guide Steps - Linux
-        "guide.linux.desc": "In <code class=\"code-inline\">/etc/systemd/resolved.conf</code>:",
-        "guide.linux.reload": "Restart service: <code class=\"code-inline\">systemctl restart systemd-resolved</code>",
+        "guide.linux.desc": "For <code>systemd-resolved</code>, edit the file <code class=\"code-inline\">/etc/systemd/resolved.conf</code>:",
+        "guide.linux.reload": "Then restart the service with: <code class=\"code-inline\">systemctl restart systemd-resolved</code>",
 
         // Guide Steps - Browsers
-        "guide.browser.ff": "<strong>Firefox:</strong> Settings → Privacy & Security → DNS over HTTPS → Custom: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
-        "guide.browser.chrome": "<strong>Chrome / Brave / Edge:</strong> Settings → Privacy → Use secure DNS → Custom: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
+        "guide.browser.ff": "<strong>Firefox:</strong> Settings → Privacy & Security → DNS over HTTPS → Max Protection → Custom provider: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
+        "guide.browser.chrome": "<strong>Chrome / Brave / Edge:</strong> Settings → Privacy and security → Use secure DNS → With: Custom → <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
 
         // Stats Summary
         "stats.summary_title": "Statistics (24h)",

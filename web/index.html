@@ -221,44 +221,46 @@
                     <!-- Android Guide -->
                     <div id="guide-android" class="guide-panel active" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="android">
                         <ol class="steps-list">
-                            <li data-i18n-html="guide.android.s1">Ajustes &rarr; Conexiones / Redes e Internet &rarr; Más ajustes</li>
-                            <li data-i18n-html="guide.android.s2">DNS privado &rarr; Nombre de host</li>
-                            <li data-i18n-html="guide.android.s3">Escribir: <code class="code-inline">dns.xdp.es</code> y guardar</li>
+                            <li data-i18n-html="guide.android.s1">Ve a <strong>Ajustes</strong> &rarr; <strong>Redes e Internet / Conexiones</strong> &rarr; <strong>Más ajustes de conexión</strong>.</li>
+                            <li data-i18n-html="guide.android.s2">Pulsa sobre <strong>DNS privado</strong> (Private DNS).</li>
+                            <li data-i18n-html="guide.android.s3">Selecciona <em>"Nombre de host del proveedor de DNS privado"</em>.</li>
+                            <li data-i18n-html="guide.android.s4">Escribe: <code class="code-inline">dns.xdp.es</code> y pulsa <strong>Guardar</strong>.</li>
                         </ol>
                     </div>
 
                     <!-- iOS / Mac Guide -->
                     <div id="guide-ios" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="ios">
                         <ol class="steps-list">
-                            <li data-i18n-html="guide.ios.s1">Descargar el <a href="dns_xdp_es_doh.mobileconfig" class="text-link">perfil .mobileconfig (DoH)</a> en Safari.</li>
-                            <li data-i18n-html="guide.ios.s2">Ajustes &rarr; Perfil descargado</li>
-                            <li data-i18n-html="guide.ios.s3">Pulsar Instalar y confirmar.</li>
+                            <li data-i18n-html="guide.ios.s1">Descarga el perfil <a href="dns_xdp_es_doh.mobileconfig" class="text-link">.mobileconfig (DoH)</a> desde el navegador Safari.</li>
+                            <li data-i18n-html="guide.ios.s2">Abre <strong>Ajustes</strong> y pulsa en <em>"Perfil descargado"</em> en la parte superior.</li>
+                            <li data-i18n-html="guide.ios.s3">Pulsa <strong>Instalar</strong> en la esquina superior derecha y confirma con tu código de desbloqueo.</li>
                         </ol>
                     </div>
 
                     <!-- Windows 11 Guide -->
                     <div id="guide-windows" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="windows">
                         <ol class="steps-list">
-                            <li data-i18n-html="guide.windows.s1">Configuración &rarr; Red e Internet &rarr; Wi-Fi / Ethernet</li>
-                            <li data-i18n-html="guide.windows.s2">Asignación de DNS &rarr; Manual (IPv4: <code class="code-inline">85.208.114.51</code>)</li>
-                            <li data-i18n-html="guide.windows.s3">Cifrado DNS &rarr; Solo cifrado (DoH) con plantilla: <code class="code-inline">https://dns.xdp.es/dns-query</code></li>
+                            <li data-i18n-html="guide.windows.s1">Abre <strong>Configuración</strong> &rarr; <strong>Red e Internet</strong> &rarr; <strong>Wi-Fi o Ethernet</strong>.</li>
+                            <li data-i18n-html="guide.windows.s2">En <em>"Asignación de DNS"</em>, pulsa <strong>Editar</strong> y selecciona <strong>Manual</strong>.</li>
+                            <li data-i18n-html="guide.windows.s3">Activa <strong>IPv4</strong> e introduce como DNS preferido: <code class="code-inline">85.208.114.51</code>.</li>
+                            <li data-i18n-html="guide.windows.s4">En <em>"Cifrado DNS"</em>, selecciona <strong>Solo cifrado (DNS a través de HTTPS)</strong> y como plantilla: <code class="code-inline">https://dns.xdp.es/dns-query</code>.</li>
                         </ol>
                     </div>
 
                     <!-- Linux Guide -->
                     <div id="guide-linux" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="linux">
-                        <p data-i18n-html="guide.linux.desc" style="margin-bottom: 8px;">En <code class="code-inline">/etc/systemd/resolved.conf</code>:</p>
+                        <p data-i18n-html="guide.linux.desc" style="margin-bottom: 8px;">Para <code>systemd-resolved</code>, edita el archivo <code class="code-inline">/etc/systemd/resolved.conf</code>:</p>
                         <pre class="code-block"><code>[Resolve]
 DNS=85.208.114.51#dns.xdp.es 2a0e:97c0:c40::51#dns.xdp.es
 DNSOverTLS=yes
 DNSSEC=allow-downgrade</code></pre>
-                        <p data-i18n-html="guide.linux.reload" style="margin-top: 8px;">Reiniciar servicio: <code class="code-inline">systemctl restart systemd-resolved</code></p>
+                        <p data-i18n-html="guide.linux.reload" style="margin-top: 8px;">A continuación, reinicia el servicio con: <code class="code-inline">systemctl restart systemd-resolved</code></p>
                     </div>
 
                     <!-- Browser Guide -->
                     <div id="guide-browser" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="browser">
-                        <p data-i18n-html="guide.browser.ff" style="margin-bottom: 6px;"><strong>Firefox:</strong> Ajustes &rarr; Privacidad y Seguridad &rarr; DNS sobre HTTPS &rarr; Personalizado: <code class="code-inline">https://dns.xdp.es/dns-query</code></p>
-                        <p data-i18n-html="guide.browser.chrome"><strong>Chrome / Brave / Edge:</strong> Configuración &rarr; Privacidad &rarr; Usar DNS seguro &rarr; Personalizado: <code class="code-inline">https://dns.xdp.es/dns-query</code></p>
+                        <p data-i18n-html="guide.browser.ff" style="margin-bottom: 6px;"><strong>Firefox:</strong> Ajustes &rarr; Privacidad y Seguridad &rarr; DNS sobre HTTPS &rarr; Protección máxima &rarr; Proveedor personalizado: <code class="code-inline">https://dns.xdp.es/dns-query</code></p>
+                        <p data-i18n-html="guide.browser.chrome"><strong>Chrome / Brave / Edge:</strong> Configuración &rarr; Privacidad y Seguridad &rarr; Usar DNS seguro &rarr; Con: Personalizado &rarr; <code class="code-inline">https://dns.xdp.es/dns-query</code></p>
                     </div>
                 </div>
             </section>
