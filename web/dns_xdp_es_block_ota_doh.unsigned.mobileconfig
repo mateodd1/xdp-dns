@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>PayloadDisplayName</key>
-    <string>xdp.es (Bloqueo OTA)</string>
+    <string>xdp.es OTA Block DNS</string>
     <key>PayloadDescription</key>
     <string>Perfil DNS seguro xdp.es: DoH con bloqueo de anuncios, telemetría y bloqueo de actualizaciones OTA de iOS y macOS.</string>
     <key>PayloadOrganization</key>
@@ -30,7 +30,7 @@
             <key>PayloadUUID</key>
             <string>f1a4e239-8472-4cf3-9182-5d9c720a4b31</string>
             <key>PayloadDisplayName</key>
-            <string>xdp.es</string>
+            <string>xdp.es OTA Block DNS</string>
             <key>PayloadOrganization</key>
             <string>xdp.es</string>
             <key>PayloadDescription</key>

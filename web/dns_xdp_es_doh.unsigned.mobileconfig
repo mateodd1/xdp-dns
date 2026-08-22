@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>PayloadDisplayName</key>
-    <string>xdp.es (DoH)</string>
+    <string>xdp.es DoH DNS</string>
     <key>PayloadDescription</key>
     <string>Configura DNS cifrado mediante HTTPS (DoH) en dns.xdp.es con protección contra anuncios y rastreo.</string>
     <key>PayloadOrganization</key>
@@ -30,7 +30,7 @@
             <key>PayloadUUID</key>
             <string>a7d3c829-43bf-4b95-a220-7f284e311029</string>
             <key>PayloadDisplayName</key>
-            <string>xdp.es</string>
+            <string>xdp.es DoH DNS</string>
             <key>PayloadOrganization</key>
             <string>xdp.es</string>
             <key>PayloadDescription</key>
