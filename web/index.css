@@ -114,55 +114,6 @@ header h1 {
     color: var(--text-heading);
 }
 
-.header-controls {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-/* Language Switcher */
-.lang-switcher {
-    display: inline-flex;
-    align-items: center;
-    background-color: var(--theme-toggle-bg);
-    border: 1px solid var(--theme-toggle-border);
-    border-radius: 20px;
-    padding: 3px;
-    gap: 2px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    flex-shrink: 0;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.lang-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    padding: 5px 10px;
-    min-height: 36px;
-    border-radius: 16px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
-    user-select: none;
-}
-
-.lang-btn:hover {
-    color: var(--text-heading);
-}
-
-.lang-btn.active {
-    background-color: var(--theme-toggle-btn-active-bg);
-    color: var(--theme-toggle-btn-active-color);
-    font-weight: 700;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
 /* Theme Switcher */
 .theme-switcher {
     display: inline-flex;

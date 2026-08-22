@@ -1,7 +1,5 @@
 // /root/xpd-dns/web/i18n.js
-// Lightweight, zero-dependency i18n manager with auto-detection
-
-const I18N_STORAGE_KEY = 'xdp_lang';
+// Automatic language detection based on browser and OS locale
 
 const translations = {
     es: {
@@ -217,22 +215,8 @@ const translations = {
 };
 
 function getLanguage() {
-    try {
-        const stored = localStorage.getItem(I18N_STORAGE_KEY);
-        if (stored === 'es' || stored === 'en') return stored;
-    } catch (e) {}
-    
-    // Auto-detect browser/system language
     const lang = (navigator.language || (navigator.languages && navigator.languages[0]) || 'es').toLowerCase();
     return lang.startsWith('es') ? 'es' : 'en';
-}
-
-function setLanguage(lang) {
-    if (lang !== 'es' && lang !== 'en') lang = 'es';
-    try {
-        localStorage.setItem(I18N_STORAGE_KEY, lang);
-    } catch (e) {}
-    applyLanguage(lang);
 }
 
 function t(key, lang) {
@@ -263,32 +247,18 @@ function applyLanguage(lang) {
         }
     });
 
-    // Update Language Switcher UI Buttons
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        const val = btn.getAttribute('data-lang-val');
-        if (val === currentLang) {
-            btn.classList.add('active');
-            btn.setAttribute('aria-pressed', 'true');
-        } else {
-            btn.classList.remove('active');
-            btn.setAttribute('aria-pressed', 'false');
-        }
-    });
-
-    // Dispatch global event for other scripts (like stats.js)
+    // Dispatch global event for other scripts
     window.dispatchEvent(new CustomEvent('langchange', { detail: { lang: currentLang } }));
 }
 
 // Global Exports
 window.i18n = {
     getLanguage,
-    setLanguage,
     applyLanguage,
     t
 };
-window.setLanguage = setLanguage;
 
-// Run before DOM fully rendered to prevent flash of wrong language
+// Immediate early execution
 (function() {
     const initialLang = getLanguage();
     document.documentElement.setAttribute('lang', initialLang);
