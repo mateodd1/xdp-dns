@@ -4,19 +4,16 @@
 
 ## Endpoints
 
-- [Standard DNS over HTTPS (DoH)](https://dns.xdp.es/dns-query): RFC 8484 endpoint supporting HTTP/2 and HTTP/3 QUIC with GET and POST wireformat queries.
-- [Block-OTA DNS over HTTPS (DoH)](https://dns.xdp.es/block-ota/dns-query): Specialized DoH resolver blocking ads, Apple OTA update servers, and OCSP endpoints.
+- [DNS over HTTPS (DoH)](https://dns.xdp.es/dns-query): RFC 8484 endpoint supporting HTTP/2 and HTTP/3 QUIC with GET and POST wireformat queries.
 - [Live Metrics API](https://xdp.es/stats.json): Real-time anonymized telemetry and resolution statistics in JSON format.
 - [OpenAPI 3.1 Specification](https://xdp.es/openapi.json): Machine-readable schema for agent function-calling and tool use.
 - [Comprehensive Agent Documentation](https://xdp.es/llms-full.txt): In-depth system architecture, parameters, and OS configuration scripts.
 - [Interactive Telemetry Dashboard](https://xdp.es/stats): Web-based visual metrics dashboard with 24h and 30d views.
-- [Apple OTA Blocker Page](https://xdp.es/block-ota): Documentation and mobileconfig profiles to prevent iOS/macOS automatic updates.
 
 ## Configuration Profiles
 
-- [Apple DoH Standard Profile](https://xdp.es/dns_xdp_es_doh.mobileconfig): Automatic DNS over HTTPS configuration for iOS, iPadOS, and macOS.
-- [Apple DoT Standard Profile](https://xdp.es/dns_xdp_es_dot.mobileconfig): Automatic DNS over TLS configuration for iOS, iPadOS, and macOS.
-- [Apple Block-OTA DoH Profile](https://xdp.es/dns_xdp_es_block_ota_doh.mobileconfig): DNS over HTTPS configuration blocking iOS/macOS system updates and OCSP checks.
+- [Apple DoH Profile](https://xdp.es/dns_xdp_es_doh.mobileconfig): Automatic DNS over HTTPS configuration for iOS, iPadOS, and macOS.
+- [Apple DoT Profile](https://xdp.es/dns_xdp_es_dot.mobileconfig): Automatic DNS over TLS configuration for iOS, iPadOS, and macOS.
 
 ## IP Addresses
 
