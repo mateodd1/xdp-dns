@@ -1,28 +1,17 @@
+# /etc/caddy/Caddyfile
+# Caddy configuration with Wildcard TLS (*.xdp.es) for xdp.es, dns.xdp.es and all subdomains
 {
 	email admin@xdp.es
+	# Enable HTTP/3 (QUIC) for ultra-low latency DoH
 	servers {
 		protocols h1 h2 h3
-	}
-	on_demand_tls {
-		ask http://127.0.0.1:9123/check
-	}
-}
-
-# Internal Ask Endpoint for On-Demand TLS Security (Approves only *.xdp.es and xdp.es)
-http://127.0.0.1:9123 {
-	@allowed {
-		vars_regexp {query.domain} ^([a-zA-Z0-9-]+\.)*xdp\.es$
-	}
-	handle @allowed {
-		respond "OK" 200
-	}
-	handle {
-		respond "Forbidden" 403
 	}
 }
 
 # Dedicated DoH & DoT Subdomain (dns.xdp.es)
 dns.xdp.es {
+	tls /etc/letsencrypt/live/xdp.es/fullchain.pem /etc/letsencrypt/live/xdp.es/privkey.pem
+
 	handle /block-ota/dns-query* {
 		rewrite * /dns-query
 		reverse_proxy 127.0.0.1:4001 {
@@ -100,6 +89,7 @@ dns.xdp.es {
 
 # Main Canonical Landing Page (xdp.es)
 xdp.es {
+	tls /etc/letsencrypt/live/xdp.es/fullchain.pem /etc/letsencrypt/live/xdp.es/privkey.pem
 	root * /var/www/xdp.es
 
 	handle /.well-known/dns-query* {
@@ -192,11 +182,9 @@ xdp.es {
 	}
 }
 
-# Wildcard Subdomains (*.xdp.es) with On-Demand TLS
-http://*.xdp.es, *.xdp.es {
-	tls {
-		on_demand
-	}
+# Wildcard Subdomains (*.xdp.es) -> Instant redirect to https://xdp.es/ with Wildcard TLS
+*.xdp.es {
+	tls /etc/letsencrypt/live/xdp.es/fullchain.pem /etc/letsencrypt/live/xdp.es/privkey.pem
 	redir https://xdp.es/ permanent
 }
 

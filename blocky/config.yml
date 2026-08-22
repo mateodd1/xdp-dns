@@ -3,8 +3,8 @@ ports:
   tls: 853
   http: 127.0.0.1:4000
 
-certFile: /etc/letsencrypt/live/dns.xdp.es/fullchain.pem
-keyFile: /etc/letsencrypt/live/dns.xdp.es/privkey.pem
+certFile: /etc/letsencrypt/live/xdp.es/fullchain.pem
+keyFile: /etc/letsencrypt/live/xdp.es/privkey.pem
 minTlsServeVersion: "1.2"
 
 upstreams:

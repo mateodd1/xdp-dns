@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CERT_DIR="/etc/letsencrypt/live/dns.xdp.es"
+CERT_DIR="/etc/letsencrypt/live/xdp.es"
 CERT_FILE="${CERT_DIR}/cert.pem"
 KEY_FILE="${CERT_DIR}/privkey.pem"
 CHAIN_FILE="${CERT_DIR}/chain.pem"
