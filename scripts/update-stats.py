@@ -417,6 +417,7 @@ def build_window_stats(history, window_seconds):
             "ipv4_percent": v4_pct,
             "ipv6_percent": v6_pct
         })
+    top_asns = top_asns[:10]
 
     # If no real external ASN data is present yet in this bucket window, provide top observed network
     if not top_asns and total_queries > 0:

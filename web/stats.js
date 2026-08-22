@@ -34,14 +34,16 @@ function renderStatsList(elementId, items, isAsn = false) {
     if (!container) return;
     container.innerHTML = '';
 
-    if (!items || items.length === 0) {
+    const displayItems = isAsn && items ? items.slice(0, 10) : (items || []);
+
+    if (!displayItems || displayItems.length === 0) {
         container.innerHTML = '<div class="empty-msg">Sin consultas registradas.</div>';
         return;
     }
 
-    const maxCount = Math.max(...items.map(i => i.count));
+    const maxCount = Math.max(...displayItems.map(i => i.count));
 
-    items.forEach(item => {
+    displayItems.forEach(item => {
         const percent = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
         const row = document.createElement('div');
         row.className = 'stats-row-item';
