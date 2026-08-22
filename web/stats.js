@@ -86,6 +86,37 @@ function renderStatsList(elementId, items, isAsn = false) {
     });
 }
 
+let currentStatsCache = null;
+let currentAsnFilter24h = 'isp';
+let currentAsnFilter30d = 'isp';
+
+function changeAsnFilter(period, filterType) {
+    if (period === '24h') {
+        currentAsnFilter24h = filterType;
+        if (currentStatsCache && currentStatsCache.stats_24h) {
+            renderAsnSection('24h', currentStatsCache.stats_24h, filterType);
+        }
+    } else {
+        currentAsnFilter30d = filterType;
+        if (currentStatsCache && currentStatsCache.stats_30d) {
+            renderAsnSection('30d', currentStatsCache.stats_30d, filterType);
+        }
+    }
+}
+
+function renderAsnSection(period, statsObj, filterType) {
+    const elementId = period === '24h' ? 'list-asns-24h' : 'list-asns-30d';
+    let items = [];
+    if (filterType === 'isp') {
+        items = statsObj.top_asns_isp || statsObj.top_asns || [];
+    } else if (filterType === 'datacenter') {
+        items = statsObj.top_asns_datacenter || [];
+    } else {
+        items = statsObj.top_asns || statsObj.top_asns_isp || [];
+    }
+    renderStatsList(elementId, items, true);
+}
+
 function loadStatsData() {
     fetch('/stats.json')
         .then(r => {
@@ -93,6 +124,7 @@ function loadStatsData() {
             return r.json();
         })
         .then(data => {
+            currentStatsCache = data;
             const s24 = data.stats_24h || {};
             const s30 = data.stats_30d || {};
 
@@ -111,7 +143,7 @@ function loadStatsData() {
             if (elSubCached24) elSubCached24.innerText = `${Number(s24.cached || 0).toLocaleString()} en caché`;
             if (elLatency24) elLatency24.innerText = `${s24.avg_duration || 0} ms`;
 
-            renderStatsList('list-asns-24h', s24.top_asns, true);
+            renderAsnSection('24h', s24, currentAsnFilter24h);
             renderStatsList('list-types-24h', s24.top_query_types, false);
 
             // 30 Days Metrics
@@ -129,7 +161,7 @@ function loadStatsData() {
             if (elSubCached30) elSubCached30.innerText = `${Number(s30.cached || 0).toLocaleString()} en caché`;
             if (elLatency30) elLatency30.innerText = `${s30.avg_duration || 0} ms`;
 
-            renderStatsList('list-asns-30d', s30.top_asns, true);
+            renderAsnSection('30d', s30, currentAsnFilter30d);
             renderStatsList('list-types-30d', s30.top_query_types, false);
         })
         .catch(err => {

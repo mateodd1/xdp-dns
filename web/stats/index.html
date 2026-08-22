@@ -355,6 +355,23 @@
             align-items: center;
         }
 
+        .asn-select-filter {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 0.76rem;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .asn-select-filter:hover, .asn-select-filter:focus {
+            border-color: var(--accent);
+        }
+
         .stats-list {
             display: flex;
             flex-direction: column;
@@ -657,7 +674,14 @@
 
                 <div class="dashboard-grid">
                     <div class="table-card">
-                        <h3 data-i18n="stats.table_asn">Top ASNs</h3>
+                        <h3>
+                            <span data-i18n="stats.table_asn">Top ASNs</span>
+                            <select id="asn-filter-24h" class="asn-select-filter" onchange="changeAsnFilter('24h', this.value)" aria-label="Filtrar tipo de red">
+                                <option value="isp" selected data-i18n="stats.asn_filter_isp">Operadores (ISP)</option>
+                                <option value="datacenter" data-i18n="stats.asn_filter_datacenter">Datacenters</option>
+                                <option value="all" data-i18n="stats.asn_filter_all">Todos</option>
+                            </select>
+                        </h3>
                         <div class="stats-list" id="list-asns-24h" data-agent-list="top-asns-24h">
                             <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
                         </div>
@@ -696,7 +720,14 @@
 
                 <div class="dashboard-grid">
                     <div class="table-card">
-                        <h3 data-i18n="stats.table_asn">Top ASNs</h3>
+                        <h3>
+                            <span data-i18n="stats.table_asn">Top ASNs</span>
+                            <select id="asn-filter-30d" class="asn-select-filter" onchange="changeAsnFilter('30d', this.value)" aria-label="Filtrar tipo de red">
+                                <option value="isp" selected data-i18n="stats.asn_filter_isp">Operadores (ISP)</option>
+                                <option value="datacenter" data-i18n="stats.asn_filter_datacenter">Datacenters</option>
+                                <option value="all" data-i18n="stats.asn_filter_all">Todos</option>
+                            </select>
+                        </h3>
                         <div class="stats-list" id="list-asns-30d" data-agent-list="top-asns-30d">
                             <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
                         </div>
@@ -861,6 +892,35 @@
         }
 
         let currentStatsCache = null;
+        let currentAsnFilter24h = 'isp';
+        let currentAsnFilter30d = 'isp';
+
+        function changeAsnFilter(period, filterType) {
+            if (period === '24h') {
+                currentAsnFilter24h = filterType;
+                if (currentStatsCache && currentStatsCache.stats_24h) {
+                    renderAsnSection('24h', currentStatsCache.stats_24h, filterType);
+                }
+            } else {
+                currentAsnFilter30d = filterType;
+                if (currentStatsCache && currentStatsCache.stats_30d) {
+                    renderAsnSection('30d', currentStatsCache.stats_30d, filterType);
+                }
+            }
+        }
+
+        function renderAsnSection(period, statsObj, filterType) {
+            const elementId = period === '24h' ? 'list-asns-24h' : 'list-asns-30d';
+            let items = [];
+            if (filterType === 'isp') {
+                items = statsObj.top_asns_isp || statsObj.top_asns || [];
+            } else if (filterType === 'datacenter') {
+                items = statsObj.top_asns_datacenter || [];
+            } else {
+                items = statsObj.top_asns || statsObj.top_asns_isp || [];
+            }
+            renderStatsList(elementId, items, true);
+        }
 
         function updateStatsUI(data) {
             if (!data) return;
@@ -885,7 +945,7 @@
             if (elSubCached24) elSubCached24.innerText = Number(s24.cached || 0).toLocaleString();
             if (elLatency24) elLatency24.innerText = `${s24.avg_duration || 0} ms`;
 
-            renderStatsList('list-asns-24h', s24.top_asns, true);
+            renderAsnSection('24h', s24, currentAsnFilter24h);
             renderStatsList('list-types-24h', s24.top_query_types, false);
 
             // 30 Days
@@ -903,7 +963,7 @@
             if (elSubCached30) elSubCached30.innerText = Number(s30.cached || 0).toLocaleString();
             if (elLatency30) elLatency30.innerText = `${s30.avg_duration || 0} ms`;
 
-            renderStatsList('list-asns-30d', s30.top_asns, true);
+            renderAsnSection('30d', s30, currentAsnFilter30d);
             renderStatsList('list-types-30d', s30.top_query_types, false);
         }
 
