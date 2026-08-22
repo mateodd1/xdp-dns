@@ -411,7 +411,8 @@ def build_window_stats(history, window_seconds):
             duration_count += b.get("duration_count", 0)
 
             for qt, c in b.get("query_types", {}).items():
-                query_types[qt] = query_types.get(qt, 0) + c
+                if qt and qt.upper() != "ANY":
+                    query_types[qt] = query_types.get(qt, 0) + c
 
             for ip, c in b.get("client_ips", {}).items():
                 client_ips[ip] = client_ips.get(ip, 0) + c
@@ -477,7 +478,7 @@ def build_window_stats(history, window_seconds):
             "ipv6_percent": v6_pct,
             "type": "isp"
         })
-    top_asns_isp = top_asns_isp[:10]
+    top_asns_isp = top_asns_isp[:8]
 
     # Build Datacenter list
     for item in sorted([i for i in asn_data.values() if i.get("type") == "datacenter"], key=lambda x: x["count"], reverse=True):
@@ -497,7 +498,7 @@ def build_window_stats(history, window_seconds):
             "ipv6_percent": v6_pct,
             "type": "datacenter"
         })
-    top_asns_datacenter = top_asns_datacenter[:10]
+    top_asns_datacenter = top_asns_datacenter[:8]
 
     # Build Overall list
     for item in sorted(asn_data.values(), key=lambda x: x["count"], reverse=True):
@@ -517,7 +518,7 @@ def build_window_stats(history, window_seconds):
             "ipv6_percent": v6_pct,
             "type": item.get("type", "isp")
         })
-    top_asns_all = top_asns_all[:10]
+    top_asns_all = top_asns_all[:8]
 
     # Default fallback realistic operator network distribution if no real ISP queries yet
     if not top_asns_isp and total_queries > 0:
@@ -564,9 +565,11 @@ def build_window_stats(history, window_seconds):
             }
         ]
 
-    # Process Query Types
+    # Process Query Types (filtering out ANY)
     top_query_types = []
     for qtype, cnt in sorted(query_types.items(), key=lambda x: x[1], reverse=True):
+        if qtype.upper() == "ANY":
+            continue
         top_query_types.append({
             "name": qtype,
             "count": int(cnt),

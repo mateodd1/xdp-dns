@@ -29,92 +29,165 @@ function getIspLogo(name) {
     return null;
 }
 
+function createStatRow(item, maxCount, isAsn = false) {
+    const percent = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
+    const row = document.createElement('div');
+    row.className = 'stats-row-item';
+
+    const bgBar = document.createElement('div');
+    bgBar.className = 'row-bg-bar';
+    bgBar.style.width = '0%';
+    bgBar.setAttribute('data-target-width', `${percent}%`);
+    row.appendChild(bgBar);
+
+    const itemLeft = document.createElement('div');
+    itemLeft.className = 'item-left';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'item-name';
+    nameSpan.innerText = item.name;
+    itemLeft.appendChild(nameSpan);
+
+    if (isAsn && item.ipv4_percent !== undefined && item.ipv6_percent !== undefined) {
+        const subSpan = document.createElement('span');
+        subSpan.className = 'item-sub';
+        subSpan.innerText = `IPv4: ${item.ipv4_percent}% • IPv6: ${item.ipv6_percent}%`;
+        itemLeft.appendChild(subSpan);
+    }
+
+    row.appendChild(itemLeft);
+
+    const countSpan = document.createElement('span');
+    countSpan.className = 'item-count';
+    if (item.percent !== undefined) {
+        countSpan.innerText = `${item.percent}% (${Number(item.count).toLocaleString()})`;
+    } else {
+        countSpan.innerText = Number(item.count).toLocaleString();
+    }
+    row.appendChild(countSpan);
+
+    setTimeout(() => {
+        bgBar.style.width = `${percent}%`;
+    }, 50);
+
+    return row;
+}
+
 function renderStatsList(elementId, items, isAsn = false) {
     const container = document.getElementById(elementId);
     if (!container) return;
     container.innerHTML = '';
 
-    const displayItems = isAsn && items ? items.slice(0, 10) : (items || []);
+    const displayItems = (items || []).filter(i => i && i.name && i.name.toUpperCase() !== 'ANY');
 
     if (!displayItems || displayItems.length === 0) {
         container.innerHTML = '<div class="empty-msg">Sin consultas registradas.</div>';
         return;
     }
 
-    const maxCount = Math.max(...displayItems.map(i => i.count));
+    const maxCount = Math.max(...displayItems.map(i => i.count), 1);
 
     displayItems.forEach(item => {
-        const percent = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
-        const row = document.createElement('div');
-        row.className = 'stats-row-item';
+        const row = createStatRow(item, maxCount, isAsn);
+        container.appendChild(row);
+    });
+}
 
-        const bgBar = document.createElement('div');
-        bgBar.className = 'row-bg-bar';
-        bgBar.style.width = '0%';
-        row.appendChild(bgBar);
+function renderAsnListWithAccordion(elementId, isps, dcs, period) {
+    const container = document.getElementById(elementId);
+    if (!container) return;
+    container.innerHTML = '';
+
+    const ispItems = (isps || []).slice(0, 8);
+    const dcItems = (dcs || []).slice(0, 8);
+
+    if (ispItems.length === 0 && dcItems.length === 0) {
+        container.innerHTML = '<div class="empty-msg">Sin consultas registradas.</div>';
+        return;
+    }
+
+    const allItems = [...ispItems, ...dcItems];
+    const maxCount = Math.max(...allItems.map(i => i.count), 1);
+
+    // 1. Render Top 8 ISP items
+    ispItems.forEach(item => {
+        const row = createStatRow(item, maxCount, true);
+        container.appendChild(row);
+    });
+
+    // 2. Render 9th item: Datacenter ASN accordion toggle
+    if (dcItems.length > 0) {
+        const totalDcCount = dcItems.reduce((acc, curr) => acc + (curr.count || 0), 0);
+
+        const toggleRow = document.createElement('div');
+        toggleRow.className = 'stats-row-item dc-accordion-toggle';
+        toggleRow.setAttribute('role', 'button');
+        toggleRow.setAttribute('tabindex', '0');
+        toggleRow.setAttribute('id', `dc-toggle-${period}`);
 
         const itemLeft = document.createElement('div');
         itemLeft.className = 'item-left';
 
+        const nameRow = document.createElement('div');
+        nameRow.className = 'item-name-row';
+
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'dc-toggle-icon';
+        iconSpan.innerText = '▶';
+        nameRow.appendChild(iconSpan);
+
         const nameSpan = document.createElement('span');
         nameSpan.className = 'item-name';
-        nameSpan.innerText = item.name;
-        itemLeft.appendChild(nameSpan);
+        nameSpan.style.fontWeight = '600';
+        nameSpan.innerText = 'Datacenter ASN';
+        nameRow.appendChild(nameSpan);
 
-        if (isAsn && item.ipv4_percent !== undefined && item.ipv6_percent !== undefined) {
-            const subSpan = document.createElement('span');
-            subSpan.className = 'item-sub';
-            subSpan.innerText = `IPv4: ${item.ipv4_percent}% • IPv6: ${item.ipv6_percent}%`;
-            itemLeft.appendChild(subSpan);
-        }
+        itemLeft.appendChild(nameRow);
 
-        row.appendChild(itemLeft);
+        const subSpan = document.createElement('span');
+        subSpan.className = 'item-sub';
+        subSpan.innerText = `${dcItems.length} centros de datos y servidores`;
+        itemLeft.appendChild(subSpan);
+
+        toggleRow.appendChild(itemLeft);
 
         const countSpan = document.createElement('span');
         countSpan.className = 'item-count';
-        if (item.percent !== undefined) {
-            countSpan.innerText = `${item.percent}% (${Number(item.count).toLocaleString()})`;
-        } else {
-            countSpan.innerText = Number(item.count).toLocaleString();
-        }
-        row.appendChild(countSpan);
-        container.appendChild(row);
+        countSpan.innerText = Number(totalDcCount).toLocaleString();
+        toggleRow.appendChild(countSpan);
 
-        setTimeout(() => {
-            bgBar.style.width = `${percent}%`;
-        }, 50);
-    });
-}
+        // Content container
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'dc-accordion-content';
+        contentDiv.id = `dc-content-${period}`;
 
-let currentStatsCache = null;
-let currentAsnFilter24h = 'isp';
-let currentAsnFilter30d = 'isp';
+        dcItems.forEach(item => {
+            const dcRow = createStatRow(item, maxCount, true);
+            contentDiv.appendChild(dcRow);
+        });
 
-function changeAsnFilter(period, filterType) {
-    if (period === '24h') {
-        currentAsnFilter24h = filterType;
-        if (currentStatsCache && currentStatsCache.stats_24h) {
-            renderAsnSection('24h', currentStatsCache.stats_24h, filterType);
-        }
-    } else {
-        currentAsnFilter30d = filterType;
-        if (currentStatsCache && currentStatsCache.stats_30d) {
-            renderAsnSection('30d', currentStatsCache.stats_30d, filterType);
-        }
+        // Click / Keyboard handler to toggle accordion
+        toggleRow.onclick = function() {
+            const isExpanded = contentDiv.classList.toggle('expanded');
+            toggleRow.classList.toggle('expanded', isExpanded);
+            if (isExpanded) {
+                contentDiv.querySelectorAll('.row-bg-bar').forEach(bar => {
+                    const w = bar.getAttribute('data-target-width');
+                    if (w) bar.style.width = w;
+                });
+            }
+        };
+
+        toggleRow.onkeydown = function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleRow.click();
+            }
+        };
+
+        container.appendChild(toggleRow);
+        container.appendChild(contentDiv);
     }
-}
-
-function renderAsnSection(period, statsObj, filterType) {
-    const elementId = period === '24h' ? 'list-asns-24h' : 'list-asns-30d';
-    let items = [];
-    if (filterType === 'isp') {
-        items = statsObj.top_asns_isp || statsObj.top_asns || [];
-    } else if (filterType === 'datacenter') {
-        items = statsObj.top_asns_datacenter || [];
-    } else {
-        items = statsObj.top_asns || statsObj.top_asns_isp || [];
-    }
-    renderStatsList(elementId, items, true);
 }
 
 function loadStatsData() {
@@ -124,7 +197,6 @@ function loadStatsData() {
             return r.json();
         })
         .then(data => {
-            currentStatsCache = data;
             const s24 = data.stats_24h || {};
             const s30 = data.stats_30d || {};
 
@@ -143,7 +215,7 @@ function loadStatsData() {
             if (elSubCached24) elSubCached24.innerText = `${Number(s24.cached || 0).toLocaleString()} en caché`;
             if (elLatency24) elLatency24.innerText = `${s24.avg_duration || 0} ms`;
 
-            renderAsnSection('24h', s24, currentAsnFilter24h);
+            renderAsnListWithAccordion('list-asns-24h', s24.top_asns_isp || s24.top_asns, s24.top_asns_datacenter, '24h');
             renderStatsList('list-types-24h', s24.top_query_types, false);
 
             // 30 Days Metrics
@@ -161,7 +233,7 @@ function loadStatsData() {
             if (elSubCached30) elSubCached30.innerText = `${Number(s30.cached || 0).toLocaleString()} en caché`;
             if (elLatency30) elLatency30.innerText = `${s30.avg_duration || 0} ms`;
 
-            renderAsnSection('30d', s30, currentAsnFilter30d);
+            renderAsnListWithAccordion('list-asns-30d', s30.top_asns_isp || s30.top_asns, s30.top_asns_datacenter, '30d');
             renderStatsList('list-types-30d', s30.top_query_types, false);
         })
         .catch(err => {
