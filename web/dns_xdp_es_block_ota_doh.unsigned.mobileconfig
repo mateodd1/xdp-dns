@@ -2,9 +2,39 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>PayloadDisplayName</key>
+    <string>xdp.es (Bloqueo OTA)</string>
+    <key>PayloadDescription</key>
+    <string>Perfil DNS seguro xdp.es: DoH con bloqueo de anuncios, telemetría y bloqueo de actualizaciones OTA de iOS y macOS.</string>
+    <key>PayloadOrganization</key>
+    <string>xdp.es</string>
+    <key>PayloadIdentifier</key>
+    <string>es.xdp.dns.blockota.doh.root</string>
+    <key>PayloadScope</key>
+    <string>System</string>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>98e5d312-32a1-4328-861f-1b72e0a4f5c9</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
     <key>PayloadContent</key>
     <array>
         <dict>
+            <key>PayloadType</key>
+            <string>com.apple.dnsSettings.managed</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>PayloadIdentifier</key>
+            <string>es.xdp.dns.blockota.doh</string>
+            <key>PayloadUUID</key>
+            <string>f1a4e239-8472-4cf3-9182-5d9c720a4b31</string>
+            <key>PayloadDisplayName</key>
+            <string>xdp.es</string>
+            <key>PayloadOrganization</key>
+            <string>xdp.es</string>
+            <key>PayloadDescription</key>
+            <string>DNS cifrado mediante HTTPS (DoH) con bloqueo de publicidad y bloqueo de actualizaciones OTA de Apple.</string>
             <key>DNSSettings</key>
             <dict>
                 <key>DNSProtocol</key>
@@ -17,33 +47,7 @@
                     <string>2a0e:97c0:c40::51</string>
                 </array>
             </dict>
-            <key>PayloadDescription</key>
-            <string>Configura DNS cifrado mediante HTTPS (DoH) para dns.xdp.es con bloqueo de publicidad y bloqueo de actualizaciones OTA de Apple.</string>
-            <key>PayloadDisplayName</key>
-            <string>xdp.es DNS (DoH + Bloqueo OTA Apple)</string>
-            <key>PayloadIdentifier</key>
-            <string>es.xdp.dns.blockota.doh</string>
-            <key>PayloadType</key>
-            <string>com.apple.dnsSettings.managed</string>
-            <key>PayloadUUID</key>
-            <string>f1a4e239-8472-4cf3-9182-5d9c720a4b31</string>
-            <key>PayloadVersion</key>
-            <integer>1</integer>
         </dict>
     </array>
-    <key>PayloadDescription</key>
-    <string>Perfil DNS seguro xdp.es: DoH con bloqueo de anuncios, telemetría y bloqueo de actualizaciones OTA de iOS y macOS.</string>
-    <key>PayloadDisplayName</key>
-    <string>xdp.es DNS (Bloqueo OTA Apple)</string>
-    <key>PayloadIdentifier</key>
-    <string>es.xdp.dns.blockota.doh.root</string>
-    <key>PayloadOrganization</key>
-    <string>xdp.es</string>
-    <key>PayloadType</key>
-    <string>Configuration</string>
-    <key>PayloadUUID</key>
-    <string>98e5d312-32a1-4328-861f-1b72e0a4f5c9</string>
-    <key>PayloadVersion</key>
-    <integer>1</integer>
 </dict>
 </plist>
