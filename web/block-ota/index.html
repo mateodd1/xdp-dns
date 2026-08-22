@@ -17,8 +17,8 @@
                 const effectiveTheme = theme === 'auto' ? (prefersDark ? 'dark' : 'light') : theme;
                 document.documentElement.setAttribute('data-theme', effectiveTheme);
 
-                const storedLang = localStorage.getItem('xdp_lang');
-                const userLang = storedLang || ((navigator.language || (navigator.languages && navigator.languages[0]) || 'es').toLowerCase().startsWith('es') ? 'es' : 'en');
+                const navLang = (navigator.language || (navigator.languages && navigator.languages[0]) || 'es').toLowerCase();
+                const userLang = navLang.startsWith('es') ? 'es' : 'en';
                 document.documentElement.setAttribute('lang', userLang);
             } catch (e) {}
         })();
