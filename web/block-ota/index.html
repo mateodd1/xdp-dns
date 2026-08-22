@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>xdp.es | Block-OTA</title>
+    <title data-i18n="ota.page_title">xdp.es | Block-OTA</title>
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 
     <meta name="theme-color" content="#0e0f12" media="(prefers-color-scheme: dark)">
@@ -16,6 +16,10 @@
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 const effectiveTheme = theme === 'auto' ? (prefersDark ? 'dark' : 'light') : theme;
                 document.documentElement.setAttribute('data-theme', effectiveTheme);
+
+                const storedLang = localStorage.getItem('xdp_lang');
+                const userLang = storedLang || ((navigator.language || (navigator.languages && navigator.languages[0]) || 'es').toLowerCase().startsWith('es') ? 'es' : 'en');
+                document.documentElement.setAttribute('lang', userLang);
             } catch (e) {}
         })();
     </script>
@@ -92,42 +96,50 @@
         <!-- Site Header -->
         <header>
             <div class="back-nav">
-                <a href="/" class="back-link" aria-label="Volver">
+                <a href="/" class="back-link" aria-label="Volver" data-i18n="nav.home">
                     &larr; Inicio
                 </a>
-                <div class="theme-switcher" role="group" aria-label="Seleccionar tema">
-                    <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="5"></circle>
-                            <line x1="12" y1="1" x2="12" y2="3"></line>
-                            <line x1="12" y1="21" x2="12" y2="23"></line>
-                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                            <line x1="1" y1="12" x2="3" y2="12"></line>
-                            <line x1="21" y1="12" x2="23" y2="12"></line>
-                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                        </svg>
-                        <span class="theme-text">Claro</span>
-                    </button>
-                    <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                        </svg>
-                        <span class="theme-text">Oscuro</span>
-                    </button>
-                    <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático" aria-label="Automático">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                            <line x1="8" y1="21" x2="16" y2="21"></line>
-                            <line x1="12" y1="17" x2="12" y2="21"></line>
-                        </svg>
-                        <span class="theme-text">Auto</span>
-                    </button>
+                <div class="header-controls">
+                    <!-- Language Switcher -->
+                    <div class="lang-switcher" role="group" aria-label="Seleccionar idioma">
+                        <button type="button" class="lang-btn" data-lang-val="es" onclick="setLanguage('es')" title="Español" aria-label="Español">ES</button>
+                        <button type="button" class="lang-btn" data-lang-val="en" onclick="setLanguage('en')" title="English" aria-label="English">EN</button>
+                    </div>
+                    <!-- Theme Switcher -->
+                    <div class="theme-switcher" role="group" aria-label="Seleccionar tema">
+                        <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro">
+                            <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                            <span class="theme-text" data-i18n="theme.light">Claro</span>
+                        </button>
+                        <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro">
+                            <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                            <span class="theme-text" data-i18n="theme.dark">Oscuro</span>
+                        </button>
+                        <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático" aria-label="Automático">
+                            <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                <line x1="8" y1="21" x2="16" y2="21"></line>
+                                <line x1="12" y1="17" x2="12" y2="21"></line>
+                            </svg>
+                            <span class="theme-text" data-i18n="theme.auto">Auto</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             <h1>xdp.es <span class="badge badge-ota" style="font-size: 0.9rem; vertical-align: middle;">Block-OTA</span></h1>
-            <p style="color: var(--text-secondary); margin-top: 4px; font-size: 0.9rem;">
+            <p style="color: var(--text-secondary); margin-top: 4px; font-size: 0.9rem;" data-i18n="ota.subtitle">
                 Adblock + Bloqueo de actualizaciones OTA de Apple.
             </p>
         </header>
@@ -136,13 +148,13 @@
             <!-- Apple Profile (.mobileconfig) -->
             <section class="card">
                 <div class="card-header">
-                    <h2>Perfil Apple <span class="badge">iOS &bull; iPadOS &bull; macOS</span></h2>
+                    <h2><span data-i18n="ota.profile_title">Perfil Apple</span> <span class="badge">iOS &bull; iPadOS &bull; macOS</span></h2>
                 </div>
                 <div class="card-content">
                     <div class="profile-list">
                         <a href="/dns_xdp_es_block_ota_doh.mobileconfig" class="profile-btn" download aria-label="Descargar perfil DoH Block-OTA">
                             <div class="profile-info">
-                                <span class="profile-label">xdp.es OTA Block DNS</span>
+                                <span class="profile-label" data-i18n="ota.profile_btn">xdp.es OTA Block DNS</span>
                                 <span class="profile-sub">DNS over HTTPS</span>
                             </div>
                             <span class="profile-link">.mobileconfig &darr;</span>
@@ -154,7 +166,7 @@
             <!-- Blocked Domains -->
             <section class="card">
                 <div class="card-header">
-                    <h2>Dominios Bloqueados</h2>
+                    <h2 data-i18n="ota.domains_title">Dominios Bloqueados</h2>
                 </div>
                 <div class="card-content">
                     <div class="domain-grid">
@@ -177,6 +189,8 @@
         </main>
     </div>
 
+    <!-- Scripts -->
+    <script src="/i18n.js"></script>
     <script src="/theme.js" defer></script>
     <script src="/index.js" defer></script>
 </body>

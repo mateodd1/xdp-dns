@@ -5,7 +5,8 @@ function copyEndpoint(text, wrapper) {
         const tooltip = wrapper.querySelector('.tooltip');
         if (tooltip) {
             const originalText = tooltip.innerText;
-            tooltip.innerText = '¡Copiado!';
+            const copiedText = (window.i18n && window.i18n.t('copy.copied')) || '¡Copiado!';
+            tooltip.innerText = copiedText;
             setTimeout(() => {
                 tooltip.innerText = originalText;
             }, 2000);
