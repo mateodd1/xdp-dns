@@ -119,6 +119,15 @@ function renderAsnListWithAccordion(elementId, isps, dcs, period) {
     if (dcItems.length > 0) {
         const totalDcCount = dcItems.reduce((acc, curr) => acc + (curr.count || 0), 0);
 
+        let dcToggleTitle = 'Datacenter ASN';
+        let dcToggleSub = `${dcItems.length} centros de datos y servidores`;
+        if (window.i18n && typeof window.i18n.t === 'function') {
+            const resT = window.i18n.t('stats.dc_toggle_title');
+            if (resT && !resT.includes('.')) dcToggleTitle = resT;
+            const resS = window.i18n.t('stats.dc_toggle_sub');
+            if (resS && !resS.includes('.')) dcToggleSub = resS;
+        }
+
         const toggleRow = document.createElement('div');
         toggleRow.className = 'stats-row-item dc-accordion-toggle';
         toggleRow.setAttribute('role', 'button');
@@ -139,14 +148,16 @@ function renderAsnListWithAccordion(elementId, isps, dcs, period) {
         const nameSpan = document.createElement('span');
         nameSpan.className = 'item-name';
         nameSpan.style.fontWeight = '600';
-        nameSpan.innerText = 'Datacenter ASN';
+        nameSpan.innerText = dcToggleTitle;
+        nameSpan.setAttribute('data-i18n', 'stats.dc_toggle_title');
         nameRow.appendChild(nameSpan);
 
         itemLeft.appendChild(nameRow);
 
         const subSpan = document.createElement('span');
         subSpan.className = 'item-sub';
-        subSpan.innerText = `${dcItems.length} centros de datos y servidores`;
+        subSpan.innerText = dcToggleSub;
+        subSpan.setAttribute('data-i18n', 'stats.dc_toggle_sub');
         itemLeft.appendChild(subSpan);
 
         toggleRow.appendChild(itemLeft);

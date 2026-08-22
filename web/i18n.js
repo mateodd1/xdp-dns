@@ -196,7 +196,12 @@ function getLanguage() {
 function t(key, lang) {
     const activeLang = lang || getLanguage();
     const dict = translations[activeLang] || translations.es;
-    return dict[key] || (translations.es[key] || key);
+    if (dict && dict[key]) return dict[key];
+    if (translations.es && translations.es[key]) return translations.es[key];
+    if (translations.en && translations.en[key]) return translations.en[key];
+    if (key === 'stats.dc_toggle_title') return 'Datacenter ASN';
+    if (key === 'stats.dc_toggle_sub') return activeLang === 'es' ? 'Centros de datos y servidores' : 'Data centers & servers';
+    return key;
 }
 
 function applyLanguage(lang) {
