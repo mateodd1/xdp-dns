@@ -34,6 +34,21 @@ function createStatRow(item, maxCount, isAsn = false) {
     const row = document.createElement('div');
     row.className = 'stats-row-item';
 
+    if (item.isSwitchCard) {
+        row.classList.add('asn-switch-card');
+        row.setAttribute('role', 'button');
+        row.setAttribute('tabindex', '0');
+        if (item.onClick) {
+            row.onclick = item.onClick;
+            row.onkeydown = (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    item.onClick();
+                }
+            };
+        }
+    }
+
     const bgBar = document.createElement('div');
     bgBar.className = 'row-bg-bar';
     bgBar.style.width = '0%';
@@ -46,9 +61,16 @@ function createStatRow(item, maxCount, isAsn = false) {
     const nameSpan = document.createElement('span');
     nameSpan.className = 'item-name';
     nameSpan.innerText = item.name;
+    if (item.nameI18nKey) nameSpan.setAttribute('data-i18n', item.nameI18nKey);
     itemLeft.appendChild(nameSpan);
 
-    if (isAsn && item.ipv4_percent !== undefined && item.ipv6_percent !== undefined) {
+    if (item.sub) {
+        const subSpan = document.createElement('span');
+        subSpan.className = 'item-sub';
+        subSpan.innerText = item.sub;
+        if (item.subI18nKey) subSpan.setAttribute('data-i18n', item.subI18nKey);
+        itemLeft.appendChild(subSpan);
+    } else if (isAsn && item.ipv4_percent !== undefined && item.ipv6_percent !== undefined) {
         const subSpan = document.createElement('span');
         subSpan.className = 'item-sub';
         subSpan.innerText = `IPv4: ${item.ipv4_percent}% • IPv6: ${item.ipv6_percent}%`;
@@ -118,57 +140,49 @@ function renderAsnSection(period, statsObj, category) {
     container.innerHTML = '';
 
     const isIsp = category === 'isp';
-    const items = isIsp
-        ? ((statsObj.top_asns_isp && statsObj.top_asns_isp.length > 0) ? statsObj.top_asns_isp : (statsObj.top_asns || [])).slice(0, 8)
-        : (statsObj.top_asns_datacenter || []).slice(0, 8);
+    const ispItems = statsObj.top_asns_isp && statsObj.top_asns_isp.length > 0 ? statsObj.top_asns_isp : (statsObj.top_asns || []);
+    const dcItems = statsObj.top_asns_datacenter || [];
 
-    if (!items || items.length === 0) {
+    const currentItems = (isIsp ? ispItems : dcItems).slice(0, 8);
+    const otherItems = isIsp ? dcItems : ispItems;
+
+    if (!currentItems || currentItems.length === 0) {
         container.innerHTML = '<div class="empty-msg">Sin consultas registradas.</div>';
         return;
     }
 
-    const maxCount = Math.max(...items.map(i => i.count), 1);
+    const otherTotal = otherItems.reduce((acc, curr) => acc + (curr.count || 0), 0);
+    const allItemsForMax = [...currentItems];
+    if (otherTotal > 0) {
+        allItemsForMax.push({ count: otherTotal });
+    }
+    const maxCount = Math.max(...allItemsForMax.map(i => i.count), 1);
 
-    // 1. Render Top 8 items
-    items.forEach(item => {
+    // 1. Render Top 8 current items
+    currentItems.forEach(item => {
         const row = createStatRow(item, maxCount, true);
         container.appendChild(row);
     });
 
-    // 2. Render 9th item: Toggle card to switch category
-    const switchCard = document.createElement('div');
-    switchCard.className = 'asn-switch-card';
-    switchCard.setAttribute('role', 'button');
-    switchCard.setAttribute('tabindex', '0');
+    // 2. Render 9th item: Toggle card with identical layout and count
+    if (otherItems.length > 0) {
+        const targetCategory = isIsp ? 'datacenter' : 'isp';
+        const nameKey = isIsp ? 'stats.asn_toggle_to_dc' : 'stats.asn_toggle_to_isp';
+        const subKey = isIsp ? 'stats.asn_toggle_to_dc_sub' : 'stats.asn_toggle_to_isp_sub';
 
-    const itemLeft = document.createElement('div');
-    itemLeft.className = 'item-left';
+        const toggleItem = {
+            name: isIsp ? 'Datacenter ASN' : 'Operadores (ISP)',
+            nameI18nKey: nameKey,
+            sub: isIsp ? 'Centros de datos y servidores' : 'Proveedores de Internet y móvil',
+            subI18nKey: subKey,
+            count: otherTotal,
+            isSwitchCard: true,
+            onClick: () => switchAsnCategory(period, targetCategory)
+        };
 
-    const nameSpan = document.createElement('span');
-    nameSpan.className = 'item-name';
-    nameSpan.style.fontWeight = '600';
-    nameSpan.innerText = isIsp ? 'Datacenter ASN' : 'Operadores (ISP)';
-    nameSpan.setAttribute('data-i18n', isIsp ? 'stats.asn_toggle_to_dc' : 'stats.asn_toggle_to_isp');
-    itemLeft.appendChild(nameSpan);
-
-    const subSpan = document.createElement('span');
-    subSpan.className = 'item-sub';
-    subSpan.innerText = isIsp ? 'Centros de datos y servidores' : 'Proveedores de Internet y móvil';
-    subSpan.setAttribute('data-i18n', isIsp ? 'stats.asn_toggle_to_dc_sub' : 'stats.asn_toggle_to_isp_sub');
-    itemLeft.appendChild(subSpan);
-
-    switchCard.appendChild(itemLeft);
-
-    const targetCategory = isIsp ? 'datacenter' : 'isp';
-    switchCard.onclick = () => switchAsnCategory(period, targetCategory);
-    switchCard.onkeydown = (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            switchAsnCategory(period, targetCategory);
-        }
-    };
-
-    container.appendChild(switchCard);
+        const switchRow = createStatRow(toggleItem, maxCount, true);
+        container.appendChild(switchRow);
+    }
 }
 
 function loadStatsData() {
