@@ -23,6 +23,9 @@ function getIspLogo(name) {
     if (lower.includes('orange') || lower.includes('as12479')) {
         return '/stats/img/orange.svg';
     }
+    if (lower.includes('digi') || lower.includes('as57269') || lower.includes('as206238')) {
+        return '/stats/img/digi.png';
+    }
     return null;
 }
 
