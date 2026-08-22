@@ -8,12 +8,13 @@ ports:
 upstreams:
   groups:
     default:
-      - tcp+udp:127.0.0.1:53
+      - tcp+udp:127.0.0.1:5335
   strategy: strict
   timeout: 4s
 
 bootstrapDns:
-  - 127.0.0.1:53
+  - 127.0.0.1:5335
+  - 1.1.1.1
 
 caching:
   minTime: 10m
@@ -26,7 +27,10 @@ caching:
 blocking:
   denylists:
     ads:
-      - https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/multi.txt
+      - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro.txt
+      - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+      - https://small.oisd.nl
+      - https://urlhaus.abuse.ch/downloads/hostfile/
     apple_ota:
       - /root/xpd-dns/blocky/apple-ota.txt
   clientGroupsBlock:
