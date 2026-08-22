@@ -320,60 +320,100 @@ function renderErrorCard() {
 }
 
 function detectUserConnection() {
-    // Fast check of client IP and local storage caching
-    fetch('/api/ip')
-        .then(res => {
-            if (!res.ok) throw new Error('Failed to fetch client IP');
-            return res.text();
-        })
-        .then(currentIp => {
-            currentIp = currentIp.trim();
-            const cachedIp = localStorage.getItem('geoip_ip');
-            const cachedDataStr = localStorage.getItem('geoip_data');
+    // Helper to fetch GeoIP for a specific IP
+    function fetchGeoData(currentIp) {
+        const cachedIp = localStorage.getItem('geoip_ip');
+        const cachedDataStr = localStorage.getItem('geoip_data');
 
-            if (cachedIp === currentIp && cachedDataStr) {
-                try {
-                    const cachedData = JSON.parse(cachedDataStr);
-                    updateStatusCard(cachedData);
-                    return; // Loaded from cache!
-                } catch (e) {
-                    console.error('Error parsing cached geoip data:', e);
-                }
+        if (cachedIp === currentIp && cachedDataStr) {
+            try {
+                const cachedData = JSON.parse(cachedDataStr);
+                updateStatusCard(cachedData);
+                return; // Instant load from cache!
+            } catch (e) {
+                console.error('Error parsing cached geoip data:', e);
             }
+        }
 
-            // Cache miss or IP changed: fetch details from /api/geoip
-            fetch('/api/geoip')
-                .then(res => {
-                    if (!res.ok) throw new Error('Failed to fetch geoip info');
-                    return res.json();
-                })
-                .then(info => {
+        // Fetch details from our backend /api/geoip/{ip}
+        fetch('/api/geoip/' + encodeURIComponent(currentIp))
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to fetch geoip info');
+                return res.json();
+            })
+            .then(info => {
+                if (info && info.status === 'success') {
                     localStorage.setItem('geoip_ip', currentIp);
                     localStorage.setItem('geoip_data', JSON.stringify(info));
                     updateStatusCard(info);
-                })
-                .catch(err => {
-                    console.error('Error fetching geoip info:', err);
-                    renderErrorCard();
-                });
+                } else {
+                    throw new Error('GeoIP lookup failed');
+                }
+            })
+            .catch(err => {
+                console.error('Error fetching geoip info:', err);
+                // Fallback to ipwho.is if backend proxy has any issues
+                fetch('https://ipwho.is/' + encodeURIComponent(currentIp))
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data && data.success) {
+                            const asn = (data.connection && data.connection.asn) ? `AS${data.connection.asn}` : '';
+                            const orgName = (data.connection && (data.connection.org || data.connection.isp)) || 'Network';
+                            const fallbackInfo = { query: currentIp, as: asn, isp: orgName };
+                            updateStatusCard(fallbackInfo);
+                        } else {
+                            renderErrorCard();
+                        }
+                    })
+                    .catch(() => renderErrorCard());
+            });
+    }
+
+    // Step 1: Check if client has IPv6 via fast IPv6 probe (api6.ipify.org or ipwho.is)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1200);
+
+    fetch('https://api6.ipify.org?format=json', { signal: controller.signal })
+        .then(res => res.json())
+        .then(data => {
+            clearTimeout(timeoutId);
+            if (data && data.ip && data.ip.includes(':')) {
+                fetchGeoData(data.ip.trim());
+            } else {
+                fallbackIPv4();
+            }
         })
-        .catch(err => {
-            console.error('Error fetching client IP:', err);
-            // Fallback to client-side geoip lookup
-            fetch('https://ipwho.is/')
-                .then(r => r.json())
-                .then(data => {
-                    if (data && data.success) {
-                        const ip = data.ip || '-';
-                        const asn = (data.connection && data.connection.asn) ? `AS${data.connection.asn}` : '';
-                        const orgName = (data.connection && (data.connection.org || data.connection.isp)) || 'Network';
-                        updateStatusCard({ query: ip, as: asn, isp: orgName });
-                    } else {
-                        renderErrorCard();
-                    }
-                })
-                .catch(() => renderErrorCard());
+        .catch(() => {
+            clearTimeout(timeoutId);
+            fallbackIPv4();
         });
+
+    function fallbackIPv4() {
+        fetch('/api/ip')
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to fetch client IP');
+                return res.text();
+            })
+            .then(ipText => {
+                fetchGeoData(ipText.trim());
+            })
+            .catch(err => {
+                console.error('Error fetching client IP:', err);
+                fetch('https://ipwho.is/')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data && data.success) {
+                            const ip = data.ip || '-';
+                            const asn = (data.connection && data.connection.asn) ? `AS${data.connection.asn}` : '';
+                            const orgName = (data.connection && (data.connection.org || data.connection.isp)) || 'Network';
+                            updateStatusCard({ query: ip, as: asn, isp: orgName });
+                        } else {
+                            renderErrorCard();
+                        }
+                    })
+                    .catch(() => renderErrorCard());
+            });
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
