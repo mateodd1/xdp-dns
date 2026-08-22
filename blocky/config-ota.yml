@@ -1,11 +1,9 @@
-ports:
-  dns: 127.0.0.1:5353
-  tls: 853
-  http: 4000
+# /root/xpd-dns/blocky/config-ota.yml
+# Blocky Instance for Apple OTA & Update Blocking + Adblock
 
-certFile: /etc/letsencrypt/live/dns.xdp.es/fullchain.pem
-keyFile: /etc/letsencrypt/live/dns.xdp.es/privkey.pem
-minTlsServeVersion: "1.2"
+ports:
+  dns: 127.0.0.1:5354
+  http: 4001
 
 upstreams:
   groups:
@@ -33,11 +31,6 @@ blocking:
       - /root/xpd-dns/blocky/apple-ota.txt
   clientGroupsBlock:
     default:
-      - ads
-    block-ota:
-      - ads
-      - apple_ota
-    ota:
       - ads
       - apple_ota
   blockType: zeroIp

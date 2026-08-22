@@ -16,12 +16,10 @@ fi
 
 echo "Firmando perfiles Apple (.mobileconfig) con certificado Let's Encrypt..."
 
-# Create temporary unsigned source backups if needed
-for profile in "dns_xdp_es_doh" "dns_xdp_es_dot"; do
+for profile in "dns_xdp_es_doh" "dns_xdp_es_dot" "dns_xdp_es_block_ota_doh"; do
     raw_file="${SRC_DIR}/${profile}.unsigned.mobileconfig"
     target_file="${SRC_DIR}/${profile}.mobileconfig"
     
-    # If unsigned template doesn't exist yet, create it from current plain xml
     if [[ ! -f "$raw_file" ]]; then
         cp "$target_file" "$raw_file"
     fi
@@ -50,7 +48,8 @@ for profile in "dns_xdp_es_doh" "dns_xdp_es_dot"; do
     echo " -> ${profile}.mobileconfig firmado correctamente."
 done
 
-# Restart Blocky to ensure updated TLS certificates are active on port 853
+# Restart Blocky and Blocky-OTA to ensure updated TLS certificates are active
 systemctl restart blocky 2>/dev/null || true
+systemctl restart blocky-ota 2>/dev/null || true
 
 echo "¡Todos los perfiles de Apple (.mobileconfig) han sido firmados con éxito!"

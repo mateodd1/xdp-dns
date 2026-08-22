@@ -15,9 +15,17 @@
 }
 
 # Dedicated DoH & DoT Subdomain (dns.xdp.es)
-# Specific site block: handles /dns-query for DoH, /stats* for anonymous dashboard, redirects everything else to https://xdp.es/
 dns.xdp.es {
-    # RFC 8484 DoH & RFC 9462 DDR Discovery Endpoint
+    # Block-OTA DoH Endpoint (Proxied to Blocky-OTA on port 4001 with path rewrite to /dns-query)
+    handle /block-ota/dns-query* {
+        rewrite * /dns-query
+        reverse_proxy 127.0.0.1:4001 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+        }
+    }
+
+    # Standard RFC 8484 DoH & RFC 9462 DDR Discovery Endpoint (Proxied to Blocky on port 4000)
     handle /dns-query* {
         reverse_proxy 127.0.0.1:4000 {
             header_up Host {host}
@@ -50,6 +58,16 @@ dns.xdp.es {
         file_server
     }
 
+    # Dedicated Block-OTA Page (/block-ota or /block-ota/)
+    @block_ota_page path /block-ota /block-ota/ /block-ota/index.html
+    handle @block_ota_page {
+        root * /var/www/xdp.es
+        header Content-Type "text/html; charset=utf-8"
+        header Cache-Control "public, max-age=60, must-revalidate"
+        rewrite * /block-ota/index.html
+        file_server
+    }
+
     # Known Static assets & Machine-readable files
     @assets path /index.css /index.js /theme.js /stats.js /llms.txt /llms-full.txt /openapi.json /robots.txt /sitemap.xml /favicon.ico *.mobileconfig *.svg *.png *.ico *.css *.js
     handle @assets {
@@ -58,7 +76,7 @@ dns.xdp.es {
         file_server
     }
 
-    # Fallback: All other paths, subdirectories or root on dns.xdp.es redirect to main landing page https://xdp.es/
+    # Fallback: All other paths or root on dns.xdp.es redirect to main landing page https://xdp.es/
     handle {
         redir https://xdp.es/ permanent
     }
@@ -89,6 +107,11 @@ xdp.es, http://85.208.114.51, http://127.0.0.1, http://localhost {
         redir https://dns.xdp.es/dns-query permanent
     }
 
+    # Block-OTA DoH Endpoint (Redirect to dedicated endpoint)
+    handle /block-ota/dns-query* {
+        redir https://dns.xdp.es{uri} permanent
+    }
+
     # Public stats.json endpoint (Explicit UTF-8)
     @stats path /stats.json /stats/stats.json
     handle @stats {
@@ -103,6 +126,15 @@ xdp.es, http://85.208.114.51, http://127.0.0.1, http://localhost {
         header Content-Type "text/html; charset=utf-8"
         header Cache-Control "public, max-age=60, must-revalidate"
         rewrite * /stats/index.html
+        file_server
+    }
+
+    # Dedicated Block-OTA Page (/block-ota or /block-ota/)
+    @block_ota_page path /block-ota /block-ota/ /block-ota/index.html
+    handle @block_ota_page {
+        header Content-Type "text/html; charset=utf-8"
+        header Cache-Control "public, max-age=60, must-revalidate"
+        rewrite * /block-ota/index.html
         file_server
     }
 

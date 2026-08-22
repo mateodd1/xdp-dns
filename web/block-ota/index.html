@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es" prefix="og: https://ogp.me/ns#">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloqueo de Actualizaciones Apple (OTA) | xdp.es DNS</title>
+    <meta name="description" content="Perfil DNS seguro con bloqueo de publicidad y bloqueo estricto de actualizaciones OTA y servidores OCSP de Apple para iOS y macOS.">
+    <link rel="canonical" href="https://xdp.es/block-ota">
+    <meta name="robots" content="index, follow">
+
+    <!-- Machine & Agent Discovery -->
+    <link rel="help" type="text/markdown" href="/llms.txt" title="LLM & AI Agent Context">
+    <link rel="service-desc" type="application/json" href="/openapi.json" title="OpenAPI 3.1 Specification">
+
+    <!-- Open Graph & Social -->
+    <meta property="og:title" content="Bloqueo de Actualizaciones Apple (OTA) | xdp.es DNS">
+    <meta property="og:description" content="DNS cifrado con bloqueo de publicidad y prevención de actualizaciones automáticas en iOS y macOS.">
+    <meta property="og:url" content="https://xdp.es/block-ota">
+    <meta property="og:type" content="website">
+
+    <!-- Theme Color for Mobile Browsers -->
+    <meta name="theme-color" content="#0e0f12" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Bloqueo de Actualizaciones Apple (OTA) - xdp.es DNS",
+      "description": "Configuración de DNS cifrado DoH para bloquear actualizaciones automáticas de iOS/macOS y filtrado de publicidad.",
+      "url": "https://xdp.es/block-ota"
+    }
+    </script>
+
+    <!-- Inline script to prevent theme flashing (FOIT) -->
+    <script>
+        (function() {
+            try {
+                const theme = localStorage.getItem('xdp_theme') || 'auto';
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const effectiveTheme = theme === 'auto' ? (prefersDark ? 'dark' : 'light') : theme;
+                document.documentElement.setAttribute('data-theme', effectiveTheme);
+            } catch (e) {}
+        })();
+    </script>
+
+    <!-- Font Optimization -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    </noscript>
+
+    <link rel="stylesheet" href="/index.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20100%20100%22><text y=%22.9em%22 font-size=%2290%22>🛑</text></svg>">
+
+    <style>
+        .badge-ota {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        [data-theme="light"] .badge-ota {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border-color: #fca5a5;
+        }
+        .domain-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .domain-tag {
+            background-color: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 7px 10px;
+            font-family: SFMono-Regular, Consolas, monospace;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            word-break: break-all;
+        }
+        .domain-tag::before {
+            content: "✕";
+            color: #ef4444;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+        .back-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .back-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Site Header -->
+        <header>
+            <div class="back-nav">
+                <a href="/" class="back-link" aria-label="Volver a la página principal">
+                    &larr; Volver al DNS estándar
+                </a>
+                <div class="theme-switcher" role="group" aria-label="Seleccionar tema de color">
+                    <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <span class="theme-text">Claro</span>
+                    </button>
+                    <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <span class="theme-text">Oscuro</span>
+                    </button>
+                    <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático" aria-label="Automático">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                        <span class="theme-text">Auto</span>
+                    </button>
+                </div>
+            </div>
+            <h1>xdp.es DNS <span class="badge badge-ota" style="font-size: 0.9rem; vertical-align: middle;">Block-OTA</span></h1>
+            <p style="color: var(--text-secondary); margin-top: 6px; font-size: 0.95rem;">
+                Resolución DNS ultrarrápida con <strong>bloqueo de publicidad</strong> y <strong>bloqueo total de actualizaciones de software (OTA) y OCSP en dispositivos Apple</strong>.
+            </p>
+        </header>
+
+        <main>
+            <!-- DoH Block-OTA Card -->
+            <section class="card" aria-labelledby="heading-doh-ota">
+                <div class="card-header">
+                    <h2 id="heading-doh-ota">Endpoint DoH <span class="badge badge-ota">Bloqueo OTA</span></h2>
+                </div>
+                <div class="card-content">
+                    <p class="desc">Introduce esta dirección URL en navegadores, clientes DoH o configuraciones manuales de red para activar el bloqueo de anuncios y de actualizaciones OTA.</p>
+                    <div class="endpoint-box">
+                        <span class="label desktop-only">URL DoH:</span>
+                        <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('https://dns.xdp.es/block-ota/dns-query', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('https://dns.xdp.es/block-ota/dns-query', this)" aria-label="Copiar URL DoH Block-OTA">
+                            <code class="code-val">https://dns.xdp.es/block-ota/dns-query</code>
+                            <span class="tooltip">Click para copiar</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Apple Profile (.mobileconfig) -->
+            <section class="card" aria-labelledby="heading-apple-ota">
+                <div class="card-header">
+                    <h2 id="heading-apple-ota">Perfil Apple <span class="badge">iOS &bull; iPadOS &bull; macOS</span></h2>
+                </div>
+                <div class="card-content">
+                    <p class="desc">Instala el perfil oficial firmado para bloquear permanentemente las actualizaciones automáticas del sistema operativo en tu iPhone, iPad o Mac.</p>
+                    <div class="profile-list">
+                        <a href="/dns_xdp_es_block_ota_doh.mobileconfig" class="profile-btn" download aria-label="Descargar perfil de bloqueo de actualizaciones Apple OTA">
+                            <div class="profile-info">
+                                <span class="profile-label">DoH + Adblock + Bloqueo OTA Apple</span>
+                                <span class="profile-sub">Perfil firmado con Let's Encrypt (.mobileconfig)</span>
+                            </div>
+                            <span class="profile-link">.mobileconfig &darr;</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Blocked Domains List -->
+            <section class="card" aria-labelledby="heading-domains">
+                <div class="card-header">
+                    <h2 id="heading-domains">Servidores Apple Bloqueados</h2>
+                </div>
+                <div class="card-content">
+                    <p class="desc">Todas las consultas hacia los siguientes dominios de actualización, telemetría y verificación de certificados OCSP son redirigidas a <code class="code-inline">0.0.0.0</code>:</p>
+                    <div class="domain-grid">
+                        <div class="domain-tag">ocsp.apple.com</div>
+                        <div class="domain-tag">ocsp2.apple.com</div>
+                        <div class="domain-tag">mesu.apple.com</div>
+                        <div class="domain-tag">valid.apple.com</div>
+                        <div class="domain-tag">crl.apple.com</div>
+                        <div class="domain-tag">certs.apple.com</div>
+                        <div class="domain-tag">appattest.apple.com</div>
+                        <div class="domain-tag">vpp.itunes.apple.com</div>
+                        <div class="domain-tag">guzzoni-apple-com.v.aaplimg.com</div>
+                        <div class="domain-tag">gdmf.apple.com</div>
+                        <div class="domain-tag">axm-app.apple.com</div>
+                        <div class="domain-tag">comm-cohort.ess.apple.com</div>
+                        <div class="domain-tag">comm-main.ess.apple.com</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Installation Guide -->
+            <section class="card" aria-labelledby="heading-instructions">
+                <div class="card-header">
+                    <h2 id="heading-instructions">Instrucciones de Instalación</h2>
+                </div>
+                <div class="card-content">
+                    <ol class="steps-list">
+                        <li>Descarga el perfil <a href="/dns_xdp_es_block_ota_doh.mobileconfig" class="text-link">.mobileconfig</a> desde Safari en tu dispositivo Apple.</li>
+                        <li>Abre <strong>Ajustes</strong> &rarr; <strong>Perfil descargado</strong> (en la parte superior).</li>
+                        <li>Pulsa <strong>Instalar</strong> en la esquina superior derecha y confirma con tu código de seguridad.</li>
+                        <li>Una vez instalado, tu dispositivo dejará de recibir notificaciones y no podrá descargar nuevas versiones de iOS/macOS.</li>
+                    </ol>
+                    <p style="margin-top: 14px; font-size: 0.85rem; color: var(--text-muted);">
+                        <em>Nota: Para volver a recibir actualizaciones en el futuro, simplemente desinstala el perfil desde <strong>Ajustes &rarr; General &rarr; VPN y gestión de dispositivos</strong>.</em>
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts with defer -->
+    <script src="/theme.js" defer></script>
+    <script src="/index.js" defer></script>
+</body>
+</html>

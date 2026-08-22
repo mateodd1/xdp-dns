@@ -5,6 +5,7 @@
 ## Overview & Architecture
 
 - [Main Service](https://xdp.es/): Canonical home page and overview.
+- [Block-OTA Service](https://xdp.es/block-ota): Specialized resolver blocking Apple OTA updates and OCSP checks.
 - [Telemetry Dashboard](https://xdp.es/stats): Live graphical dashboard.
 - [JSON Metrics](https://xdp.es/stats.json): Real-time metrics API endpoint.
 - [OpenAPI Schema](https://xdp.es/openapi.json): Machine-readable OpenAPI 3.1.0 API definition.
@@ -13,7 +14,8 @@
 ## Protocols & Endpoints
 
 ### 1. DNS-over-HTTPS (DoH)
-- [DoH Query URL](https://dns.xdp.es/dns-query): Standard RFC 8484 endpoint.
+- [Standard DoH Endpoint](https://dns.xdp.es/dns-query): Standard RFC 8484 endpoint with ad/malware blocking.
+- [Block-OTA DoH Endpoint](https://dns.xdp.es/block-ota/dns-query): RFC 8484 endpoint blocking ads, Apple updates (mesu.apple.com, gdmf.apple.com, etc.), and OCSP checks.
 - Protocols: HTTP/1.1, HTTP/2, HTTP/3 (QUIC) on port 443.
 - Request Methods: `GET ?dns=<base64url>` or `POST` with binary `application/dns-message`.
 
@@ -24,6 +26,7 @@
 - [IPv4 Resolver](https://xdp.es/): `85.208.114.51` on port 53 UDP/TCP with DNSSEC root anchor validation.
 - [IPv6 Resolver](https://xdp.es/): `2a0e:97c0:c40::51` on port 53 UDP/TCP with DNSSEC root anchor validation.
 
-### 4. Apple Configuration Profiles
-- [DoH Profile (.mobileconfig)](https://xdp.es/dns_xdp_es_doh.mobileconfig): Installs encrypted DNS over HTTPS on iOS, iPadOS, and macOS.
-- [DoT Profile (.mobileconfig)](https://xdp.es/dns_xdp_es_dot.mobileconfig): Installs encrypted DNS over TLS on iOS, iPadOS, and macOS.
+### 4. Apple Configuration Profiles (.mobileconfig)
+- [DoH Standard Profile](https://xdp.es/dns_xdp_es_doh.mobileconfig): Encrypted DNS over HTTPS on iOS, iPadOS, and macOS.
+- [DoT Standard Profile](https://xdp.es/dns_xdp_es_dot.mobileconfig): Encrypted DNS over TLS on iOS, iPadOS, and macOS.
+- [Block-OTA DoH Profile](https://xdp.es/dns_xdp_es_block_ota_doh.mobileconfig): Encrypted DNS over HTTPS blocking iOS/macOS updates.

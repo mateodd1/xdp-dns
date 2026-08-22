@@ -1,0 +1,14 @@
+# Apple OTA & Update Blocking List for xdp.es Block-OTA Profile
+ocsp.apple.com
+ocsp2.apple.com
+mesu.apple.com
+valid.apple.com
+crl.apple.com
+certs.apple.com
+appattest.apple.com
+vpp.itunes.apple.com
+guzzoni-apple-com.v.aaplimg.com
+gdmf.apple.com
+axm-app.apple.com
+comm-cohort.ess.apple.com
+comm-main.ess.apple.com

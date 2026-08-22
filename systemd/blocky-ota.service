@@ -1,0 +1,16 @@
+[Unit]
+Description=Blocky DNS Proxy (Apple OTA & Update Blocker)
+After=network.target unbound.service
+Wants=unbound.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/xpd-dns/blocky
+ExecStart=/usr/local/bin/blocky --config /root/xpd-dns/blocky/config-ota.yml
+Restart=always
+RestartSec=3s
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
