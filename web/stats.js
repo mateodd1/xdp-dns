@@ -11,6 +11,21 @@ function switchTab(interval) {
     if (activePane) activePane.classList.add('active');
 }
 
+function getIspLogo(name) {
+    if (!name) return null;
+    const lower = name.toLowerCase();
+    if (lower.includes('telefonica') || lower.includes('movistar') || lower.includes('as3352') || lower.includes('as6739')) {
+        return '/stats/img/movistar.svg';
+    }
+    if (lower.includes('vodafone') || lower.includes('as12430')) {
+        return '/stats/img/vodafone.svg';
+    }
+    if (lower.includes('orange') || lower.includes('as12479')) {
+        return '/stats/img/orange.svg';
+    }
+    return null;
+}
+
 function renderStatsList(elementId, items, isAsn = false) {
     const container = document.getElementById(elementId);
     if (!container) return;
@@ -36,10 +51,27 @@ function renderStatsList(elementId, items, isAsn = false) {
         const itemLeft = document.createElement('div');
         itemLeft.className = 'item-left';
 
+        const nameRow = document.createElement('div');
+        nameRow.className = 'item-name-row';
+
+        if (isAsn) {
+            const logoUrl = getIspLogo(item.name);
+            if (logoUrl) {
+                const logoImg = document.createElement('img');
+                logoImg.src = logoUrl;
+                logoImg.alt = '';
+                logoImg.className = 'isp-logo';
+                logoImg.loading = 'lazy';
+                nameRow.appendChild(logoImg);
+            }
+        }
+
         const nameSpan = document.createElement('span');
         nameSpan.className = 'item-name';
         nameSpan.innerText = item.name;
-        itemLeft.appendChild(nameSpan);
+        nameRow.appendChild(nameSpan);
+
+        itemLeft.appendChild(nameRow);
 
         if (isAsn && item.ipv4_percent !== undefined && item.ipv6_percent !== undefined) {
             const subSpan = document.createElement('span');
@@ -139,8 +171,10 @@ function detectUserConnection() {
                 }
                 
                 let orgName = (data.connection && (data.connection.org || data.connection.isp)) || 'Organización';
+                const logoUrl = getIspLogo(orgName + ' ' + (data.connection && data.connection.asn ? 'AS' + data.connection.asn : ''));
+                const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="" class="conn-isp-logo">` : '';
                 
-                if (desc) desc.innerText = `${asnDisplay}${orgName}`;
+                if (desc) desc.innerHTML = `${logoHtml}${asnDisplay}${orgName}`;
                 if (ipEl) ipEl.innerText = ip;
             } else {
                 fallbackDetect();
@@ -161,8 +195,10 @@ function detectUserConnection() {
                     
                     let asnDisplay = data.asn ? `${data.asn} • ` : '';
                     let orgName = data.org || data.carrier || 'Organización';
+                    const logoUrl = getIspLogo(orgName + ' ' + (data.asn || ''));
+                    const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="" class="conn-isp-logo">` : '';
                     
-                    if (desc) desc.innerText = `${asnDisplay}${orgName}`;
+                    if (desc) desc.innerHTML = `${logoHtml}${asnDisplay}${orgName}`;
                     if (ipEl) ipEl.innerText = ip;
                 }
             })

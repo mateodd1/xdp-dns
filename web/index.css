@@ -588,3 +588,29 @@ main {
         font-size: 1.65rem;
     }
 }
+
+.item-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.isp-logo {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: inline-block;
+}
+
+.conn-isp-logo {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    border-radius: 4px;
+    margin-right: 6px;
+    vertical-align: middle;
+    display: inline-block;
+}
