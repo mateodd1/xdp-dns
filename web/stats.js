@@ -26,6 +26,9 @@ function getIspLogo(name) {
     if (lower.includes('digi') || lower.includes('as57269') || lower.includes('as206238')) {
         return '/stats/img/digi.png';
     }
+    if (lower.includes('yoigo') || lower.includes('masmovil') || lower.includes('másmóvil') || lower.includes('xfera') || lower.includes('pepephone') || lower.includes('euskaltel') || lower.includes('as15704') || lower.includes('as210344') || lower.includes('as15954') || lower.includes('as56645')) {
+        return '/stats/img/masmovil.svg';
+    }
     return null;
 }
 
@@ -267,6 +270,7 @@ function updateStatusCard(info) {
     const isMovistar = lowerAS.includes('as3352') || lowerAS.includes('as3351') || lowerISP.includes('telefonica') || lowerISP.includes('movistar') || lowerORG.includes('telefonica') || lowerORG.includes('movistar');
     const isOrange = lowerAS.includes('as12479') || lowerISP.includes('orange') || lowerORG.includes('orange');
     const isDigi = lowerAS.includes('as57269') || lowerAS.includes('as206238') || lowerISP.includes('digi') || lowerORG.includes('digi');
+    const isMasmovil = lowerAS.includes('as15704') || lowerAS.includes('as210344') || lowerAS.includes('as15954') || lowerAS.includes('as56645') || lowerISP.includes('yoigo') || lowerISP.includes('masmovil') || lowerISP.includes('másmóvil') || lowerISP.includes('xfera') || lowerISP.includes('pepephone') || lowerISP.includes('euskaltel') || lowerORG.includes('yoigo') || lowerORG.includes('masmovil') || lowerORG.includes('másmóvil') || lowerORG.includes('xfera') || lowerORG.includes('pepephone') || lowerORG.includes('euskaltel');
 
     if (isVodafone) {
         logoHtml = `<div class="connection-icon-wrapper"><img src="/stats/img/vodafone.svg" alt="Vodafone" style="width: 24px; height: 24px;" /></div>`;
@@ -280,6 +284,9 @@ function updateStatusCard(info) {
     } else if (isDigi) {
         logoHtml = `<div class="connection-icon-wrapper"><img src="/stats/img/digi.png" alt="Digi" style="width: 24px; height: 24px;" /></div>`;
         brandClass = 'brand-digi';
+    } else if (isMasmovil) {
+        logoHtml = `<div class="connection-icon-wrapper"><img src="/stats/img/masmovil.svg" alt="MásMóvil / Yoigo" style="width: 26px; height: 26px;" /></div>`;
+        brandClass = 'brand-masmovil';
     }
 
     const titleText = (window.i18n && window.i18n.t('conn.title')) || 'Tu Conexión';
