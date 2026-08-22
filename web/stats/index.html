@@ -343,6 +343,21 @@
             transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         }
 
+        .table-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+        }
+
+        .table-card-header h3 {
+            margin: 0 !important;
+            padding: 0 !important;
+            border-bottom: none !important;
+        }
+
         .table-card h3 {
             margin: 0 0 14px 0;
             font-size: 0.95rem;
@@ -355,49 +370,37 @@
             align-items: center;
         }
 
-        .dc-accordion-toggle {
-            cursor: pointer;
-            user-select: none;
-            border: 1px dashed var(--border);
-            background-color: var(--bg-card);
+        .asn-pill-group {
+            display: inline-flex;
+            background-color: var(--bg-body);
+            border: 1px solid var(--border);
             border-radius: 6px;
-            padding: 9px 12px;
-            margin-top: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
+            padding: 2px;
+            gap: 2px;
         }
 
-        .dc-accordion-toggle:hover {
-            background-color: var(--accent-dim);
-            border-color: var(--accent);
+        .asn-pill-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.74rem;
+            font-weight: 500;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .dc-accordion-toggle .dc-toggle-icon {
-            display: inline-block;
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 0.75rem;
-            color: var(--accent);
-            margin-right: 6px;
+        .asn-pill-btn:hover {
+            color: var(--text-primary);
         }
 
-        .dc-accordion-toggle.expanded .dc-toggle-icon {
-            transform: rotate(90deg);
-        }
-
-        .dc-accordion-content {
-            display: none;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 6px;
-            padding-left: 10px;
-            border-left: 2px solid var(--accent-dim);
-            animation: fadeIn 0.2s ease;
-        }
-
-        .dc-accordion-content.expanded {
-            display: flex;
+        .asn-pill-btn.active {
+            background-color: var(--accent);
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
         }
 
         .stats-list {
@@ -702,7 +705,13 @@
 
                 <div class="dashboard-grid">
                     <div class="table-card">
-                        <h3 data-i18n="stats.table_asn">Top ASNs</h3>
+                        <div class="table-card-header">
+                            <h3 data-i18n="stats.table_asn">Top ASNs</h3>
+                            <div class="asn-pill-group" role="group" aria-label="Filtrar tipo de red">
+                                <button type="button" class="asn-pill-btn active" id="btn-asn-isp-24h" onclick="switchAsnCategory('24h', 'isp')" data-i18n="stats.asn_btn_isp">Operadores</button>
+                                <button type="button" class="asn-pill-btn" id="btn-asn-dc-24h" onclick="switchAsnCategory('24h', 'datacenter')" data-i18n="stats.asn_btn_datacenter">Datacenter</button>
+                            </div>
+                        </div>
                         <div class="stats-list" id="list-asns-24h" data-agent-list="top-asns-24h">
                             <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
                         </div>
@@ -741,7 +750,13 @@
 
                 <div class="dashboard-grid">
                     <div class="table-card">
-                        <h3 data-i18n="stats.table_asn">Top ASNs</h3>
+                        <div class="table-card-header">
+                            <h3 data-i18n="stats.table_asn">Top ASNs</h3>
+                            <div class="asn-pill-group" role="group" aria-label="Filtrar tipo de red">
+                                <button type="button" class="asn-pill-btn active" id="btn-asn-isp-30d" onclick="switchAsnCategory('30d', 'isp')" data-i18n="stats.asn_btn_isp">Operadores</button>
+                                <button type="button" class="asn-pill-btn" id="btn-asn-dc-30d" onclick="switchAsnCategory('30d', 'datacenter')" data-i18n="stats.asn_btn_datacenter">Datacenter</button>
+                            </div>
+                        </div>
                         <div class="stats-list" id="list-asns-30d" data-agent-list="top-asns-30d">
                             <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
                         </div>
@@ -774,7 +789,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=2.3"></script>
+    <script src="/i18n.js?v=2.4"></script>
     <script>
         // Theme Management
         const THEME_KEY = 'xdp_theme';
@@ -913,117 +928,43 @@
             });
         }
 
-        // Render 8 ISP ASNs + 9th Datacenter ASN Collapsible Accordion
-        function renderAsnListWithAccordion(elementId, isps, dcs, period) {
-            const container = document.getElementById(elementId);
-            if (!container) return;
-            container.innerHTML = '';
+        let currentStatsCache = null;
+        let currentAsnCategory24h = 'isp';
+        let currentAsnCategory30d = 'isp';
 
-            const ispItems = (isps || []).slice(0, 8);
-            const dcItems = (dcs || []).slice(0, 8);
-
-            if (ispItems.length === 0 && dcItems.length === 0) {
-                const noDataText = (window.i18n && window.i18n.t('stats.no_data')) || 'Sin consultas registradas.';
-                container.innerHTML = `<div class="empty-msg">${noDataText}</div>`;
-                return;
-            }
-
-            const allItems = [...ispItems, ...dcItems];
-            const maxCount = Math.max(...allItems.map(i => i.count), 1);
-
-            // 1. Render Top 8 ISP items
-            ispItems.forEach(item => {
-                const row = createStatRow(item, maxCount, true);
-                container.appendChild(row);
-            });
-
-            // 2. Render 9th item: Datacenter ASN accordion toggle
-            if (dcItems.length > 0) {
-                const totalDcCount = dcItems.reduce((acc, curr) => acc + (curr.count || 0), 0);
-                
-                let dcToggleTitle = 'Datacenter ASN';
-                let dcToggleSub = `${dcItems.length} centros de datos y servidores`;
-                if (window.i18n && typeof window.i18n.t === 'function') {
-                    const resT = window.i18n.t('stats.dc_toggle_title');
-                    if (resT && !resT.includes('.')) dcToggleTitle = resT;
-                    const resS = window.i18n.t('stats.dc_toggle_sub');
-                    if (resS && !resS.includes('.')) dcToggleSub = resS;
+        function switchAsnCategory(period, category) {
+            if (period === '24h') {
+                currentAsnCategory24h = category;
+                const btnIsp = document.getElementById('btn-asn-isp-24h');
+                const btnDc = document.getElementById('btn-asn-dc-24h');
+                if (btnIsp && btnDc) {
+                    btnIsp.classList.toggle('active', category === 'isp');
+                    btnDc.classList.toggle('active', category === 'datacenter');
                 }
-
-                const toggleRow = document.createElement('div');
-                toggleRow.className = 'stats-row-item dc-accordion-toggle';
-                toggleRow.setAttribute('role', 'button');
-                toggleRow.setAttribute('tabindex', '0');
-                toggleRow.setAttribute('id', `dc-toggle-${period}`);
-
-                const itemLeft = document.createElement('div');
-                itemLeft.className = 'item-left';
-
-                const nameRow = document.createElement('div');
-                nameRow.className = 'item-name-row';
-
-                const iconSpan = document.createElement('span');
-                iconSpan.className = 'dc-toggle-icon';
-                iconSpan.innerText = '▶';
-                nameRow.appendChild(iconSpan);
-
-                const nameSpan = document.createElement('span');
-                nameSpan.className = 'item-name';
-                nameSpan.style.fontWeight = '600';
-                nameSpan.innerText = dcToggleTitle;
-                nameSpan.setAttribute('data-i18n', 'stats.dc_toggle_title');
-                nameRow.appendChild(nameSpan);
-
-                itemLeft.appendChild(nameRow);
-
-                const subSpan = document.createElement('span');
-                subSpan.className = 'item-sub';
-                subSpan.innerText = dcToggleSub;
-                subSpan.setAttribute('data-i18n', 'stats.dc_toggle_sub');
-                itemLeft.appendChild(subSpan);
-
-                toggleRow.appendChild(itemLeft);
-
-                const countSpan = document.createElement('span');
-                countSpan.className = 'item-count';
-                countSpan.innerText = Number(totalDcCount).toLocaleString();
-                toggleRow.appendChild(countSpan);
-
-                // Content container
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'dc-accordion-content';
-                contentDiv.id = `dc-content-${period}`;
-
-                dcItems.forEach(item => {
-                    const dcRow = createStatRow(item, maxCount, true);
-                    contentDiv.appendChild(dcRow);
-                });
-
-                // Click / Keyboard handler to toggle accordion
-                toggleRow.onclick = function() {
-                    const isExpanded = contentDiv.classList.toggle('expanded');
-                    toggleRow.classList.toggle('expanded', isExpanded);
-                    if (isExpanded) {
-                        contentDiv.querySelectorAll('.row-bg-bar').forEach(bar => {
-                            const w = bar.getAttribute('data-target-width');
-                            if (w) bar.style.width = w;
-                        });
-                    }
-                };
-
-                toggleRow.onkeydown = function(e) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        toggleRow.click();
-                    }
-                };
-
-                container.appendChild(toggleRow);
-                container.appendChild(contentDiv);
+                if (currentStatsCache && currentStatsCache.stats_24h) {
+                    renderAsnSection('24h', currentStatsCache.stats_24h, category);
+                }
+            } else {
+                currentAsnCategory30d = category;
+                const btnIsp = document.getElementById('btn-asn-isp-30d');
+                const btnDc = document.getElementById('btn-asn-dc-30d');
+                if (btnIsp && btnDc) {
+                    btnIsp.classList.toggle('active', category === 'isp');
+                    btnDc.classList.toggle('active', category === 'datacenter');
+                }
+                if (currentStatsCache && currentStatsCache.stats_30d) {
+                    renderAsnSection('30d', currentStatsCache.stats_30d, category);
+                }
             }
         }
 
-        let currentStatsCache = null;
+        function renderAsnSection(period, statsObj, category) {
+            const elementId = period === '24h' ? 'list-asns-24h' : 'list-asns-30d';
+            const items = category === 'datacenter'
+                ? (statsObj.top_asns_datacenter || [])
+                : (statsObj.top_asns_isp || statsObj.top_asns || []);
+            renderStatsList(elementId, items, true);
+        }
 
         function updateStatsUI(data) {
             if (!data) return;
@@ -1048,7 +989,7 @@
             if (elSubCached24) elSubCached24.innerText = Number(s24.cached || 0).toLocaleString();
             if (elLatency24) elLatency24.innerText = `${s24.avg_duration || 0} ms`;
 
-            renderAsnListWithAccordion('list-asns-24h', s24.top_asns_isp || s24.top_asns, s24.top_asns_datacenter, '24h');
+            renderAsnSection('24h', s24, currentAsnCategory24h);
             renderStatsList('list-types-24h', s24.top_query_types, false);
 
             // 30 Days
@@ -1066,7 +1007,7 @@
             if (elSubCached30) elSubCached30.innerText = Number(s30.cached || 0).toLocaleString();
             if (elLatency30) elLatency30.innerText = `${s30.avg_duration || 0} ms`;
 
-            renderAsnListWithAccordion('list-asns-30d', s30.top_asns_isp || s30.top_asns, s30.top_asns_datacenter, '30d');
+            renderAsnSection('30d', s30, currentAsnCategory30d);
             renderStatsList('list-types-30d', s30.top_query_types, false);
         }
 

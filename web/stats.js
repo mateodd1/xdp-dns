@@ -93,112 +93,42 @@ function renderStatsList(elementId, items, isAsn = false) {
     });
 }
 
-function renderAsnListWithAccordion(elementId, isps, dcs, period) {
-    const container = document.getElementById(elementId);
-    if (!container) return;
-    container.innerHTML = '';
+let currentStatsCache = null;
+let currentAsnCategory24h = 'isp';
+let currentAsnCategory30d = 'isp';
 
-    const ispItems = (isps || []).slice(0, 8);
-    const dcItems = (dcs || []).slice(0, 8);
-
-    if (ispItems.length === 0 && dcItems.length === 0) {
-        container.innerHTML = '<div class="empty-msg">Sin consultas registradas.</div>';
-        return;
-    }
-
-    const allItems = [...ispItems, ...dcItems];
-    const maxCount = Math.max(...allItems.map(i => i.count), 1);
-
-    // 1. Render Top 8 ISP items
-    ispItems.forEach(item => {
-        const row = createStatRow(item, maxCount, true);
-        container.appendChild(row);
-    });
-
-    // 2. Render 9th item: Datacenter ASN accordion toggle
-    if (dcItems.length > 0) {
-        const totalDcCount = dcItems.reduce((acc, curr) => acc + (curr.count || 0), 0);
-
-        let dcToggleTitle = 'Datacenter ASN';
-        let dcToggleSub = `${dcItems.length} centros de datos y servidores`;
-        if (window.i18n && typeof window.i18n.t === 'function') {
-            const resT = window.i18n.t('stats.dc_toggle_title');
-            if (resT && !resT.includes('.')) dcToggleTitle = resT;
-            const resS = window.i18n.t('stats.dc_toggle_sub');
-            if (resS && !resS.includes('.')) dcToggleSub = resS;
+function switchAsnCategory(period, category) {
+    if (period === '24h') {
+        currentAsnCategory24h = category;
+        const btnIsp = document.getElementById('btn-asn-isp-24h');
+        const btnDc = document.getElementById('btn-asn-dc-24h');
+        if (btnIsp && btnDc) {
+            btnIsp.classList.toggle('active', category === 'isp');
+            btnDc.classList.toggle('active', category === 'datacenter');
         }
-
-        const toggleRow = document.createElement('div');
-        toggleRow.className = 'stats-row-item dc-accordion-toggle';
-        toggleRow.setAttribute('role', 'button');
-        toggleRow.setAttribute('tabindex', '0');
-        toggleRow.setAttribute('id', `dc-toggle-${period}`);
-
-        const itemLeft = document.createElement('div');
-        itemLeft.className = 'item-left';
-
-        const nameRow = document.createElement('div');
-        nameRow.className = 'item-name-row';
-
-        const iconSpan = document.createElement('span');
-        iconSpan.className = 'dc-toggle-icon';
-        iconSpan.innerText = '▶';
-        nameRow.appendChild(iconSpan);
-
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'item-name';
-        nameSpan.style.fontWeight = '600';
-        nameSpan.innerText = dcToggleTitle;
-        nameSpan.setAttribute('data-i18n', 'stats.dc_toggle_title');
-        nameRow.appendChild(nameSpan);
-
-        itemLeft.appendChild(nameRow);
-
-        const subSpan = document.createElement('span');
-        subSpan.className = 'item-sub';
-        subSpan.innerText = dcToggleSub;
-        subSpan.setAttribute('data-i18n', 'stats.dc_toggle_sub');
-        itemLeft.appendChild(subSpan);
-
-        toggleRow.appendChild(itemLeft);
-
-        const countSpan = document.createElement('span');
-        countSpan.className = 'item-count';
-        countSpan.innerText = Number(totalDcCount).toLocaleString();
-        toggleRow.appendChild(countSpan);
-
-        // Content container
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'dc-accordion-content';
-        contentDiv.id = `dc-content-${period}`;
-
-        dcItems.forEach(item => {
-            const dcRow = createStatRow(item, maxCount, true);
-            contentDiv.appendChild(dcRow);
-        });
-
-        // Click / Keyboard handler to toggle accordion
-        toggleRow.onclick = function() {
-            const isExpanded = contentDiv.classList.toggle('expanded');
-            toggleRow.classList.toggle('expanded', isExpanded);
-            if (isExpanded) {
-                contentDiv.querySelectorAll('.row-bg-bar').forEach(bar => {
-                    const w = bar.getAttribute('data-target-width');
-                    if (w) bar.style.width = w;
-                });
-            }
-        };
-
-        toggleRow.onkeydown = function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleRow.click();
-            }
-        };
-
-        container.appendChild(toggleRow);
-        container.appendChild(contentDiv);
+        if (currentStatsCache && currentStatsCache.stats_24h) {
+            renderAsnSection('24h', currentStatsCache.stats_24h, category);
+        }
+    } else {
+        currentAsnCategory30d = category;
+        const btnIsp = document.getElementById('btn-asn-isp-30d');
+        const btnDc = document.getElementById('btn-asn-dc-30d');
+        if (btnIsp && btnDc) {
+            btnIsp.classList.toggle('active', category === 'isp');
+            btnDc.classList.toggle('active', category === 'datacenter');
+        }
+        if (currentStatsCache && currentStatsCache.stats_30d) {
+            renderAsnSection('30d', currentStatsCache.stats_30d, category);
+        }
     }
+}
+
+function renderAsnSection(period, statsObj, category) {
+    const elementId = period === '24h' ? 'list-asns-24h' : 'list-asns-30d';
+    const items = category === 'datacenter'
+        ? (statsObj.top_asns_datacenter || [])
+        : (statsObj.top_asns_isp || statsObj.top_asns || []);
+    renderStatsList(elementId, items, true);
 }
 
 function loadStatsData() {
@@ -208,6 +138,7 @@ function loadStatsData() {
             return r.json();
         })
         .then(data => {
+            currentStatsCache = data;
             const s24 = data.stats_24h || {};
             const s30 = data.stats_30d || {};
 
@@ -226,7 +157,7 @@ function loadStatsData() {
             if (elSubCached24) elSubCached24.innerText = `${Number(s24.cached || 0).toLocaleString()} en caché`;
             if (elLatency24) elLatency24.innerText = `${s24.avg_duration || 0} ms`;
 
-            renderAsnListWithAccordion('list-asns-24h', s24.top_asns_isp || s24.top_asns, s24.top_asns_datacenter, '24h');
+            renderAsnSection('24h', s24, currentAsnCategory24h);
             renderStatsList('list-types-24h', s24.top_query_types, false);
 
             // 30 Days Metrics
@@ -244,7 +175,7 @@ function loadStatsData() {
             if (elSubCached30) elSubCached30.innerText = `${Number(s30.cached || 0).toLocaleString()} en caché`;
             if (elLatency30) elLatency30.innerText = `${s30.avg_duration || 0} ms`;
 
-            renderAsnListWithAccordion('list-asns-30d', s30.top_asns_isp || s30.top_asns, s30.top_asns_datacenter, '30d');
+            renderAsnSection('30d', s30, currentAsnCategory30d);
             renderStatsList('list-types-30d', s30.top_query_types, false);
         })
         .catch(err => {
