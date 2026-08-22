@@ -13,8 +13,8 @@ const translations = {
         "nav.home": "← Inicio",
 
         // Protocols
-        "doh.desc": "Cifrado de extremo a extremo mediante HTTPS y HTTP/3 (QUIC).",
-        "dot.desc": "Protocolos de alta velocidad DNS sobre TLS y DNS sobre QUIC (RFC 9250).",
+        "doh.desc": "Cifrado de extremo a extremo a través de HTTPS.",
+        "dot.desc": "Protocolo estándar de DNS sobre TLS.",
         "std.title": "DNS Estándar",
         "std.desc": "Resolución DNS estándar con validación DNSSEC.",
 
@@ -103,8 +103,8 @@ const translations = {
         "nav.home": "← Home",
 
         // Protocols
-        "doh.desc": "End-to-end encryption over HTTPS and HTTP/3 (QUIC).",
-        "dot.desc": "High-speed DNS over TLS and DNS over QUIC (RFC 9250).",
+        "doh.desc": "End-to-end encryption over HTTPS.",
+        "dot.desc": "Standard protocol for DNS over TLS.",
         "std.title": "Standard DNS",
         "std.desc": "Standard DNS resolution with DNSSEC validation.",
 
