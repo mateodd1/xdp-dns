@@ -598,13 +598,12 @@
                     </div>
             </div>
             <h1>xdp.es DNS</h1>
-            <div class="subtitle" data-i18n="stats.subtitle">Estadísticas de resolución DNS y métricas en tiempo real</div>
         </header>
 
         <!-- Timeframe Tabs -->
         <div class="tabs-container" role="tablist" aria-label="Intervalo de tiempo">
-            <button type="button" class="tab-btn active" data-interval="24h" onclick="switchTab('24h')" data-agent-tab="interval-24h" data-i18n="stats.tab_24h">Últimas 24 Horas</button>
-            <button type="button" class="tab-btn" data-interval="30d" onclick="switchTab('30d')" data-agent-tab="interval-30d" data-i18n="stats.tab_30d">Últimos 30 Días</button>
+            <button type="button" class="tab-btn active" data-interval="24h" onclick="switchTab('24h')" data-agent-tab="interval-24h" data-i18n="stats.tab_24h">24 Horas</button>
+            <button type="button" class="tab-btn" data-interval="30d" onclick="switchTab('30d')" data-agent-tab="interval-30d" data-i18n="stats.tab_30d">30 Días</button>
         </div>
 
         <main>
@@ -614,7 +613,6 @@
                     <div class="metric-card" data-agent-metric="total-queries">
                         <span class="metric-title" data-i18n="stats.card_total">Total Consultas</span>
                         <span class="metric-value" id="val-total-24h">...</span>
-                        <span class="metric-sub" data-i18n="stats.card_total_sub">Peticiones procesadas</span>
                     </div>
                     <div class="metric-card" data-agent-metric="blocked-queries">
                         <span class="metric-title" data-i18n="stats.card_blocked">Consultas Bloqueadas</span>
@@ -622,26 +620,25 @@
                         <span class="metric-sub" id="sub-blocked-24h">-</span>
                     </div>
                     <div class="metric-card" data-agent-metric="cached-queries">
-                        <span class="metric-title" data-i18n="stats.card_cached">Acierto en Caché</span>
+                        <span class="metric-title" data-i18n="stats.card_cached">Caché Hit</span>
                         <span class="metric-value" id="val-cached-24h">...</span>
                         <span class="metric-sub" id="sub-cached-24h">-</span>
                     </div>
                     <div class="metric-card" data-agent-metric="avg-latency">
                         <span class="metric-title" data-i18n="stats.card_latency">Latencia Media</span>
                         <span class="metric-value" id="val-latency-24h">...</span>
-                        <span class="metric-sub" data-i18n="stats.card_latency_sub">Tiempo medio de resolución</span>
                     </div>
                 </div>
 
                 <div class="dashboard-grid">
                     <div class="table-card">
-                        <h3 data-i18n="stats.table_asn">Origen de las Solicitudes (ASN)</h3>
+                        <h3 data-i18n="stats.table_asn">Top ASNs</h3>
                         <div class="stats-list" id="list-asns-24h" data-agent-list="top-asns-24h">
                             <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
                         </div>
                     </div>
                     <div class="table-card">
-                        <h3 data-i18n="stats.table_types">Distribución por Tipo de Registro</h3>
+                        <h3 data-i18n="stats.table_types">Tipos de Registro</h3>
                         <div class="stats-list" id="list-types-24h" data-agent-list="top-query-types-24h">
                             <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
                         </div>
@@ -655,7 +652,6 @@
                     <div class="metric-card" data-agent-metric="total-queries-30d">
                         <span class="metric-title" data-i18n="stats.card_total">Total Consultas</span>
                         <span class="metric-value" id="val-total-30d">...</span>
-                        <span class="metric-sub" data-i18n="stats.card_total_sub">Peticiones procesadas</span>
                     </div>
                     <div class="metric-card" data-agent-metric="blocked-queries-30d">
                         <span class="metric-title" data-i18n="stats.card_blocked">Consultas Bloqueadas</span>
@@ -663,26 +659,25 @@
                         <span class="metric-sub" id="sub-blocked-30d">-</span>
                     </div>
                     <div class="metric-card" data-agent-metric="cached-queries-30d">
-                        <span class="metric-title" data-i18n="stats.card_cached">Acierto en Caché</span>
+                        <span class="metric-title" data-i18n="stats.card_cached">Caché Hit</span>
                         <span class="metric-value" id="val-cached-30d">...</span>
                         <span class="metric-sub" id="sub-cached-30d">-</span>
                     </div>
                     <div class="metric-card" data-agent-metric="avg-latency-30d">
                         <span class="metric-title" data-i18n="stats.card_latency">Latencia Media</span>
                         <span class="metric-value" id="val-latency-30d">...</span>
-                        <span class="metric-sub" data-i18n="stats.card_latency_sub">Tiempo medio de resolución</span>
                     </div>
                 </div>
 
                 <div class="dashboard-grid">
                     <div class="table-card">
-                        <h3 data-i18n="stats.table_asn">Origen de las Solicitudes (ASN)</h3>
+                        <h3 data-i18n="stats.table_asn">Top ASNs</h3>
                         <div class="stats-list" id="list-asns-30d" data-agent-list="top-asns-30d">
                             <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
                         </div>
                     </div>
                     <div class="table-card">
-                        <h3 data-i18n="stats.table_types">Distribución por Tipo de Registro</h3>
+                        <h3 data-i18n="stats.table_types">Tipos de Registro</h3>
                         <div class="stats-list" id="list-types-30d" data-agent-list="top-query-types-30d">
                             <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
                         </div>
@@ -839,9 +834,9 @@
 
             if (elTotal24) elTotal24.innerText = Number(s24.total || 0).toLocaleString();
             if (elBlocked24) elBlocked24.innerText = Number(s24.blocked || 0).toLocaleString();
-            if (elSubBlocked24) elSubBlocked24.innerText = `${s24.blocked_pct || 0}% ${rateSuffix}`;
+            if (elSubBlocked24) elSubBlocked24.innerText = `${s24.blocked_pct || 0}%`;
             if (elCached24) elCached24.innerText = `${s24.cached_pct || 0}%`;
-            if (elSubCached24) elSubCached24.innerText = `${Number(s24.cached || 0).toLocaleString()} ${cachedSuffix}`;
+            if (elSubCached24) elSubCached24.innerText = Number(s24.cached || 0).toLocaleString();
             if (elLatency24) elLatency24.innerText = `${s24.avg_duration || 0} ms`;
 
             renderStatsList('list-asns-24h', s24.top_asns, true);
@@ -857,9 +852,9 @@
 
             if (elTotal30) elTotal30.innerText = Number(s30.total || 0).toLocaleString();
             if (elBlocked30) elBlocked30.innerText = Number(s30.blocked || 0).toLocaleString();
-            if (elSubBlocked30) elSubBlocked30.innerText = `${s30.blocked_pct || 0}% ${rateSuffix}`;
+            if (elSubBlocked30) elSubBlocked30.innerText = `${s30.blocked_pct || 0}%`;
             if (elCached30) elCached30.innerText = `${s30.cached_pct || 0}%`;
-            if (elSubCached30) elSubCached30.innerText = `${Number(s30.cached || 0).toLocaleString()} ${cachedSuffix}`;
+            if (elSubCached30) elSubCached30.innerText = Number(s30.cached || 0).toLocaleString();
             if (elLatency30) elLatency30.innerText = `${s30.avg_duration || 0} ms`;
 
             renderStatsList('list-asns-30d', s30.top_asns, true);
