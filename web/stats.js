@@ -159,12 +159,6 @@ function renderAsnSection(period, statsObj, category) {
 
     switchCard.appendChild(itemLeft);
 
-    const badgeSpan = document.createElement('span');
-    badgeSpan.className = 'switch-badge';
-    badgeSpan.innerText = '⇄ Cambiar';
-    badgeSpan.setAttribute('data-i18n', 'stats.asn_switch_btn');
-    switchCard.appendChild(badgeSpan);
-
     const targetCategory = isIsp ? 'datacenter' : 'isp';
     switchCard.onclick = () => switchAsnCategory(period, targetCategory);
     switchCard.onkeydown = (e) => {

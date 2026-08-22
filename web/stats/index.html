@@ -356,45 +356,19 @@
         }
 
         .asn-switch-card {
-            position: relative;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 9px 12px;
-            border-radius: 6px;
             cursor: pointer;
             user-select: none;
-            border: 1px dashed var(--border);
-            background-color: var(--bg-card);
-            margin-top: 4px;
-            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+            transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
         }
 
         .asn-switch-card:hover {
             background-color: var(--accent-dim);
             border-color: var(--accent);
-            transform: translateY(-1px);
+            box-shadow: 0 0 0 1px var(--accent);
         }
 
         .asn-switch-card:active {
-            transform: translateY(0);
-        }
-
-        .asn-switch-card .switch-badge {
-            font-size: 0.74rem;
-            font-weight: 600;
-            color: var(--accent);
-            background-color: var(--accent-dim);
-            padding: 3px 8px;
-            border-radius: 4px;
-            border: 1px solid var(--border);
-            transition: all 0.2s ease;
-        }
-
-        .asn-switch-card:hover .switch-badge {
-            background-color: var(--accent);
-            color: #ffffff;
-            border-color: var(--accent);
+            transform: scale(0.995);
         }
 
         .stats-list {
@@ -771,7 +745,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=2.5"></script>
+    <script src="/i18n.js?v=2.6"></script>
     <script>
         // Theme Management
         const THEME_KEY = 'xdp_theme';
@@ -981,12 +955,6 @@
             itemLeft.appendChild(subSpan);
 
             switchCard.appendChild(itemLeft);
-
-            const badgeSpan = document.createElement('span');
-            badgeSpan.className = 'switch-badge';
-            badgeSpan.innerText = (window.i18n && window.i18n.t('stats.asn_switch_btn')) || '⇄ Cambiar';
-            badgeSpan.setAttribute('data-i18n', 'stats.asn_switch_btn');
-            switchCard.appendChild(badgeSpan);
 
             const targetCategory = isIsp ? 'datacenter' : 'isp';
             switchCard.onclick = () => switchAsnCategory(period, targetCategory);
