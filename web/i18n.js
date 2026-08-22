@@ -4,7 +4,6 @@
 const translations = {
     es: {
         "site.title": "xdp.es DNS",
-        "site.subtitle": "Servidor DNS recursivo público con bloqueo de publicidad y telemetría.",
         "theme.light": "Claro",
         "theme.dark": "Oscuro",
         "theme.auto": "Auto",
@@ -95,7 +94,6 @@ const translations = {
     },
     en: {
         "site.title": "xdp.es DNS",
-        "site.subtitle": "Public recursive DNS resolver with ad and telemetry blocking.",
         "theme.light": "Light",
         "theme.dark": "Dark",
         "theme.auto": "Auto",
