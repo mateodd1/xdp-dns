@@ -124,7 +124,7 @@ KNOWN_ISP_ASNS = {
     '57269', '206238', '20743', '197828', '200543', '50392', '43590', '59432', '206385',
     '212456', '29119', '3320', '15557', '12322', '5410', '3269', '12874', '1267', '1136',
     '9143', '5432', '6848', '3303', '8447', '1299', '2119', '8657', '3243', '7922', '7018',
-    '701', '20115', '21928', '22773', '812', '577', '852', '8151', '26599'
+    '701', '20115', '21928', '22773', '812', '577', '852', '8151', '26599', '202673'
 }
 
 KNOWN_DC_ASNS = {
@@ -132,7 +132,7 @@ KNOWN_DC_ASNS = {
     '209242', '395747', '24940', '213230', '16276', '35540', '14061', '202018', '200130',
     '63949', '20940', '16625', '35994', '20473', '64514', '16265', '28753', '60636', '50428',
     '51167', '12876', '21409', '47583', '22612', '22611', '54113', '174', '3356', '6939',
-    '31898', '714', '202673', '41931', '44547'
+    '31898', '714', '41931', '44547'
 }
 
 def classify_asn(name, asn_num=''):
@@ -149,7 +149,7 @@ def classify_asn(name, asn_num=''):
         'dedicated', 'colocation', 'colo', 'transit', 'carrier', 'network-services', 'baremetal',
         'servers', 'ovh', 'hetzner', 'amazon', 'aws', 'azure', 'google', 'cloudflare', 'digitalocean',
         'linode', 'vultr', 'leaseweb', 'contabo', 'scaleway', 'namecheap', 'fastly', 'cdn', 'akamai',
-        'equinix', 'interxion', 'cogent', 'lumen', 'level3', 'hurricane', 'netundweb', 'ohz', 'layerip'
+        'equinix', 'interxion', 'cogent', 'lumen', 'level3', 'hurricane', 'netundweb', 'layerip'
     ]
     for kw in dc_keywords:
         if kw in name_lower:
