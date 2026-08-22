@@ -3,6 +3,22 @@
 	servers {
 		protocols h1 h2 h3
 	}
+	on_demand_tls {
+		ask http://127.0.0.1:9123/check
+	}
+}
+
+# Internal Ask Endpoint for On-Demand TLS Security (Approves only *.xdp.es and xdp.es)
+http://127.0.0.1:9123 {
+	@allowed {
+		vars_regexp {query.domain} ^([a-zA-Z0-9-]+\.)*xdp\.es$
+	}
+	handle @allowed {
+		respond "OK" 200
+	}
+	handle {
+		respond "Forbidden" 403
+	}
 }
 
 # Dedicated DoH & DoT Subdomain (dns.xdp.es)
@@ -176,13 +192,16 @@ xdp.es {
 	}
 }
 
-# Wildcard Subdomains (*.xdp.es) -> Redirect to https://xdp.es/
-http://*.xdp.es {
+# Wildcard Subdomains (*.xdp.es) with On-Demand TLS
+http://*.xdp.es, *.xdp.es {
+	tls {
+		on_demand
+	}
 	redir https://xdp.es/ permanent
 }
 
-# Catch-all for any other domain, direct IP, or unrecognized Host header
-:80 {
+# Catch-all on HTTP for non-xdp.es hostnames or direct IP
+http:// {
 	@not_xdp {
 		not header_regexp Host ^([a-zA-Z0-9-]+\.)*xdp\.es(:[0-9]+)?$
 	}
