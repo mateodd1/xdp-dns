@@ -339,6 +339,7 @@
             border: 1px solid var(--border);
             border-radius: 10px;
             padding: 20px;
+            min-height: 480px;
             box-shadow: var(--shadow-card);
             transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         }
@@ -359,6 +360,21 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            min-height: 410px;
+        }
+
+        .skeleton-row {
+            height: 40px;
+            background: linear-gradient(90deg, var(--bg-main) 25%, var(--border) 50%, var(--bg-main) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-shimmer 1.5s infinite;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        @keyframes skeleton-shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         .stats-row-item {
@@ -674,13 +690,27 @@
                     <div class="table-card">
                         <h3 data-i18n="stats.table_asn">Top ASNs</h3>
                         <div class="stats-list" id="list-asns-24h" data-agent-list="top-asns-24h">
-                            <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
                         </div>
                     </div>
                     <div class="table-card">
                         <h3 data-i18n="stats.table_types">Tipos de Registro</h3>
                         <div class="stats-list" id="list-types-24h" data-agent-list="top-query-types-24h">
-                            <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
                         </div>
                     </div>
                 </div>
@@ -713,13 +743,27 @@
                     <div class="table-card">
                         <h3 data-i18n="stats.table_asn">Top ASNs</h3>
                         <div class="stats-list" id="list-asns-30d" data-agent-list="top-asns-30d">
-                            <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
                         </div>
                     </div>
                     <div class="table-card">
                         <h3 data-i18n="stats.table_types">Tipos de Registro</h3>
                         <div class="stats-list" id="list-types-30d" data-agent-list="top-query-types-30d">
-                            <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
                         </div>
                     </div>
                 </div>
@@ -744,7 +788,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=2.7"></script>
+    <script src="/i18n.js?v=2.8"></script>
     <script>
         // Theme Management
         const THEME_KEY = 'xdp_theme';
