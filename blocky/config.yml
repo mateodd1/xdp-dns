@@ -1,7 +1,7 @@
 ports:
   dns: 127.0.0.1:5353
   tls: 853
-  http: 4000
+  http: 127.0.0.1:4000
 
 certFile: /etc/letsencrypt/live/dns.xdp.es/fullchain.pem
 keyFile: /etc/letsencrypt/live/dns.xdp.es/privkey.pem
