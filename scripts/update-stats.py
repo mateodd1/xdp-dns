@@ -68,10 +68,11 @@ def is_local_ip(ip_str):
 
 def resolve_asn(ip_str):
     if is_local_ip(ip_str):
-        return None, "0"
+        return None, "0", ""
     
     if ip_str in asn_cache:
-        return asn_cache[ip_str]["name"], asn_cache[ip_str]["asn"]
+        cached = asn_cache[ip_str]
+        return cached.get("name"), cached.get("asn", "0"), cached.get("country", "")
 
     try:
         ip = ipaddress.ip_address(ip_str)
@@ -89,12 +90,12 @@ def resolve_asn(ip_str):
         ).strip().strip('"')
 
         if not res:
-            asn_cache[ip_str] = {"name": f"IP ({ip_str})", "asn": "0"}
-            return asn_cache[ip_str]["name"], "0"
+            asn_cache[ip_str] = {"name": f"IP ({ip_str})", "asn": "0", "country": ""}
+            return asn_cache[ip_str]["name"], "0", ""
 
         asn = res.split("|")[0].strip()
 
-        # Resolve ASN Org Name
+        # Resolve ASN Org Name & Country
         asn_name_raw = subprocess.check_output(
             ["dig", "@127.0.0.1", "-p", "53", "+short", "TXT", f"AS{asn}.asn.cymru.com"],
             text=True,
@@ -102,6 +103,7 @@ def resolve_asn(ip_str):
         ).strip().strip('"')
 
         parts = asn_name_raw.split("|")
+        country = parts[1].strip() if len(parts) >= 2 else ""
         raw_name = parts[-1].strip() if len(parts) >= 5 else f"AS{asn}"
         if "-" in raw_name:
             org = raw_name.split("-", 1)[1].strip()
@@ -111,20 +113,20 @@ def resolve_asn(ip_str):
         clean_name = re.sub(r'[,_]+', ' ', org).strip()
         formatted_name = f"AS{asn} ({clean_name})"
 
-        asn_cache[ip_str] = {"name": formatted_name, "asn": asn}
-        return formatted_name, asn
+        asn_cache[ip_str] = {"name": formatted_name, "asn": asn, "country": country}
+        return formatted_name, asn, country
 
     except Exception:
         fallback = f"AS-Unknown ({ip_str})"
-        asn_cache[ip_str] = {"name": fallback, "asn": "0"}
-        return fallback, "0"
+        asn_cache[ip_str] = {"name": fallback, "asn": "0", "country": ""}
+        return fallback, "0", ""
 
 KNOWN_ISP_ASNS = {
-    '3352', '12338', '2856', '12430', '12353', '12715', '12479', '34048', '29259', '15704',
+    # Spanish National and Regional ISPs & Operators
+    '3352', '12338', '6739', '12430', '12353', '12715', '12479', '34048', '29259', '15704',
     '57269', '206238', '20743', '197828', '200543', '50392', '43590', '59432', '206385',
-    '212456', '29119', '3320', '15557', '12322', '5410', '3269', '12874', '1267', '1136',
-    '9143', '5432', '6848', '3303', '8447', '1299', '2119', '8657', '3243', '7922', '7018',
-    '701', '20115', '21928', '22773', '812', '577', '852', '8151', '26599', '202673'
+    '212456', '29119', '202673', '203870', '205423', '210100', '208880', '210678', '209867',
+    '207421', '208272', '205779', '206979', '206412', '206684', '29647', '15399', '208861'
 }
 
 KNOWN_DC_ASNS = {
@@ -132,42 +134,59 @@ KNOWN_DC_ASNS = {
     '209242', '395747', '24940', '213230', '16276', '35540', '14061', '202018', '200130',
     '63949', '20940', '16625', '35994', '20473', '64514', '16265', '28753', '60636', '50428',
     '51167', '12876', '21409', '47583', '22612', '22611', '54113', '174', '3356', '6939',
-    '31898', '714', '41931', '44547'
+    '31898', '714', '41931', '44547', '64199', '137964', '7922', '11427', '11426', '20115',
+    '12735', '131111', '133774', '14080', '142403', '14593', '17639', '20454', '207326',
+    '209630', '212238', '212477', '215124', '215925', '219139', '21928', '23724', '2856',
+    '31083', '33363', '400556', '41653', '45102', '47331', '4837', '51396', '54936', '60068',
+    '63859', '680', '701', '7713', '8386', '8560', '9121', '9198', '9299', '9465'
 }
 
-def classify_asn(name, asn_num=''):
+def classify_asn(name, asn_num='', country=''):
     asn_clean = str(asn_num).strip().upper().replace('AS', '')
+    country_clean = str(country).strip().upper()
+
+    # 1. Direct Known Spanish ISP Whitelist
     if asn_clean in KNOWN_ISP_ASNS:
         return 'isp'
+
+    # 2. Known Datacenter / Transit / Foreign ASNs
     if asn_clean in KNOWN_DC_ASNS:
         return 'datacenter'
 
+    # 3. Foreign ASNs (outside Spain) -> Always Datacenter
+    if country_clean and country_clean != 'ES':
+        return 'datacenter'
+
     name_lower = name.lower()
-    
+
+    # 4. Known datacenter/hosting/transit/foreign keywords
     dc_keywords = [
         'hosting', 'host', 'datacenter', 'data center', 'server', 'cloud', 'vps', 'compute',
         'dedicated', 'colocation', 'colo', 'transit', 'carrier', 'network-services', 'baremetal',
         'servers', 'ovh', 'hetzner', 'amazon', 'aws', 'azure', 'google', 'cloudflare', 'digitalocean',
         'linode', 'vultr', 'leaseweb', 'contabo', 'scaleway', 'namecheap', 'fastly', 'cdn', 'akamai',
-        'equinix', 'interxion', 'cogent', 'lumen', 'level3', 'hurricane', 'netundweb', 'layerip'
+        'equinix', 'interxion', 'cogent', 'lumen', 'level3', 'hurricane', 'netundweb', 'layerip',
+        'tcpshield', 'nextgen', 'comcast', 'charter', 'spectrum', 'verizon', 'at&t', 't-mobile',
+        'centurylink', 'cogentco', 'telia', 'arelion', 'gtt', 'zayo', 'turknet', 'starlink',
+        'telecomunikasyon', 'iletisim', 'shirkat', 'sirketi', 'ltd', 'gmbh', 'corp', 'inc', 'sasu', 'bv', 'llc'
     ]
     for kw in dc_keywords:
         if kw in name_lower:
             return 'datacenter'
 
+    # 5. Spanish ISP keywords (only for Spain)
     isp_keywords = [
-        'telecom', 'telefonica', 'movistar', 'vodafone', 'orange', 'digi', 'masmovil', 'yoigo',
-        'pepephone', 'jazztel', 'ono', 'adamo', 'avatel', 'euskaltel', 'broadband', 'cable',
-        'wireless', 'mobile', 'cellular', 'ftth', 'fibra', 'dsl', 'docsis', 'residential', 'isp',
-        'dialup', 'access', 'comm', 'communications', 'fibercat', 'parlem', 'goufone', 'telekom',
-        'comcast', 'spectrum', 'charter', 'verizon', 'at&t', 't-mobile', 'rogers', 'bell', 'telus',
-        'claro', 'vivo', 'o2', 'simyo', 'lowi'
+        'telefonica', 'movistar', 'vodafone', 'orange', 'digi', 'masmovil', 'yoigo',
+        'pepephone', 'jazztel', 'ono', 'adamo', 'avatel', 'euskaltel', 'fibercat',
+        'fibracat', 'parlem', 'goufone', 'simyo', 'lowi', 'o2', 'finetwork', 'silbo',
+        'guuk', 'avanza fibra', 'wewi', 'asteo', 'bluevia', 'oniti'
     ]
     for kw in isp_keywords:
         if kw in name_lower:
             return 'isp'
 
-    return 'datacenter' if any(w in name_lower for w in ['ltd', 'gmbh', 'corp', 'inc', 's.l.']) else 'isp'
+    # 6. Default to datacenter if not an explicitly verified Spanish ISP
+    return 'datacenter'
 
 def fetch_metrics():
     try:
@@ -429,12 +448,12 @@ def build_window_stats(history, window_seconds):
         if is_local_ip(ip) or cnt <= 0:
             continue
 
-        asn_name, asn_num = resolve_asn(ip)
+        asn_name, asn_num, country = resolve_asn(ip)
         if not asn_name:
             continue
 
         is_ipv6 = ":" in ip
-        asn_type = classify_asn(asn_name, asn_num)
+        asn_type = classify_asn(asn_name, asn_num, country)
 
         if asn_name not in asn_data:
             asn_data[asn_name] = {
