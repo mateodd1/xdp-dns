@@ -4,6 +4,7 @@
 const translations = {
     es: {
         "site.title": "xdp.es DNS",
+        "site.subtitle": "DNS privado de alta velocidad con DoH, DoT y bloqueo de publicidad.",
         "theme.light": "Claro",
         "theme.dark": "Oscuro",
         "theme.auto": "Auto",
@@ -13,10 +14,14 @@ const translations = {
         "nav.home": "← Inicio",
 
         // Protocols
+        "doh.desc": "DNS cifrado sobre HTTPS para navegadores y aplicaciones.",
+        "dot.desc": "DNS cifrado sobre TLS para Android y routers.",
         "std.title": "DNS Estándar",
+        "std.desc": "Resolución directa IPv4 e IPv6 con validación DNSSEC.",
 
         // Apple Profiles
         "profiles.title": "Perfiles Apple",
+        "profiles.desc": "Perfiles de configuración rápida para iOS, iPadOS y macOS.",
         "profiles.doh_title": "xdp.es DoH DNS",
         "profiles.dot_title": "xdp.es DoT DNS",
 
@@ -60,6 +65,7 @@ const translations = {
 
         // Stats Dashboard Page
         "stats.page_title": "Estadísticas | xdp.es DNS",
+        "stats.subtitle": "Métricas de resolución y tráfico en tiempo real.",
         "stats.tab_24h": "24 Horas",
         "stats.tab_30d": "30 Días",
         "stats.card_total": "Total Consultas",
@@ -87,6 +93,7 @@ const translations = {
     },
     en: {
         "site.title": "xdp.es DNS",
+        "site.subtitle": "High-speed private DNS with DoH, DoT, and ad blocking.",
         "theme.light": "Light",
         "theme.dark": "Dark",
         "theme.auto": "Auto",
@@ -96,10 +103,14 @@ const translations = {
         "nav.home": "← Home",
 
         // Protocols
+        "doh.desc": "Encrypted DNS over HTTPS for browsers and applications.",
+        "dot.desc": "Encrypted DNS over TLS for Android and routers.",
         "std.title": "Standard DNS",
+        "std.desc": "Direct IPv4 and IPv6 resolution with DNSSEC validation.",
 
         // Apple Profiles
         "profiles.title": "Apple Profiles",
+        "profiles.desc": "Quick configuration profiles for iOS, iPadOS, and macOS.",
         "profiles.doh_title": "xdp.es DoH DNS",
         "profiles.dot_title": "xdp.es DoT DNS",
 
@@ -143,6 +154,7 @@ const translations = {
 
         // Stats Dashboard Page
         "stats.page_title": "Statistics | xdp.es DNS",
+        "stats.subtitle": "Real-time DNS resolution and traffic metrics.",
         "stats.tab_24h": "24 Hours",
         "stats.tab_30d": "30 Days",
         "stats.card_total": "Total Queries",

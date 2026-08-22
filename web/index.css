@@ -114,6 +114,12 @@ header h1 {
     color: var(--text-heading);
 }
 
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-top: 4px;
+}
+
 /* Theme Switcher */
 .theme-switcher {
     display: inline-flex;

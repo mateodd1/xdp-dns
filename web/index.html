@@ -81,7 +81,10 @@
         <!-- Site Header -->
         <header>
             <div class="header-top">
-                <h1>xdp.es DNS</h1>
+                <div>
+                    <h1>xdp.es DNS</h1>
+                    <div class="subtitle" data-i18n="site.subtitle">DNS privado de alta velocidad con DoH, DoT y bloqueo de publicidad.</div>
+                </div>
                 <div class="theme-switcher" role="group" aria-label="Seleccionar tema de color" data-agent-role="theme-control">
                     <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro" data-agent-action="set-light-theme">
                         <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -123,6 +126,7 @@
                     <h2 id="heading-doh">DoH <span class="badge">HTTPS</span></h2>
                 </div>
                 <div class="card-content">
+                    <p class="desc" data-i18n="doh.desc">DNS cifrado sobre HTTPS para navegadores y aplicaciones.</p>
                     <div class="endpoint-box">
                         <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('https://dns.xdp.es/dns-query', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('https://dns.xdp.es/dns-query', this)" aria-label="Copiar URL DoH" data-agent-action="copy-doh-endpoint">
                             <code class="code-val" id="doh-endpoint-value">https://dns.xdp.es/dns-query</code>
@@ -138,6 +142,7 @@
                     <h2 id="heading-dot">DoT <span class="badge">TLS</span></h2>
                 </div>
                 <div class="card-content">
+                    <p class="desc" data-i18n="dot.desc">DNS cifrado sobre TLS para Android y routers.</p>
                     <div class="endpoint-box">
                         <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyEndpoint('dns.xdp.es', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyEndpoint('dns.xdp.es', this)" aria-label="Copiar Hostname DoT" data-agent-action="copy-dot-hostname">
                             <code class="code-val" id="dot-hostname-value">dns.xdp.es</code>
@@ -153,6 +158,7 @@
                     <h2 id="heading-standard-dns"><span data-i18n="std.title">DNS Estándar</span> <span class="badge badge-secondary">UDP &bull; TCP</span></h2>
                 </div>
                 <div class="card-content">
+                    <p class="desc" data-i18n="std.desc">Resolución directa IPv4 e IPv6 con validación DNSSEC.</p>
                     <div class="ip-grid">
                         <div class="ip-item" data-ip-version="ipv4">
                             <span class="label">IPv4</span>
@@ -178,6 +184,7 @@
                     <h2 id="heading-profiles"><span data-i18n="profiles.title">Perfiles Apple</span> <span class="badge">iOS &bull; macOS</span></h2>
                 </div>
                 <div class="card-content">
+                    <p class="desc" data-i18n="profiles.desc">Perfiles de configuración rápida para iOS, iPadOS y macOS.</p>
                     <div class="profile-list">
                         <a href="dns_xdp_es_doh.mobileconfig" class="profile-btn" download aria-label="Descargar perfil DoH" data-agent-action="download-doh-mobileconfig">
                             <div class="profile-info">
