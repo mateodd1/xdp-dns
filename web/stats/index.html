@@ -343,21 +343,6 @@
             transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         }
 
-        .table-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
-            margin-bottom: 14px;
-        }
-
-        .table-card-header h3 {
-            margin: 0 !important;
-            padding: 0 !important;
-            border-bottom: none !important;
-        }
-
         .table-card h3 {
             margin: 0 0 14px 0;
             font-size: 0.95rem;
@@ -370,37 +355,46 @@
             align-items: center;
         }
 
-        .asn-pill-group {
-            display: inline-flex;
-            background-color: var(--bg-body);
-            border: 1px solid var(--border);
+        .asn-switch-card {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 12px;
             border-radius: 6px;
-            padding: 2px;
-            gap: 2px;
+            cursor: pointer;
+            user-select: none;
+            border: 1px dashed var(--border);
+            background-color: var(--bg-card);
+            margin-top: 4px;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
         }
 
-        .asn-pill-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
+        .asn-switch-card:hover {
+            background-color: var(--accent-dim);
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .asn-switch-card:active {
+            transform: translateY(0);
+        }
+
+        .asn-switch-card .switch-badge {
             font-size: 0.74rem;
-            font-weight: 500;
+            font-weight: 600;
+            color: var(--accent);
+            background-color: var(--accent-dim);
             padding: 3px 8px;
             border-radius: 4px;
-            cursor: pointer;
-            outline: none;
-            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
         }
 
-        .asn-pill-btn:hover {
-            color: var(--text-primary);
-        }
-
-        .asn-pill-btn.active {
+        .asn-switch-card:hover .switch-badge {
             background-color: var(--accent);
             color: #ffffff;
-            font-weight: 600;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent);
         }
 
         .stats-list {
@@ -705,13 +699,7 @@
 
                 <div class="dashboard-grid">
                     <div class="table-card">
-                        <div class="table-card-header">
-                            <h3 data-i18n="stats.table_asn">Top ASNs</h3>
-                            <div class="asn-pill-group" role="group" aria-label="Filtrar tipo de red">
-                                <button type="button" class="asn-pill-btn active" id="btn-asn-isp-24h" onclick="switchAsnCategory('24h', 'isp')" data-i18n="stats.asn_btn_isp">Operadores</button>
-                                <button type="button" class="asn-pill-btn" id="btn-asn-dc-24h" onclick="switchAsnCategory('24h', 'datacenter')" data-i18n="stats.asn_btn_datacenter">Datacenter</button>
-                            </div>
-                        </div>
+                        <h3 data-i18n="stats.table_asn">Top ASNs</h3>
                         <div class="stats-list" id="list-asns-24h" data-agent-list="top-asns-24h">
                             <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
                         </div>
@@ -750,13 +738,7 @@
 
                 <div class="dashboard-grid">
                     <div class="table-card">
-                        <div class="table-card-header">
-                            <h3 data-i18n="stats.table_asn">Top ASNs</h3>
-                            <div class="asn-pill-group" role="group" aria-label="Filtrar tipo de red">
-                                <button type="button" class="asn-pill-btn active" id="btn-asn-isp-30d" onclick="switchAsnCategory('30d', 'isp')" data-i18n="stats.asn_btn_isp">Operadores</button>
-                                <button type="button" class="asn-pill-btn" id="btn-asn-dc-30d" onclick="switchAsnCategory('30d', 'datacenter')" data-i18n="stats.asn_btn_datacenter">Datacenter</button>
-                            </div>
-                        </div>
+                        <h3 data-i18n="stats.table_asn">Top ASNs</h3>
                         <div class="stats-list" id="list-asns-30d" data-agent-list="top-asns-30d">
                             <div class="empty-msg" data-i18n="stats.loading">Cargando datos...</div>
                         </div>
@@ -789,7 +771,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=2.4"></script>
+    <script src="/i18n.js?v=2.5"></script>
     <script>
         // Theme Management
         const THEME_KEY = 'xdp_theme';
@@ -935,23 +917,11 @@
         function switchAsnCategory(period, category) {
             if (period === '24h') {
                 currentAsnCategory24h = category;
-                const btnIsp = document.getElementById('btn-asn-isp-24h');
-                const btnDc = document.getElementById('btn-asn-dc-24h');
-                if (btnIsp && btnDc) {
-                    btnIsp.classList.toggle('active', category === 'isp');
-                    btnDc.classList.toggle('active', category === 'datacenter');
-                }
                 if (currentStatsCache && currentStatsCache.stats_24h) {
                     renderAsnSection('24h', currentStatsCache.stats_24h, category);
                 }
             } else {
                 currentAsnCategory30d = category;
-                const btnIsp = document.getElementById('btn-asn-isp-30d');
-                const btnDc = document.getElementById('btn-asn-dc-30d');
-                if (btnIsp && btnDc) {
-                    btnIsp.classList.toggle('active', category === 'isp');
-                    btnDc.classList.toggle('active', category === 'datacenter');
-                }
                 if (currentStatsCache && currentStatsCache.stats_30d) {
                     renderAsnSection('30d', currentStatsCache.stats_30d, category);
                 }
@@ -960,10 +930,74 @@
 
         function renderAsnSection(period, statsObj, category) {
             const elementId = period === '24h' ? 'list-asns-24h' : 'list-asns-30d';
-            const items = category === 'datacenter'
-                ? (statsObj.top_asns_datacenter || [])
-                : (statsObj.top_asns_isp || statsObj.top_asns || []);
-            renderStatsList(elementId, items, true);
+            const container = document.getElementById(elementId);
+            if (!container) return;
+            container.innerHTML = '';
+
+            const isIsp = category === 'isp';
+            const items = isIsp
+                ? ((statsObj.top_asns_isp && statsObj.top_asns_isp.length > 0) ? statsObj.top_asns_isp : (statsObj.top_asns || [])).slice(0, 8)
+                : (statsObj.top_asns_datacenter || []).slice(0, 8);
+
+            if (!items || items.length === 0) {
+                const noDataText = (window.i18n && window.i18n.t('stats.no_data')) || 'Sin consultas registradas.';
+                container.innerHTML = `<div class="empty-msg">${noDataText}</div>`;
+                return;
+            }
+
+            const maxCount = Math.max(...items.map(i => i.count), 1);
+
+            // 1. Render Top 8 items
+            items.forEach(item => {
+                const row = createStatRow(item, maxCount, true);
+                container.appendChild(row);
+            });
+
+            // 2. Render 9th item: Toggle card to switch category
+            const switchCard = document.createElement('div');
+            switchCard.className = 'asn-switch-card';
+            switchCard.setAttribute('role', 'button');
+            switchCard.setAttribute('tabindex', '0');
+            switchCard.setAttribute('aria-label', isIsp ? 'Cambiar a Datacenter ASN' : 'Cambiar a Operadores ISP');
+
+            const itemLeft = document.createElement('div');
+            itemLeft.className = 'item-left';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'item-name';
+            nameSpan.style.fontWeight = '600';
+            nameSpan.innerText = isIsp
+                ? ((window.i18n && window.i18n.t('stats.asn_toggle_to_dc')) || 'Datacenter ASN')
+                : ((window.i18n && window.i18n.t('stats.asn_toggle_to_isp')) || 'Operadores (ISP)');
+            nameSpan.setAttribute('data-i18n', isIsp ? 'stats.asn_toggle_to_dc' : 'stats.asn_toggle_to_isp');
+            itemLeft.appendChild(nameSpan);
+
+            const subSpan = document.createElement('span');
+            subSpan.className = 'item-sub';
+            subSpan.innerText = isIsp
+                ? ((window.i18n && window.i18n.t('stats.asn_toggle_to_dc_sub')) || 'Centros de datos y servidores')
+                : ((window.i18n && window.i18n.t('stats.asn_toggle_to_isp_sub')) || 'Proveedores de Internet y móvil');
+            subSpan.setAttribute('data-i18n', isIsp ? 'stats.asn_toggle_to_dc_sub' : 'stats.asn_toggle_to_isp_sub');
+            itemLeft.appendChild(subSpan);
+
+            switchCard.appendChild(itemLeft);
+
+            const badgeSpan = document.createElement('span');
+            badgeSpan.className = 'switch-badge';
+            badgeSpan.innerText = (window.i18n && window.i18n.t('stats.asn_switch_btn')) || '⇄ Cambiar';
+            badgeSpan.setAttribute('data-i18n', 'stats.asn_switch_btn');
+            switchCard.appendChild(badgeSpan);
+
+            const targetCategory = isIsp ? 'datacenter' : 'isp';
+            switchCard.onclick = () => switchAsnCategory(period, targetCategory);
+            switchCard.onkeydown = (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    switchAsnCategory(period, targetCategory);
+                }
+            };
+
+            container.appendChild(switchCard);
         }
 
         function updateStatsUI(data) {

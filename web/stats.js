@@ -100,23 +100,11 @@ let currentAsnCategory30d = 'isp';
 function switchAsnCategory(period, category) {
     if (period === '24h') {
         currentAsnCategory24h = category;
-        const btnIsp = document.getElementById('btn-asn-isp-24h');
-        const btnDc = document.getElementById('btn-asn-dc-24h');
-        if (btnIsp && btnDc) {
-            btnIsp.classList.toggle('active', category === 'isp');
-            btnDc.classList.toggle('active', category === 'datacenter');
-        }
         if (currentStatsCache && currentStatsCache.stats_24h) {
             renderAsnSection('24h', currentStatsCache.stats_24h, category);
         }
     } else {
         currentAsnCategory30d = category;
-        const btnIsp = document.getElementById('btn-asn-isp-30d');
-        const btnDc = document.getElementById('btn-asn-dc-30d');
-        if (btnIsp && btnDc) {
-            btnIsp.classList.toggle('active', category === 'isp');
-            btnDc.classList.toggle('active', category === 'datacenter');
-        }
         if (currentStatsCache && currentStatsCache.stats_30d) {
             renderAsnSection('30d', currentStatsCache.stats_30d, category);
         }
@@ -125,10 +113,68 @@ function switchAsnCategory(period, category) {
 
 function renderAsnSection(period, statsObj, category) {
     const elementId = period === '24h' ? 'list-asns-24h' : 'list-asns-30d';
-    const items = category === 'datacenter'
-        ? (statsObj.top_asns_datacenter || [])
-        : (statsObj.top_asns_isp || statsObj.top_asns || []);
-    renderStatsList(elementId, items, true);
+    const container = document.getElementById(elementId);
+    if (!container) return;
+    container.innerHTML = '';
+
+    const isIsp = category === 'isp';
+    const items = isIsp
+        ? ((statsObj.top_asns_isp && statsObj.top_asns_isp.length > 0) ? statsObj.top_asns_isp : (statsObj.top_asns || [])).slice(0, 8)
+        : (statsObj.top_asns_datacenter || []).slice(0, 8);
+
+    if (!items || items.length === 0) {
+        container.innerHTML = '<div class="empty-msg">Sin consultas registradas.</div>';
+        return;
+    }
+
+    const maxCount = Math.max(...items.map(i => i.count), 1);
+
+    // 1. Render Top 8 items
+    items.forEach(item => {
+        const row = createStatRow(item, maxCount, true);
+        container.appendChild(row);
+    });
+
+    // 2. Render 9th item: Toggle card to switch category
+    const switchCard = document.createElement('div');
+    switchCard.className = 'asn-switch-card';
+    switchCard.setAttribute('role', 'button');
+    switchCard.setAttribute('tabindex', '0');
+
+    const itemLeft = document.createElement('div');
+    itemLeft.className = 'item-left';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'item-name';
+    nameSpan.style.fontWeight = '600';
+    nameSpan.innerText = isIsp ? 'Datacenter ASN' : 'Operadores (ISP)';
+    nameSpan.setAttribute('data-i18n', isIsp ? 'stats.asn_toggle_to_dc' : 'stats.asn_toggle_to_isp');
+    itemLeft.appendChild(nameSpan);
+
+    const subSpan = document.createElement('span');
+    subSpan.className = 'item-sub';
+    subSpan.innerText = isIsp ? 'Centros de datos y servidores' : 'Proveedores de Internet y móvil';
+    subSpan.setAttribute('data-i18n', isIsp ? 'stats.asn_toggle_to_dc_sub' : 'stats.asn_toggle_to_isp_sub');
+    itemLeft.appendChild(subSpan);
+
+    switchCard.appendChild(itemLeft);
+
+    const badgeSpan = document.createElement('span');
+    badgeSpan.className = 'switch-badge';
+    badgeSpan.innerText = '⇄ Cambiar';
+    badgeSpan.setAttribute('data-i18n', 'stats.asn_switch_btn');
+    switchCard.appendChild(badgeSpan);
+
+    const targetCategory = isIsp ? 'datacenter' : 'isp';
+    switchCard.onclick = () => switchAsnCategory(period, targetCategory);
+    switchCard.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            switchAsnCategory(period, targetCategory);
+        }
+    };
+
+    container.appendChild(switchCard);
 }
 
 function loadStatsData() {

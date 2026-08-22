@@ -74,10 +74,11 @@ const translations = {
         "stats.card_cached": "Caché Hit",
         "stats.card_latency": "Latencia Media",
         "stats.table_asn": "Top ASNs",
-        "stats.asn_btn_isp": "Operadores",
-        "stats.asn_btn_datacenter": "Datacenters",
-        "stats.dc_toggle_title": "Datacenter ASN",
-        "stats.dc_toggle_sub": "Centros de datos y servidores",
+        "stats.asn_toggle_to_dc": "Datacenter ASN",
+        "stats.asn_toggle_to_dc_sub": "Centros de datos y servidores",
+        "stats.asn_toggle_to_isp": "Operadores (ISP)",
+        "stats.asn_toggle_to_isp_sub": "Proveedores de Internet y móvil",
+        "stats.asn_switch_btn": "⇄ Cambiar",
         "stats.table_types": "Tipos de Registro",
         "stats.loading": "Cargando datos...",
         "stats.no_data": "Sin consultas.",
@@ -168,10 +169,11 @@ const translations = {
         "stats.card_cached": "Cache Hit",
         "stats.card_latency": "Avg Latency",
         "stats.table_asn": "Top ASNs",
-        "stats.asn_btn_isp": "ISPs",
-        "stats.asn_btn_datacenter": "Datacenters",
-        "stats.dc_toggle_title": "Datacenter ASN",
-        "stats.dc_toggle_sub": "Data centers & server hosting",
+        "stats.asn_toggle_to_dc": "Datacenter ASN",
+        "stats.asn_toggle_to_dc_sub": "Data centers & server hosting",
+        "stats.asn_toggle_to_isp": "Operators (ISP)",
+        "stats.asn_toggle_to_isp_sub": "Internet Service Providers & mobile",
+        "stats.asn_switch_btn": "⇄ Switch",
         "stats.table_types": "Query Types",
         "stats.loading": "Loading data...",
         "stats.no_data": "No queries.",
@@ -203,8 +205,11 @@ function t(key, lang) {
     if (dict && dict[key]) return dict[key];
     if (translations.es && translations.es[key]) return translations.es[key];
     if (translations.en && translations.en[key]) return translations.en[key];
-    if (key === 'stats.dc_toggle_title') return 'Datacenter ASN';
-    if (key === 'stats.dc_toggle_sub') return activeLang === 'es' ? 'Centros de datos y servidores' : 'Data centers & servers';
+    if (key === 'stats.asn_toggle_to_dc') return 'Datacenter ASN';
+    if (key === 'stats.asn_toggle_to_dc_sub') return activeLang === 'es' ? 'Centros de datos y servidores' : 'Data centers & servers';
+    if (key === 'stats.asn_toggle_to_isp') return activeLang === 'es' ? 'Operadores (ISP)' : 'Operators (ISP)';
+    if (key === 'stats.asn_toggle_to_isp_sub') return activeLang === 'es' ? 'Proveedores de Internet y móvil' : 'Internet Service Providers';
+    if (key === 'stats.asn_switch_btn') return activeLang === 'es' ? '⇄ Cambiar' : '⇄ Switch';
     return key;
 }
 
