@@ -171,9 +171,9 @@ function renderAsnSection(period, statsObj, category) {
         const subKey = isIsp ? 'stats.asn_toggle_to_dc_sub' : 'stats.asn_toggle_to_isp_sub';
 
         const toggleItem = {
-            name: isIsp ? 'Datacenter ASN' : 'Operadores (ISP)',
+            name: isIsp ? 'Otros ASN' : 'Operadores (ISP)',
             nameI18nKey: nameKey,
-            sub: isIsp ? 'Centros de datos y servidores' : 'Proveedores de Internet y móvil',
+            sub: isIsp ? 'Centros de datos y redes externas' : 'Proveedores de Internet y móvil',
             subI18nKey: subKey,
             count: otherTotal,
             isSwitchCard: true,

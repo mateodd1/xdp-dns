@@ -788,7 +788,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=2.8"></script>
+    <script src="/i18n.js?v=2.9"></script>
     <script>
         // Theme Management
         const THEME_KEY = 'xdp_theme';
@@ -1006,9 +1006,9 @@
                 const subKey = isIsp ? 'stats.asn_toggle_to_dc_sub' : 'stats.asn_toggle_to_isp_sub';
 
                 const toggleItem = {
-                    name: (window.i18n && window.i18n.t(nameKey)) || (isIsp ? 'Datacenter ASN' : 'Operadores (ISP)'),
+                    name: (window.i18n && window.i18n.t(nameKey)) || (isIsp ? 'Otros ASN' : 'Operadores (ISP)'),
                     nameI18nKey: nameKey,
-                    sub: (window.i18n && window.i18n.t(subKey)) || (isIsp ? 'Centros de datos y servidores' : 'Proveedores de Internet y móvil'),
+                    sub: (window.i18n && window.i18n.t(subKey)) || (isIsp ? 'Centros de datos y redes externas' : 'Proveedores de Internet y móvil'),
                     subI18nKey: subKey,
                     count: otherTotal,
                     isSwitchCard: true,
