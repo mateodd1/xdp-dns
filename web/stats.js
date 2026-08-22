@@ -54,27 +54,10 @@ function renderStatsList(elementId, items, isAsn = false) {
         const itemLeft = document.createElement('div');
         itemLeft.className = 'item-left';
 
-        const nameRow = document.createElement('div');
-        nameRow.className = 'item-name-row';
-
-        if (isAsn) {
-            const logoUrl = getIspLogo(item.name);
-            if (logoUrl) {
-                const logoImg = document.createElement('img');
-                logoImg.src = logoUrl;
-                logoImg.alt = '';
-                logoImg.className = 'isp-logo';
-                logoImg.loading = 'lazy';
-                nameRow.appendChild(logoImg);
-            }
-        }
-
         const nameSpan = document.createElement('span');
         nameSpan.className = 'item-name';
         nameSpan.innerText = item.name;
-        nameRow.appendChild(nameSpan);
-
-        itemLeft.appendChild(nameRow);
+        itemLeft.appendChild(nameSpan);
 
         if (isAsn && item.ipv4_percent !== undefined && item.ipv6_percent !== undefined) {
             const subSpan = document.createElement('span');
