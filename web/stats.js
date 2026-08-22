@@ -237,61 +237,143 @@ function loadStatsData() {
         });
 }
 
-function detectUserConnection() {
-    const iconWrap = document.getElementById('conn-icon-wrapper');
-    const desc = document.getElementById('conn-desc');
-    const ipEl = document.getElementById('conn-ip');
+function updateStatusCard(info) {
+    const statusCard = document.getElementById('connection-status');
+    if (!statusCard) return;
 
-    function applyConnection(ip, asn, orgName, isV6) {
-        const asnDisplay = asn ? `AS${asn} • ` : '';
-        const logoUrl = getIspLogo(`${orgName} AS${asn}`);
+    const ip = info.query || info.ip || '-';
+    const isIPv6 = ip.includes(':');
 
-        if (iconWrap) {
-            if (logoUrl) {
-                iconWrap.innerHTML = `<img src="${logoUrl}" alt="${orgName}" class="conn-isp-logo-main" />`;
-            } else {
-                iconWrap.innerHTML = `<div class="status-dot ${isV6 ? 'ipv6' : 'ipv4'}" id="conn-dot"></div>`;
-            }
+    // Extract ASN from "as" field (e.g. "AS12430 Vodafone Espana S.A.U.")
+    let asnDisplay = '';
+    let ispDisplay = info.isp || info.org || 'Unknown ISP';
+
+    if (info.as) {
+        const match = info.as.match(/^(AS\d+)\b/i);
+        if (match) {
+            asnDisplay = `${match[1].toUpperCase()} • `;
         }
-
-        if (desc) desc.innerText = `${asnDisplay}${orgName}`;
-        if (ipEl) ipEl.innerText = ip;
     }
 
-    fetch('https://ipwho.is/')
-        .then(r => r.json())
-        .then(data => {
-            if (data && data.success) {
-                const ip = data.ip || '-';
-                const isV6 = ip.includes(':');
-                const asn = (data.connection && data.connection.asn) || '';
-                const orgName = (data.connection && (data.connection.org || data.connection.isp)) || 'Network';
-                applyConnection(ip, asn, orgName, isV6);
-            } else {
-                fallbackDetect();
-            }
+    // Determine logo to show
+    let logoHtml = `<div class="connection-icon-wrapper"><div class="status-dot ${isIPv6 ? 'ipv6' : 'ipv4'}"></div></div>`;
+    let brandClass = isIPv6 ? 'brand-ipv6' : 'brand-ipv4';
+
+    const lowerAS = (info.as || '').toLowerCase();
+    const lowerISP = (info.isp || '').toLowerCase();
+    const lowerORG = (info.org || '').toLowerCase();
+
+    const isVodafone = lowerAS.includes('as12430') || lowerISP.includes('vodafone') || lowerORG.includes('vodafone');
+    const isMovistar = lowerAS.includes('as3352') || lowerAS.includes('as3351') || lowerISP.includes('telefonica') || lowerISP.includes('movistar') || lowerORG.includes('telefonica') || lowerORG.includes('movistar');
+    const isOrange = lowerAS.includes('as12479') || lowerISP.includes('orange') || lowerORG.includes('orange');
+    const isDigi = lowerAS.includes('as57269') || lowerAS.includes('as206238') || lowerISP.includes('digi') || lowerORG.includes('digi');
+
+    if (isVodafone) {
+        logoHtml = `<div class="connection-icon-wrapper"><img src="/stats/img/vodafone.svg" alt="Vodafone" style="width: 24px; height: 24px;" /></div>`;
+        brandClass = 'brand-vodafone';
+    } else if (isMovistar) {
+        logoHtml = `<div class="connection-icon-wrapper"><img src="/stats/img/movistar.svg" alt="Movistar" style="width: 22px; height: 22px;" /></div>`;
+        brandClass = 'brand-movistar';
+    } else if (isOrange) {
+        logoHtml = `<div class="connection-icon-wrapper"><img src="/stats/img/orange.svg" alt="Orange" style="width: 22px; height: 22px;" /></div>`;
+        brandClass = 'brand-orange';
+    } else if (isDigi) {
+        logoHtml = `<div class="connection-icon-wrapper"><img src="/stats/img/digi.png" alt="Digi" style="width: 24px; height: 24px;" /></div>`;
+        brandClass = 'brand-digi';
+    }
+
+    const titleText = (window.i18n && window.i18n.t('conn.title')) || 'Tu Conexión';
+
+    statusCard.className = 'connection-card ' + brandClass;
+    statusCard.innerHTML = `
+        <div class="connection-left">
+            ${logoHtml}
+            <div class="connection-text-group">
+                <span class="connection-card-title">${titleText}</span>
+                <span class="connection-card-desc">${asnDisplay}${ispDisplay}</span>
+            </div>
+        </div>
+        <div class="connection-right">
+            <span class="connection-ip">${ip}</span>
+        </div>
+    `;
+}
+
+function renderErrorCard() {
+    const statusCard = document.getElementById('connection-status');
+    if (statusCard) {
+        const titleText = (window.i18n && window.i18n.t('conn.title')) || 'Tu Conexión';
+        statusCard.className = 'connection-card brand-error';
+        statusCard.innerHTML = `
+            <div class="connection-left">
+                <div class="connection-icon-wrapper"><div class="status-dot" style="background-color: #ef4444;"></div></div>
+                <div class="connection-text-group">
+                    <span class="connection-card-title">${titleText}</span>
+                    <span class="connection-card-desc" style="color: #ef4444;">Error al conectar con el servicio GeoIP</span>
+                </div>
+            </div>
+            <div class="connection-right">
+                <span class="connection-ip">-</span>
+            </div>
+        `;
+    }
+}
+
+function detectUserConnection() {
+    // Fast check of client IP and local storage caching
+    fetch('/api/ip')
+        .then(res => {
+            if (!res.ok) throw new Error('Failed to fetch client IP');
+            return res.text();
         })
-        .catch(() => {
-            fallbackDetect();
-        });
+        .then(currentIp => {
+            currentIp = currentIp.trim();
+            const cachedIp = localStorage.getItem('geoip_ip');
+            const cachedDataStr = localStorage.getItem('geoip_data');
 
-    function fallbackDetect() {
-        fetch('https://ipapi.co/json/')
-            .then(r => r.json())
-            .then(data => {
-                if (data && data.ip) {
-                    const ip = data.ip;
-                    const isV6 = ip.includes(':');
-                    const asn = (data.asn || '').replace(/^AS/i, '');
-                    const orgName = data.org || data.carrier || 'Network';
-                    applyConnection(ip, asn, orgName, isV6);
+            if (cachedIp === currentIp && cachedDataStr) {
+                try {
+                    const cachedData = JSON.parse(cachedDataStr);
+                    updateStatusCard(cachedData);
+                    return; // Loaded from cache!
+                } catch (e) {
+                    console.error('Error parsing cached geoip data:', e);
                 }
-            })
-            .catch(() => {
-                if (desc) desc.innerText = 'Conexión Activa';
-                if (ipEl) ipEl.innerText = '-';
-            });
-    }
+            }
+
+            // Cache miss or IP changed: fetch details from /api/geoip
+            fetch('/api/geoip')
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to fetch geoip info');
+                    return res.json();
+                })
+                .then(info => {
+                    localStorage.setItem('geoip_ip', currentIp);
+                    localStorage.setItem('geoip_data', JSON.stringify(info));
+                    updateStatusCard(info);
+                })
+                .catch(err => {
+                    console.error('Error fetching geoip info:', err);
+                    renderErrorCard();
+                });
+        })
+        .catch(err => {
+            console.error('Error fetching client IP:', err);
+            // Fallback to client-side geoip lookup
+            fetch('https://ipwho.is/')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.success) {
+                        const ip = data.ip || '-';
+                        const asn = (data.connection && data.connection.asn) ? `AS${data.connection.asn}` : '';
+                        const orgName = (data.connection && (data.connection.org || data.connection.isp)) || 'Network';
+                        updateStatusCard({ query: ip, as: asn, isp: orgName });
+                    } else {
+                        renderErrorCard();
+                    }
+                })
+                .catch(() => renderErrorCard());
+        });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

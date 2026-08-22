@@ -33,6 +33,20 @@ dns.xdp.es {
 		}
 	}
 
+	handle /api/ip {
+		header Content-Type "text/plain; charset=utf-8"
+		header Cache-Control "no-store, no-cache, must-revalidate"
+		respond "{remote_host}" 200
+	}
+
+	handle /api/geoip {
+		rewrite * /json/{remote_host}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query
+		reverse_proxy http://ip-api.com {
+			header_up Host ip-api.com
+			header_down Cache-Control "public, max-age=3600"
+		}
+	}
+
 	@stats path /stats.json /stats/stats.json
 	handle @stats {
 		root * /var/www/xdp.es
@@ -98,6 +112,20 @@ xdp.es {
 
 	handle /block-ota/dns-query* {
 		redir https://dns.xdp.es{uri} permanent
+	}
+
+	handle /api/ip {
+		header Content-Type "text/plain; charset=utf-8"
+		header Cache-Control "no-store, no-cache, must-revalidate"
+		respond "{remote_host}" 200
+	}
+
+	handle /api/geoip {
+		rewrite * /json/{remote_host}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query
+		reverse_proxy http://ip-api.com {
+			header_up Host ip-api.com
+			header_down Cache-Control "public, max-age=3600"
+		}
 	}
 
 	@stats path /stats.json /stats/stats.json
