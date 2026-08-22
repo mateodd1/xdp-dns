@@ -153,9 +153,25 @@ function loadStatsData() {
 }
 
 function detectUserConnection() {
-    const dot = document.getElementById('conn-dot');
+    const iconWrap = document.getElementById('conn-icon-wrapper');
     const desc = document.getElementById('conn-desc');
     const ipEl = document.getElementById('conn-ip');
+
+    function applyConnection(ip, asn, orgName, isV6) {
+        const asnDisplay = asn ? `AS${asn} • ` : '';
+        const logoUrl = getIspLogo(`${orgName} AS${asn}`);
+
+        if (iconWrap) {
+            if (logoUrl) {
+                iconWrap.innerHTML = `<img src="${logoUrl}" alt="${orgName}" class="conn-isp-logo-main" />`;
+            } else {
+                iconWrap.innerHTML = `<div class="status-dot ${isV6 ? 'ipv6' : 'ipv4'}" id="conn-dot"></div>`;
+            }
+        }
+
+        if (desc) desc.innerText = `${asnDisplay}${orgName}`;
+        if (ipEl) ipEl.innerText = ip;
+    }
 
     fetch('https://ipwho.is/')
         .then(r => r.json())
@@ -163,22 +179,9 @@ function detectUserConnection() {
             if (data && data.success) {
                 const ip = data.ip || '-';
                 const isV6 = ip.includes(':');
-                
-                if (dot) {
-                    dot.className = 'status-dot ' + (isV6 ? 'ipv6' : 'ipv4');
-                }
-                
-                let asnDisplay = '';
-                if (data.connection && data.connection.asn) {
-                    asnDisplay = `AS${data.connection.asn} • `;
-                }
-                
-                let orgName = (data.connection && (data.connection.org || data.connection.isp)) || 'Organización';
-                const logoUrl = getIspLogo(orgName + ' ' + (data.connection && data.connection.asn ? 'AS' + data.connection.asn : ''));
-                const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="" class="conn-isp-logo">` : '';
-                
-                if (desc) desc.innerHTML = `${logoHtml}${asnDisplay}${orgName}`;
-                if (ipEl) ipEl.innerText = ip;
+                const asn = (data.connection && data.connection.asn) || '';
+                const orgName = (data.connection && (data.connection.org || data.connection.isp)) || 'Network';
+                applyConnection(ip, asn, orgName, isV6);
             } else {
                 fallbackDetect();
             }
@@ -194,15 +197,9 @@ function detectUserConnection() {
                 if (data && data.ip) {
                     const ip = data.ip;
                     const isV6 = ip.includes(':');
-                    if (dot) dot.className = 'status-dot ' + (isV6 ? 'ipv6' : 'ipv4');
-                    
-                    let asnDisplay = data.asn ? `${data.asn} • ` : '';
-                    let orgName = data.org || data.carrier || 'Organización';
-                    const logoUrl = getIspLogo(orgName + ' ' + (data.asn || ''));
-                    const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="" class="conn-isp-logo">` : '';
-                    
-                    if (desc) desc.innerHTML = `${logoHtml}${asnDisplay}${orgName}`;
-                    if (ipEl) ipEl.innerText = ip;
+                    const asn = (data.asn || '').replace(/^AS/i, '');
+                    const orgName = data.org || data.carrier || 'Network';
+                    applyConnection(ip, asn, orgName, isV6);
                 }
             })
             .catch(() => {
