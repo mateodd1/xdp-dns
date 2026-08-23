@@ -1,0 +1,2282 @@
+{
+  "last_updated": "2026-08-23 15:47:30 UTC",
+  "timestamp": 1787500050,
+  "evasion_active": true,
+  "total_blocked": 284,
+  "cf_blocked_count": 238,
+  "evaded_count": 238,
+  "entries": [
+    {
+      "blocked_ip": "104.18.50.34",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.18.50.35",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.18.54.45",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.18.54.46",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.20.21.45",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.20.21.46",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.1.74",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.1.75",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.8.112",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.8.113",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.12.118",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.12.119",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.12.200",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.12.201",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.15.141",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.15.142",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.18.182",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.18.183",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.20.95",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.20.96",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.20.110",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.20.111",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.21.214",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.21.215",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.23.29",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.23.30",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.24.26",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.24.27",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.25.73",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.25.74",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.26.106",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.26.107",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.27.223",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.27.224",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.29.146",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.29.147",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.32.217",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.32.218",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.32.219",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.32.220",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.34.18",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.34.19",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.34.131",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.34.132",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.36.225",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.36.226",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.37.24",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.37.25",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.38.196",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.38.197",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.41.36",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.41.37",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.41.104",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.41.105",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.45.209",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.45.210",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.50.99",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.50.100",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.51.25",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.51.26",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.51.68",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.51.69",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.54.108",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.54.109",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.55.136",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.55.137",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.57.18",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.57.19",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.58.110",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.58.111",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.58.167",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.58.168",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.58.226",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.58.227",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.59.154",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.59.155",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.59.195",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.59.196",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.60.90",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.60.91",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.61.194",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.61.195",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.62.161",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.62.162",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.64.67",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.64.68",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.66.71",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.66.72",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.68.32",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.68.33",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.68.156",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.68.157",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.71.109",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.71.110",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.73.181",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.73.182",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.74.125",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.74.126",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.77.86",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.77.87",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.77.225",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.77.226",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.78.241",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.78.242",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.83.161",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.83.162",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.86.172",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.86.173",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.89.247",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.89.248",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.90.62",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.90.63",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.90.173",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.90.174",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.21.93.80",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.16.0.0/13",
+      "alternative_ip": "104.21.93.81",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.26.0.196",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.24.0.0/14",
+      "alternative_ip": "104.26.0.197",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.26.1.196",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.24.0.0/14",
+      "alternative_ip": "104.26.1.197",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "104.26.4.244",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "104.24.0.0/14",
+      "alternative_ip": "104.26.4.245",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.64.66.1",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.64.66.2",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.68.166",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.68.167",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.69.105",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.69.106",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.70.238",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.70.239",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.72.82",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.72.83",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.73.70",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.73.71",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.74.78",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.74.79",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.75.211",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.75.212",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.128.197",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.128.198",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.135.223",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.135.224",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.136.121",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.136.122",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.136.123",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.136.124",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.137.21",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.137.22",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.138.31",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.138.32",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.138.51",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.138.52",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.138.185",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.138.186",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.144.123",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.144.124",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.146.141",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.146.142",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.148.52",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.148.53",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.149.100",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.149.101",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.152.73",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.152.74",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.153.46",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.153.47",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.153.57",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.153.58",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.153.164",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.153.165",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.157.86",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.157.87",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.157.140",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.157.141",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.158.77",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.158.78",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.158.95",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.158.96",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.159.21",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.159.22",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.159.132",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.159.133",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.161.68",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.161.69",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.162.197",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.162.198",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.165.61",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.165.62",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.166.46",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.166.47",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.166.225",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.166.226",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.168.16",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.168.17",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.169.199",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.169.200",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.176.238",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.176.239",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.177.83",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.177.84",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.178.103",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.178.104",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.179.194",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.179.195",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.182.240",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.182.241",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.183.27",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.183.28",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.185.217",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.185.218",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.192.12",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.192.13",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.192.92",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.192.93",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.195.2",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.195.3",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.196.167",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.196.168",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.200.7",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.200.8",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.200.93",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.200.94",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.202.176",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.202.177",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.203.73",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.203.74",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.203.148",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.203.149",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.204.28",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.204.29",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.205.162",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.205.163",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.205.192",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.205.193",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.207.153",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.207.154",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.208.118",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.208.119",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.209.158",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.209.159",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.212.33",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.212.34",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.213.89",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.213.90",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.216.124",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.216.125",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.219.45",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.219.46",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.219.87",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.219.88",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.222.197",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.222.198",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "172.67.223.244",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "172.64.0.0/13",
+      "alternative_ip": "172.67.223.245",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.96.2",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.96.1",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.96.3",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.96.1",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.96.4",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.96.1",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.96.5",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.96.9",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.96.6",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.96.9",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.96.7",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.96.9",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.96.8",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.96.9",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.97.2",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.97.1",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.97.3",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.97.1",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.97.4",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.97.1",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.97.5",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.97.9",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.97.6",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.97.9",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.97.7",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.97.9",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "188.114.97.8",
+      "type": "IPv4",
+      "is_cloudflare": true,
+      "prefix": "188.114.96.0/20",
+      "alternative_ip": "188.114.97.9",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2001:41d0:701:1100::486b",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2001:41d0:701:1100::486b",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2400:52e0:1e06::1446:1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2400:52e0:1e06::1446:1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2404:2280:276:0:3::a",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2404:2280:276:0:3::a",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2404:2280:276:0:3::b",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2404:2280:276:0:3::b",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:1901:0:4e5c::",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:1901:0:4e5c::",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:201a:1000:1b:78f9:8f80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:201a:1000:1b:78f9:8f80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:201a:2400:1b:78f9:8f80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:201a:2400:1b:78f9:8f80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:201a:5000:1b:78f9:8f80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:201a:5000:1b:78f9:8f80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:201a:5800:1b:78f9:8f80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:201a:5800:1b:78f9:8f80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:201a:600:1b:78f9:8f80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:201a:600:1b:78f9:8f80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:201a:7600:1b:78f9:8f80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:201a:7600:1b:78f9:8f80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:201a:ee00:1b:78f9:8f80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:201a:ee00:1b:78f9:8f80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:201a:f400:1b:78f9:8f80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:201a:f400:1b:78f9:8f80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:2091:2000:4:5888:3e80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:2091:2000:4:5888:3e80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:2091:4600:4:5888:3e80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:2091:4600:4:5888:3e80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:2091:5400:4:5888:3e80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:2091:5400:4:5888:3e80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:2091:6000:4:5888:3e80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:2091:6000:4:5888:3e80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:2091:7a00:4:5888:3e80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:2091:7a00:4:5888:3e80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:2091:b400:4:5888:3e80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:2091:b400:4:5888:3e80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:2091:d600:4:5888:3e80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:2091:d600:4:5888:3e80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2600:9000:2091:ea00:4:5888:3e80:93a1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2600:9000:2091:ea00:4:5888:3e80:93a1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2602:fea2:2::1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2602:fea2:2::1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2606:4700:10::6814:1fd1",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:10::6814:1fd2",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:10::6814:2640",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:10::6814:2641",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:10::ac42:a755",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:10::ac42:a756",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:10::ac42:aa7a",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:10::ac42:aa7b",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:163",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:164",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:17b",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:17c",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:197",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:198",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:1c4",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:1c5",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:20f",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:210",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:2a5",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:2a6",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:2bd",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:2be",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:2e1",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:2e2",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:30f",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:310",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:3a5",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:3a6",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:3bd",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:3be",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:3e1",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:3e2",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:4d8",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:4d9",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:5d8",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:5d9",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:63",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:64",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:6c5",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:6c6",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:7b",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:7c",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:7c5",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:7c6",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:81e",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:81f",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:91e",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:91f",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:97",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:98",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:a4b",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:a4c",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:b4b",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:b4c",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:c4",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:c5",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:ef4",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:ef5",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::681a:ff4",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::681a:ff5",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::ac43:445d",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::ac43:445e",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::ac43:4491",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::ac43:4492",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::ac43:453d",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::ac43:453e",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::ac43:46b1",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::ac43:46b2",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::ac43:46b5",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::ac43:46b6",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::ac43:46c3",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::ac43:46c4",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::ac43:482b",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::ac43:482c",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::ac43:49c1",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::ac43:49c2",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::ac43:4a2a",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::ac43:4a2b",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::ac43:4a63",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::ac43:4a64",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::ac43:4aa0",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::ac43:4aa1",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::ac43:4ae4",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::ac43:4ae5",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:20::ac43:4bd3",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:20::ac43:4bd4",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3030::6815:4452",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3030::6815:4453",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3030::6815:915",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3030::6815:916",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3031::6815:2457",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3031::6815:2458",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3031::6815:30d8",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3031::6815:30d9",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3031::6815:495e",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3031::6815:495f",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3031::6815:621",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3031::6815:622",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3031::ac43:c03b",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3031::ac43:c03c",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3032::6815:3b37",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3032::6815:3b38",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3032::ac43:ac89",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3032::ac43:ac8a",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3032::ac43:b7f4",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3032::ac43:b7f5",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3032::ac43:beb1",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3032::ac43:beb2",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3032::ac43:c2ae",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3032::ac43:c2af",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3032::ac43:cc1d",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3032::ac43:cc1e",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3033::6815:43d2",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3033::6815:43d3",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3033::ac43:9e98",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3033::ac43:9e99",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3033::ac43:d636",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3033::ac43:d637",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3035::6815:5615",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3035::6815:5616",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3035::6815:ad3",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3035::6815:ad4",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3035::ac43:8a0e",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3035::ac43:8a0f",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3035::ac43:9ac6",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3035::ac43:9ac7",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3035::ac43:b521",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3035::ac43:b522",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3035::ac43:bd59",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3035::ac43:bd5a",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3035::ac43:d71f",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3035::ac43:d720",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3036::6815:584f",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3036::6815:5850",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3036::ac43:8d29",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3036::ac43:8d2a",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3037::6815:12f5",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3037::6815:12f6",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3037::6815:212b",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3037::6815:212c",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3037::6815:2209",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3037::6815:220a",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3037::6815:34d7",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3037::6815:34d8",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3037::6815:582c",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3037::6815:582d",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3037::ac43:a486",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3037::ac43:a487",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:3037::ac43:ae0c",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:3037::ac43:ae0d",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:4402::6812:25e4",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:4402::6812:25e5",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:4408::ac40:9933",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:4408::ac40:9934",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:4409::ac40:961c",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:4409::ac40:961d",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:440b::ac40:9b86",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:440b::ac40:9b87",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700:440d::6812:22cd",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700:440d::6812:22ce",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700::6810:5d72",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700::6810:5d73",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700::6810:5e72",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700::6810:5e73",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700::6810:5f72",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700::6810:5f73",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700::6810:6072",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700::6810:6073",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700::6810:6172",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700::6810:6173",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700::6812:11",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700::6812:12",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700::6812:111",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700::6812:112",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700::6812:1ab",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700::6812:1aa",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700::6812:1ac",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700::6812:1ad",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700::6812:ab",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700::6812:aa",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700::6812:ac",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700::6812:ad",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700::6812:c43",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700::6812:c44",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:4700::6812:d43",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2606:4700::/32",
+      "alternative_ip": "2606:4700::6812:d44",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2606:50c0:8000::153",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2606:50c0:8000::153",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2606:50c0:8001::153",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2606:50c0:8001::153",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2606:50c0:8002::153",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2606:50c0:8002::153",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2606:50c0:8003::153",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2606:50c0:8003::153",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2620:127:f00f:e::",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2620:127:f00c::/46",
+      "alternative_ip": "2620:127:f00f:e::1",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2a00:de40:10:545::4",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a00:de40:10:545::4",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a00:de40:10:545::6",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a00:de40:10:545::6",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a00:de40:10:545::7",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a00:de40:10:545::7",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a00:de40:10:545::8",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a00:de40:10:545::8",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a00:de40:10:545::a",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a00:de40:10:545::a",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a00:de40:10:545::c",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a00:de40:10:545::c",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a01:7e01::2000:dff:fec1:5cdb",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a01:7e01::2000:dff:fec1:5cdb",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a01:7e01::f03c:95ff:fe00:2692",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a01:7e01::f03c:95ff:fe00:2692",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a01:7e01::f03c:95ff:fe91:5d91",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a01:7e01::f03c:95ff:fe91:5d91",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a01:7e01::f03c:95ff:feeb:9d4b",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a01:7e01::f03c:95ff:feeb:9d4b",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a01:7e01::f03c:95ff:feed:783e",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a01:7e01::f03c:95ff:feed:783e",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a02:4780:2a:1635:2df5:1bf:7dea:122e",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a02:4780:2a:1635:2df5:1bf:7dea:122e",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a02:4780:37:3a75:539e:1e5f:b3ff:ce32",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a02:4780:37:3a75:539e:1e5f:b3ff:ce32",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a02:6ea0:c310:2::4",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a02:6ea0:c310:2::4",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a02:ec80:600:ed1a::1",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a02:ec80:600:ed1a::1",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a04:4e42:4c::649",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a04:4e42:4c::649",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a04:4e42:4d::649",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a04:4e42:4d::649",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a05:d014:58f:6200::258",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a05:d014:58f:6200::258",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a05:d014:58f:6200::259",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a05:d014:58f:6200::259",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a05:d01c:9e6:f102::1f5",
+      "type": "IPv6",
+      "is_cloudflare": false,
+      "prefix": "Non-Cloudflare",
+      "alternative_ip": "2a05:d01c:9e6:f102::1f5",
+      "status": "No Cloudflare (Intacta)"
+    },
+    {
+      "blocked_ip": "2a06:98c1:310c::6812:207a",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2a06:98c0::/29",
+      "alternative_ip": "2a06:98c1:310c::6812:207b",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2a06:98c1:3120::5",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2a06:98c0::/29",
+      "alternative_ip": "2a06:98c1:3120::6",
+      "status": "Evadida (Limpia)"
+    },
+    {
+      "blocked_ip": "2a06:98c1:3121::5",
+      "type": "IPv6",
+      "is_cloudflare": true,
+      "prefix": "2a06:98c0::/29",
+      "alternative_ip": "2a06:98c1:3121::6",
+      "status": "Evadida (Limpia)"
+    }
+  ]
+}

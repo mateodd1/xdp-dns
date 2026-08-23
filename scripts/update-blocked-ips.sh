@@ -63,3 +63,6 @@ if [[ -f "$SOURCE_IPV6" ]]; then
         echo "[$(date -u '+%Y-%m-%d %H:%M:%S UTC')] Blocked IPv6 list synced from $SOURCE_IPV6."
     fi
 fi
+
+# 3. Update /blocked dashboard JSON
+/usr/bin/python3 /root/xpd-dns/scripts/generate-blocked-json.py >/dev/null 2>&1 || true

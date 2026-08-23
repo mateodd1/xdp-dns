@@ -127,6 +127,21 @@ xdp.es {
 		file_server
 	}
 
+	@blocked_data path /blocked/data.json
+	handle @blocked_data {
+		header Content-Type "application/json; charset=utf-8"
+		header Cache-Control "public, no-cache, must-revalidate"
+		file_server
+	}
+
+	@blocked_page path /blocked /blocked/ /blocked/index.html
+	handle @blocked_page {
+		header Content-Type "text/html; charset=utf-8"
+		header Cache-Control "public, no-cache, must-revalidate"
+		rewrite * /blocked/index.html
+		file_server
+	}
+
 	@known_assets path /index.css /index.js /theme.js /i18n.js /stats.js /llms.txt /llms-full.txt /openapi.json /robots.txt /sitemap.xml /favicon.ico /site.webmanifest *.mobileconfig *.svg *.png *.ico *.webmanifest
 	handle @known_assets {
 		@css path *.css
