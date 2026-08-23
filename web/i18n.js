@@ -113,6 +113,7 @@ const translations = {
 
         // Section 1: Privacy & Infrastructure
         "about.sec_privacy_title": "Privacidad e Infraestructura",
+        "about.sec_privacy_desc": "xdp.es DNS está concebido para ofrecer una resolución rápida, robusta y completamente privada, asegurando que tus datos de navegación nunca sean rastreados ni almacenados, con infraestructura optimizada localmente en Madrid.",
         "about.card_nologs_title": "Política Zero-Logs",
         "about.card_nologs_desc": "No registramos, rastreamos ni almacenamos tus consultas DNS ni tu dirección IP. Las estadísticas públicas son contadores numéricos agregados en memoria sin ninguna información identificable.",
         "about.card_dnssec_title": "Validación Criptográfica DNSSEC",
@@ -247,6 +248,7 @@ const translations = {
 
         // Section 1: Privacy & Infrastructure
         "about.sec_privacy_title": "Privacy & Infrastructure",
+        "about.sec_privacy_desc": "xdp.es DNS is designed to deliver fast, resilient, and completely private resolution, ensuring your browsing data is never tracked or logged, with infrastructure locally optimized in Madrid.",
         "about.card_nologs_title": "Zero-Logs Policy",
         "about.card_nologs_desc": "We never log, track, or store your DNS queries or IP address. Public dashboard statistics are in-memory integer metrics with zero personally identifiable information.",
         "about.card_dnssec_title": "DNSSEC Validation",
