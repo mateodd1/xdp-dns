@@ -20,6 +20,12 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# 0. Sync Cloudflare AS13335 Prefixes if missing or older than 24 hours
+CF_V4_FILE="/etc/unbound/cloudflare_prefixes_v4.txt"
+if [[ ! -f "$CF_V4_FILE" ]] || [[ $(find "$CF_V4_FILE" -mtime +1 -print 2>/dev/null) ]]; then
+    /usr/bin/python3 /root/xpd-dns/scripts/update-cloudflare-prefixes.py >/dev/null 2>&1 || true
+fi
+
 # 1. Fetch IPv4 Anycast Blocklist
 if curl -s -f -L --connect-timeout 10 --max-time 20 -H "User-Agent: xdp-dns-sync/1.0" "$URL" -o "$TEMP_FILE"; then
     FILTERED_TEMP=$(mktemp)
