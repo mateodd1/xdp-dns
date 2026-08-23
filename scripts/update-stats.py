@@ -58,6 +58,9 @@ CUSTOM_ASN_NAMES = {
     '14593': 'SpaceX Starlink',
     '27277': 'SpaceX Starlink',
     '397446': 'SpaceX Starlink',
+    '57269': 'DIGI Spain Telecom S.L.U.',
+    '29119': 'Parlem Telecom',
+    '200845': 'Avatel Telecom S.A.',
 }
 
 def normalize_cached_asns(cache_dict):
@@ -153,7 +156,7 @@ KNOWN_ISP_ASNS = {
     '57269', '206238', '20743', '197828', '200543', '50392', '43590', '59432', '206385',
     '212456', '29119', '202673', '203870', '205423', '210100', '208880', '210678', '209867',
     '207421', '208272', '205779', '206979', '206412', '206684', '29647', '15399', '208861',
-    '14593', '27277', '397446'
+    '14593', '27277', '397446', '200845'
 }
 
 KNOWN_DC_ASNS = {
@@ -170,10 +173,15 @@ KNOWN_DC_ASNS = {
 
 def classify_asn(name, asn_num='', country=''):
     asn_clean = str(asn_num).strip().upper().replace('AS', '')
+    if not asn_clean or asn_clean == '0':
+        m = re.search(r'AS(\d+)', name, re.IGNORECASE)
+        if m:
+            asn_clean = m.group(1)
+
     country_clean = str(country).strip().upper()
     name_lower = name.lower()
 
-    # 1. Direct Known ISP / Residential Whitelist (including Starlink)
+    # 1. Direct Known ISP / Residential Whitelist
     if asn_clean in KNOWN_ISP_ASNS:
         return 'isp'
 
