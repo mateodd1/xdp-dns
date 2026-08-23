@@ -122,11 +122,12 @@ def resolve_asn(ip_str):
         return fallback, "0", ""
 
 KNOWN_ISP_ASNS = {
-    # Spanish National and Regional ISPs & Operators
+    # Spanish National and Regional ISPs & Operators + Satellite / Starlink Residential
     '3352', '12338', '6739', '12430', '12353', '12715', '12479', '34048', '29259', '15704',
     '57269', '206238', '20743', '197828', '200543', '50392', '43590', '59432', '206385',
     '212456', '29119', '202673', '203870', '205423', '210100', '208880', '210678', '209867',
-    '207421', '208272', '205779', '206979', '206412', '206684', '29647', '15399', '208861'
+    '207421', '208272', '205779', '206979', '206412', '206684', '29647', '15399', '208861',
+    '14593', '27277', '397446'
 }
 
 KNOWN_DC_ASNS = {
@@ -135,7 +136,7 @@ KNOWN_DC_ASNS = {
     '63949', '20940', '16625', '35994', '20473', '64514', '16265', '28753', '60636', '50428',
     '51167', '12876', '21409', '47583', '22612', '22611', '54113', '174', '3356', '6939',
     '31898', '714', '41931', '44547', '64199', '137964', '7922', '11427', '11426', '20115',
-    '12735', '131111', '133774', '14080', '142403', '14593', '17639', '20454', '207326',
+    '12735', '131111', '133774', '14080', '142403', '17639', '20454', '207326',
     '209630', '212238', '212477', '215124', '215925', '219139', '21928', '23724', '2856',
     '31083', '33363', '400556', '41653', '45102', '47331', '4837', '51396', '54936', '60068',
     '63859', '680', '701', '7713', '8386', '8560', '9121', '9198', '9299', '9465'
@@ -144,22 +145,25 @@ KNOWN_DC_ASNS = {
 def classify_asn(name, asn_num='', country=''):
     asn_clean = str(asn_num).strip().upper().replace('AS', '')
     country_clean = str(country).strip().upper()
+    name_lower = name.lower()
 
-    # 1. Direct Known Spanish ISP Whitelist
+    # 1. Direct Known ISP / Residential Whitelist (including Starlink)
     if asn_clean in KNOWN_ISP_ASNS:
         return 'isp'
 
-    # 2. Known Datacenter / Transit / Foreign ASNs
+    # 2. Starlink / SpaceX residential satellite check
+    if 'starlink' in name_lower or 'spacex' in name_lower or 'space exploration technologies' in name_lower:
+        return 'isp'
+
+    # 3. Known Datacenter / Transit / Foreign ASNs
     if asn_clean in KNOWN_DC_ASNS:
         return 'datacenter'
 
-    # 3. Foreign ASNs (outside Spain) -> Always Datacenter
+    # 4. Foreign ASNs (outside Spain) -> Always Datacenter (unless matched above)
     if country_clean and country_clean != 'ES':
         return 'datacenter'
 
-    name_lower = name.lower()
-
-    # 4. Known datacenter/hosting/transit/foreign keywords
+    # 5. Known datacenter/hosting/transit/foreign keywords
     dc_keywords = [
         'hosting', 'host', 'datacenter', 'data center', 'server', 'cloud', 'vps', 'compute',
         'dedicated', 'colocation', 'colo', 'transit', 'carrier', 'network-services', 'baremetal',
@@ -167,25 +171,25 @@ def classify_asn(name, asn_num='', country=''):
         'linode', 'vultr', 'leaseweb', 'contabo', 'scaleway', 'namecheap', 'fastly', 'cdn', 'akamai',
         'equinix', 'interxion', 'cogent', 'lumen', 'level3', 'hurricane', 'netundweb', 'layerip',
         'tcpshield', 'nextgen', 'comcast', 'charter', 'spectrum', 'verizon', 'at&t', 't-mobile',
-        'centurylink', 'cogentco', 'telia', 'arelion', 'gtt', 'zayo', 'turknet', 'starlink',
+        'centurylink', 'cogentco', 'telia', 'arelion', 'gtt', 'zayo', 'turknet',
         'telecomunikasyon', 'iletisim', 'shirkat', 'sirketi', 'ltd', 'gmbh', 'corp', 'inc', 'sasu', 'bv', 'llc'
     ]
     for kw in dc_keywords:
         if kw in name_lower:
             return 'datacenter'
 
-    # 5. Spanish ISP keywords (only for Spain)
+    # 6. Spanish ISP keywords (only for Spain)
     isp_keywords = [
         'telefonica', 'movistar', 'vodafone', 'orange', 'digi', 'masmovil', 'yoigo',
         'pepephone', 'jazztel', 'ono', 'adamo', 'avatel', 'euskaltel', 'fibercat',
         'fibracat', 'parlem', 'goufone', 'simyo', 'lowi', 'o2', 'finetwork', 'silbo',
-        'guuk', 'avanza fibra', 'wewi', 'asteo', 'bluevia', 'oniti'
+        'guuk', 'avanza fibra', 'wewi', 'asteo', 'bluevia', 'oniti', 'starlink', 'spacex'
     ]
     for kw in isp_keywords:
         if kw in name_lower:
             return 'isp'
 
-    # 6. Default to datacenter if not an explicitly verified Spanish ISP
+    # 7. Default to datacenter if not an explicitly verified ISP
     return 'datacenter'
 
 def fetch_metrics():

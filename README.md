@@ -100,19 +100,18 @@ bash /root/xpd-dns/scripts/test-dns.sh
 
 ### 2. Probar resolución DNS estándar (Puerto 53 UDP):
 ```bash
-dig @127.0.0.1 google.com
 dig @85.208.114.51 google.com
 ```
 
 ### 3. Probar validación DNSSEC:
 ```bash
-dig @127.0.0.1 cloudflare.com +dnssec
+dig @85.208.114.51 cloudflare.com +dnssec
 # Comprueba la presencia de la flag 'ad' (Authenticated Data) en la respuesta
 ```
 
 ### 4. Probar DoT (DNS-over-TLS en puerto 853):
 ```bash
-kdig @127.0.0.1 +tls +tls-ca=/etc/ssl/certs/dns.xdp.es.fullchain.pem +tls-hostname=dns.xdp.es google.com
+kdig @85.208.114.51 +tls +tls-ca=/etc/ssl/certs/dns.xdp.es.fullchain.pem +tls-hostname=dns.xdp.es google.com
 ```
 
 ### 5. Probar DoH (DNS-over-HTTPS en puerto 443):
