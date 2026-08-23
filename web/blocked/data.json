@@ -1,10 +1,10 @@
 {
-  "last_updated": "2026-08-23 22:18:10 UTC",
-  "timestamp": 1787523490,
+  "last_updated": "2026-08-23 22:20:14 UTC",
+  "timestamp": 1787523614,
   "evasion_active": true,
-  "total_blocked": 463,
-  "cf_blocked_count": 463,
-  "evaded_count": 463,
+  "total_blocked": 460,
+  "cf_blocked_count": 460,
+  "evaded_count": 460,
   "entries": [
     {
       "blocked_ip": "104.18.50.34",
@@ -1223,14 +1223,6 @@
       "status": "Evadida (Limpia)"
     },
     {
-      "blocked_ip": "104.21.65.211",
-      "type": "IPv4",
-      "is_cloudflare": true,
-      "prefix": "104.16.0.0/13",
-      "alternative_ip": "104.21.65.212",
-      "status": "Evadida (Limpia)"
-    },
-    {
       "blocked_ip": "104.21.66.60",
       "type": "IPv4",
       "is_cloudflare": true,
@@ -2319,14 +2311,6 @@
       "status": "Evadida (Limpia)"
     },
     {
-      "blocked_ip": "172.67.148.45",
-      "type": "IPv4",
-      "is_cloudflare": true,
-      "prefix": "172.64.0.0/13",
-      "alternative_ip": "172.67.148.46",
-      "status": "Evadida (Limpia)"
-    },
-    {
       "blocked_ip": "172.67.148.52",
       "type": "IPv4",
       "is_cloudflare": true,
@@ -2516,14 +2500,6 @@
       "is_cloudflare": true,
       "prefix": "172.64.0.0/13",
       "alternative_ip": "172.67.159.54",
-      "status": "Evadida (Limpia)"
-    },
-    {
-      "blocked_ip": "172.67.159.105",
-      "type": "IPv4",
-      "is_cloudflare": true,
-      "prefix": "172.64.0.0/13",
-      "alternative_ip": "172.67.159.106",
       "status": "Evadida (Limpia)"
     },
     {

@@ -60,7 +60,10 @@ ecs:
   useAsClient: true
   forward: false
 
+queryLog:
+  type: none
+
 log:
-  level: info
+  level: warn
   format: text
   timestamp: true

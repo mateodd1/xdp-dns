@@ -38,6 +38,9 @@ ecs:
   useAsClient: true
   forward: false
 
+queryLog:
+  type: none
+
 log:
   # Keep individual queried names out of the journal.
   level: warn
