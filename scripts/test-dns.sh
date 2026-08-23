@@ -31,26 +31,34 @@ test_step() {
     fi
 }
 
-echo -e "\n--- 1. Pruebas de Unbound (Puerto 53 UDP/TCP & Recursión) ---"
-test_step "Unbound 127.0.0.1:53 (UDP)" "dig @127.0.0.1 -p 53 google.com A +short | grep -E '^[0-9.]+'"
-test_step "Unbound 127.0.0.1:53 (TCP)" "dig @127.0.0.1 -p 53 +tcp google.com A +short | grep -E '^[0-9.]+'"
-test_step "Unbound IP Pública 85.208.114.51:53" "dig @85.208.114.51 -p 53 google.com A +short | grep -E '^[0-9.]+'"
-test_step "Unbound IPv6 2a0e:97c0:c40::51:53" "dig @2a0e:97c0:c40::51 -p 53 google.com A +short | grep -E '^[0-9.]+'"
-test_step "Validación DNSSEC en Unbound" "dig @127.0.0.1 -p 53 cloudflare.com +dnssec | grep -w 'flags:.*ad.*'"
+echo -e "\n--- 1. Pruebas de Unbound (Recursión Pura & DNSSEC :5336) ---"
+test_step "Unbound 127.0.0.1:5336 (UDP)" "dig @127.0.0.1 -p 5336 google.com A +short | grep -E '^[0-9.]+'"
+test_step "Validación DNSSEC en Unbound" "dig @127.0.0.1 -p 5336 cloudflare.com +dnssec | grep -w 'flags:.*ad.*'"
 
-echo -e "\n--- 2. Pruebas de Blocky (Filtrado, Métricas y DoT) ---"
-test_step "Blocky DNS Resolver (127.0.0.1:5353)" "dig @127.0.0.1 -p 5353 wikipedia.org A +short | grep -E '^[0-9.]+'"
-test_step "Bloqueo de Anuncios en Blocky (0.0.0.0)" "dig @127.0.0.1 -p 5353 analytics.004gmbh.de A +short | grep '0.0.0.0'"
+echo -e "\n--- 2. Pruebas de DNS Evasion Proxy (:5335) ---"
+test_step "Evasion Proxy 127.0.0.1:5335 (UDP)" "dig @127.0.0.1 -p 5335 google.com A +short | grep -E '^[0-9.]+'"
+
+echo -e "\n--- 3. Pruebas de Blocky AdBlock (.51 / dns.xdp.es) ---"
+test_step "Adblock IPv4 85.208.114.51:53 (UDP)" "dig @85.208.114.51 -p 53 google.com A +short | grep -E '^[0-9.]+'"
+test_step "Adblock IPv6 2a0e:97c0:c40::51:53" "dig @2a0e:97c0:c40::51 -p 53 google.com A +short | grep -E '^[0-9.]+'"
+test_step "Filtrado de Publicidad en .51 (0.0.0.0)" "dig @85.208.114.51 -p 53 doubleclick.net A +short | grep '0.0.0.0'"
 test_step "Métricas Prometheus Blocky (:4000/metrics)" "curl -fs http://127.0.0.1:4000/metrics | grep 'blocky_'"
-test_step "DoT Listener (Puerto 853 TLS)" "timeout 3 openssl s_client -connect 127.0.0.1:853 </dev/null 2>&1 | grep -E 'CONNECTED|BEGIN CERTIFICATE'"
+test_step "DoT Listener .51 (Puerto 853 TLS)" "timeout 3 openssl s_client -connect 85.208.114.51:853 </dev/null 2>&1 | grep -E 'CONNECTED|BEGIN CERTIFICATE'"
 
-echo -e "\n--- 3. Pruebas de Caddy (Web, Redirección & DoH) ---"
-test_step "Landing Page Web xdp.es (Puerto 80)" "curl -fs http://127.0.0.1 | grep -i 'xdp.es'"
-test_step "Página de Estadísticas (/stats)" "curl -fs http://127.0.0.1/stats/ | grep -i 'Estadísticas'"
-test_step "Stats JSON Endpoint (/stats.json)" "curl -fs http://127.0.0.1/stats.json | grep 'stats_24h'"
-test_step "DoH Endpoint Proxy (/dns-query)" "curl -fs -H 'Host: dns.xdp.es' 'http://127.0.0.1/dns-query?dns=AAABAAABAAAAAAAABmdvb2dsZQNjb20AAAEAAQ' || curl -fs -H 'accept: application/dns-message' 'http://127.0.0.1:4000/dns-query?dns=AAABAAABAAAAAAAABmdvb2dsZQNjb20AAAEAAQ'"
-test_step "Redirección en dns.xdp.es/ hacia xdp.es/" "curl -sI -H 'Host: dns.xdp.es' http://127.0.0.1/ | grep -i 'location.*xdp.es'"
-test_step "Perfiles Apple Firmados (PKCS#7 Let's Encrypt)" "file /var/www/xdp.es/dns_xdp_es_doh.mobileconfig | grep -i 'PKCS#7'"
+echo -e "\n--- 4. Pruebas de Blocky Lite Sin Filtrado (.52 / lite.xdp.es) ---"
+test_step "Lite IPv4 85.208.114.52:53 (UDP)" "dig @85.208.114.52 -p 53 google.com A +short | grep -E '^[0-9.]+'"
+test_step "Lite IPv6 2a0e:97c0:c40::52:53" "dig @2a0e:97c0:c40::52 -p 53 google.com A +short | grep -E '^[0-9.]+'"
+test_step "Sin Filtrado en .52 (Resuelve Real IP)" "dig @85.208.114.52 -p 53 doubleclick.net A +short | grep -v '0.0.0.0'"
+test_step "Métricas Prometheus Lite (:4002/metrics)" "curl -fs http://127.0.0.1:4002/metrics | grep 'blocky_'"
+test_step "DoT Listener .52 (Puerto 853 TLS)" "timeout 3 openssl s_client -connect 85.208.114.52:853 </dev/null 2>&1 | grep -E 'CONNECTED|BEGIN CERTIFICATE'"
+
+echo -e "\n--- 5. Pruebas de Caddy (Web HTTPS, DoH & Perfiles) ---"
+test_step "Landing Page HTTPS xdp.es" "curl -fs https://xdp.es | grep -i 'xdp.es'"
+test_step "Página de Estadísticas (/stats)" "curl -fs https://xdp.es/stats | grep -i 'Estadísticas'"
+test_step "Stats JSON Endpoint (/stats.json)" "curl -fs https://xdp.es/stats.json | grep 'stats_24h'"
+test_step "DoH Adblock (https://dns.xdp.es/dns-query)" "curl -fs -H 'accept: application/dns-message' 'https://dns.xdp.es/dns-query?dns=AAABAAABAAAAAAAABmdvb2dsZQNjb20AAAEAAQ'"
+test_step "DoH Lite Sin Filtrado (https://lite.xdp.es/dns-query)" "curl -fs -H 'accept: application/dns-message' 'https://lite.xdp.es/dns-query?dns=AAABAAABAAAAAAAABmdvb2dsZQNjb20AAAEAAQ'"
+test_step "Perfiles Apple Firmados (PKCS#7 Let's Encrypt)" "file /var/www/xdp.es/dns_xdp_es_doh.mobileconfig | grep -i 'PKCS#7' && file /var/www/xdp.es/lite_xdp_es_doh.mobileconfig | grep -i 'PKCS#7'"
 test_step "Script de actualización de estadísticas" "python3 /root/xpd-dns/scripts/update-stats.py"
 
 echo -e "\n${BLUE}======================================================${NC}"
@@ -61,6 +69,6 @@ if [ "$FAIL_COUNT" -eq 0 ]; then
     echo -e "${GREEN}¡Todos los componentes están funcionando perfectamente a pleno rendimiento!${NC}"
     exit 0
 else
-    echo -e "${YELLOW}Revisa los servicios con: systemctl status unbound blocky caddy${NC}"
+    echo -e "${YELLOW}Revisa los servicios con: systemctl status unbound blocky blocky-lite caddy${NC}"
     exit 1
 fi

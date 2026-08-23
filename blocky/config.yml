@@ -1,7 +1,21 @@
 ports:
-  dns: 53
-  tls: 853
+  dns:
+    - 85.208.114.51:53
+    - 127.0.0.1:53
+    - "[2a0e:97c0:c40::51]:53"
+    - "[::1]:53"
+  tls:
+    - 85.208.114.51:853
+    - 127.0.0.1:853
+    - "[2a0e:97c0:c40::51]:853"
+    - "[::1]:853"
   http: 127.0.0.1:4000
+
+customDNS:
+  customTTL: 1h
+  mapping:
+    dns.xdp.es: 85.208.114.51,2a0e:97c0:c40::51
+    lite.xdp.es: 85.208.114.52,2a0e:97c0:c40::52
 
 certFile: /etc/letsencrypt/live/xdp.es/fullchain.pem
 keyFile: /etc/letsencrypt/live/xdp.es/privkey.pem
