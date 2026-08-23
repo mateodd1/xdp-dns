@@ -8,7 +8,7 @@
 	}
 }
 
-# Dedicated DoH & DoT Subdomain (dns.xdp.es)
+# Dedicated DoH & DoT Subdomain (dns.xdp.es) - EXCLUSIVELY FOR DNS QUERIES
 dns.xdp.es {
 	tls /etc/letsencrypt/live/xdp.es/fullchain.pem /etc/letsencrypt/live/xdp.es/privkey.pem
 
@@ -26,6 +26,7 @@ dns.xdp.es {
 			header_up X-Real-IP {remote_host}
 		}
 	}
+
 	handle /.well-known/dns-query* {
 		reverse_proxy 127.0.0.1:4000 {
 			header_up Host {host}
@@ -33,63 +34,9 @@ dns.xdp.es {
 		}
 	}
 
-	handle /api/ip {
-		header Content-Type "text/plain; charset=utf-8"
-		header Cache-Control "no-store, no-cache, must-revalidate"
-		respond "{remote_host}" 200
-	}
-
-	handle_path /api/geoip/* {
-		rewrite * /json{path}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query
-		reverse_proxy http://ip-api.com {
-			header_up Host ip-api.com
-			header_down Cache-Control "public, max-age=3600"
-		}
-	}
-
-	handle /api/geoip {
-		rewrite * /json/{remote_host}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query
-		reverse_proxy http://ip-api.com {
-			header_up Host ip-api.com
-			header_down Cache-Control "public, max-age=3600"
-		}
-	}
-
-	@stats path /stats.json /stats/stats.json
-	handle @stats {
-		root * /var/www/xdp.es
-		header Content-Type "application/json; charset=utf-8"
-		header Cache-Control "public, max-age=15, must-revalidate"
-		file_server
-	}
-
-	@stats_page path /stats /stats/ /stats/index.html
-	handle @stats_page {
-		root * /var/www/xdp.es
-		header Content-Type "text/html; charset=utf-8"
-		header Cache-Control "public, max-age=60, must-revalidate"
-		rewrite * /stats/index.html
-		file_server
-	}
-
-	@block_ota_page path /block-ota /block-ota/ /block-ota/index.html
-	handle @block_ota_page {
-		root * /var/www/xdp.es
-		header Content-Type "text/html; charset=utf-8"
-		header Cache-Control "public, max-age=60, must-revalidate"
-		rewrite * /block-ota/index.html
-		file_server
-	}
-
-	@assets path /index.css /index.js /theme.js /i18n.js /stats.js /llms.txt /llms-full.txt /openapi.json /robots.txt /sitemap.xml /favicon.ico *.mobileconfig *.svg *.png *.ico *.css *.js
-	handle @assets {
-		root * /var/www/xdp.es
-		header Cache-Control "public, max-age=86400"
-		file_server
-	}
-
+	# Any non-DNS request on dns.xdp.es is redirected immediately to the canonical web domain xdp.es
 	handle {
-		redir https://xdp.es/ permanent
+		redir https://xdp.es{uri} permanent
 	}
 
 	encode zstd gzip
@@ -113,6 +60,11 @@ dns.xdp.es {
 xdp.es {
 	tls /etc/letsencrypt/live/xdp.es/fullchain.pem /etc/letsencrypt/live/xdp.es/privkey.pem
 	root * /var/www/xdp.es
+
+	# Redirect any DNS queries on xdp.es to the dedicated dns.xdp.es subdomain
+	handle /dns-query* {
+		redir https://dns.xdp.es{uri} permanent
+	}
 
 	handle /.well-known/dns-query* {
 		redir https://dns.xdp.es/dns-query permanent
