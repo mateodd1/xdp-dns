@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Monitor de Evasión de Bloqueos | xdp.es DNS</title>
+    <title data-i18n="blocked.page_title">Monitor de Evasión de Bloqueos | xdp.es DNS</title>
     <meta name="robots" content="noindex, nofollow, noarchive">
 
     <!-- Anti-FOIT Instant Theme Loader -->
@@ -28,7 +28,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="shortcut icon" href="/favicon.ico">
 
-    <link rel="stylesheet" href="/index.css?v=3.8">
+    <link rel="stylesheet" href="/index.css?v=3.9">
     <style>
         .container {
             max-width: 1040px;
@@ -45,6 +45,22 @@
         .mono {
             font-family: 'JetBrains Mono', monospace;
             font-variant-numeric: tabular-nums;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+            transform: translateX(-2px);
         }
 
         .hero-section {
@@ -489,7 +505,7 @@
         <!-- Site Header -->
         <header>
             <div class="header-top">
-                <a href="/" class="back-link" aria-label="Volver al inicio">
+                <a href="/" class="back-link" aria-label="Volver al inicio" data-i18n="nav.back_home">
                     &larr; Volver al inicio
                 </a>
                 <div class="theme-switcher" role="group" aria-label="Seleccionar tema">
@@ -505,13 +521,13 @@
                             <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                         </svg>
-                        <span class="theme-text">Claro</span>
+                        <span class="theme-text" data-i18n="theme.light">Claro</span>
                     </button>
                     <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro">
                         <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
-                        <span class="theme-text">Oscuro</span>
+                        <span class="theme-text" data-i18n="theme.dark">Oscuro</span>
                     </button>
                     <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático" aria-label="Automático">
                         <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -519,7 +535,7 @@
                             <line x1="8" y1="21" x2="16" y2="21"></line>
                             <line x1="12" y1="17" x2="12" y2="21"></line>
                         </svg>
-                        <span class="theme-text">Auto</span>
+                        <span class="theme-text" data-i18n="theme.auto">Auto</span>
                     </button>
                 </div>
             </div>
@@ -531,13 +547,13 @@
                 <div class="hero-badge-container">
                     <div class="status-badge-live" id="live-badge">
                         <span class="pulse-dot"></span>
-                        <span id="live-text">Comprobando estado...</span>
+                        <span id="live-text" data-i18n="blocked.live_checking">Comprobando estado...</span>
                     </div>
                 </div>
-                <h1 class="hero-title" style="font-size: 2rem; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.02em; color: var(--text-heading);">
+                <h1 class="hero-title" data-i18n="blocked.title" style="font-size: 2rem; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.02em; color: var(--text-heading);">
                     Monitor de Evasión de Bloqueos
                 </h1>
-                <p style="color: var(--text-muted); max-width: 620px; margin: 0 auto; font-size: 0.9rem; line-height: 1.45;">
+                <p data-i18n="blocked.subtitle" style="color: var(--text-muted); max-width: 620px; margin: 0 auto; font-size: 0.9rem; line-height: 1.45;">
                     Seguimiento en tiempo real de IPs Anycast de Cloudflare bloqueadas y sus rutas alternativas limpias.
                 </p>
             </div>
@@ -545,15 +561,15 @@
             <!-- Metrics Grid -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <span class="stat-card-label">IPs Baneadas</span>
+                    <span class="stat-card-label" data-i18n="blocked.stat_total">IPs Baneadas</span>
                     <span class="stat-card-value" id="stat-total" style="color: #ef4444;">-</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-card-label">En Cloudflare</span>
+                    <span class="stat-card-label" data-i18n="blocked.stat_cf">En Cloudflare</span>
                     <span class="stat-card-value" id="stat-cf" style="color: #f97316;">-</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-card-label">Rutas Evasivas</span>
+                    <span class="stat-card-label" data-i18n="blocked.stat_evaded">Rutas Evasivas</span>
                     <span class="stat-card-value" id="stat-evaded" style="color: #10b981;">-</span>
                 </div>
             </div>
@@ -562,16 +578,16 @@
             <div class="controls-card">
                 <div class="search-wrapper">
                     <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" class="search-input" id="search-input" placeholder="Buscar IP o prefijo...">
+                    <input type="text" class="search-input" id="search-input" placeholder="Buscar IP o prefijo..." data-i18n-placeholder="blocked.search_placeholder">
                 </div>
                 <div class="filter-buttons">
-                    <button class="filter-btn active" data-filter="all">Todas</button>
-                    <button class="filter-btn" data-filter="cf">Cloudflare</button>
-                    <button class="filter-btn" data-filter="other">Otras CDN</button>
+                    <button class="filter-btn active" data-filter="all" data-i18n="blocked.filter_all">Todas</button>
+                    <button class="filter-btn" data-filter="cf" data-i18n="blocked.filter_cf">Cloudflare</button>
+                    <button class="filter-btn" data-filter="other" data-i18n="blocked.filter_other">Otras CDN</button>
                 </div>
                 <button class="refresh-btn" id="refresh-btn">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                    <span>Actualizar</span>
+                    <span data-i18n="blocked.refresh">Actualizar</span>
                 </button>
             </div>
 
@@ -581,16 +597,16 @@
                     <table class="blocked-table">
                         <thead>
                             <tr>
-                                <th>IP Bloqueada</th>
-                                <th>Red / Proveedor</th>
-                                <th>Prefijo BGP</th>
-                                <th>IP Alternativa (Evasión)</th>
-                                <th>Estado</th>
+                                <th data-i18n="blocked.th_ip">IP Bloqueada</th>
+                                <th data-i18n="blocked.th_network">Red / Proveedor</th>
+                                <th data-i18n="blocked.th_prefix">Prefijo BGP</th>
+                                <th data-i18n="blocked.th_alternative">IP Alternativa (Evasión)</th>
+                                <th data-i18n="blocked.th_status">Estado</th>
                             </tr>
                         </thead>
                         <tbody id="desktop-table-body">
                             <tr>
-                                <td colspan="5" class="empty-state">Cargando datos...</td>
+                                <td colspan="5" class="empty-state" data-i18n="blocked.loading">Cargando datos...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -600,22 +616,24 @@
             <!-- Mobile View (Card List) -->
             <div class="mobile-view">
                 <div class="cards-list" id="mobile-cards-body">
-                    <div class="empty-state">Cargando datos...</div>
+                    <div class="empty-state" data-i18n="blocked.loading">Cargando datos...</div>
                 </div>
             </div>
 
             <!-- Pagination Controls -->
             <div class="pagination">
-                <span id="pagination-info">Cargando...</span>
+                <span id="pagination-info">...</span>
                 <div style="display: flex; gap: 8px;">
-                    <button class="page-btn" id="prev-page" disabled>Anterior</button>
-                    <button class="page-btn" id="next-page" disabled>Siguiente</button>
+                    <button class="page-btn" id="prev-page" disabled data-i18n="blocked.prev">Anterior</button>
+                    <button class="page-btn" id="next-page" disabled data-i18n="blocked.next">Siguiente</button>
                 </div>
             </div>
         </main>
     </div>
 
-    <script src="/theme.js?v=3.8"></script>
+    <!-- Scripts -->
+    <script src="/i18n.js?v=3.9"></script>
+    <script src="/theme.js?v=3.9"></script>
     <script>
         let allEntries = [];
         let filteredEntries = [];
@@ -624,10 +642,15 @@
         let currentPage = 1;
         const pageSize = 50;
 
+        function t(key, fallback) {
+            return (window.i18n && window.i18n.t(key)) || fallback;
+        }
+
         function copyToClipboard(text, btn) {
             navigator.clipboard.writeText(text).then(() => {
                 const originalHtml = btn.innerHTML;
-                btn.innerHTML = '<span style="color: #10b981; font-weight: 700;">✓ Copiado</span>';
+                const copiedLabel = t('blocked.copied', '✓ Copiado');
+                btn.innerHTML = `<span style="color: #10b981; font-weight: 700;">${copiedLabel}</span>`;
                 setTimeout(() => { btn.innerHTML = originalHtml; }, 1400);
             });
         }
@@ -658,13 +681,14 @@
             const mobileBody = document.getElementById('mobile-cards-body');
             const total = filteredEntries.length;
 
+            const noBlocksMsg = t('blocked.empty_no_blocks', '🟢 No hay ninguna IP bloqueada en este momento.');
+            const notFoundMsg = t('blocked.empty_not_found', 'No se encontraron resultados para la búsqueda.');
+
             if (total === 0) {
-                const emptyMsg = allEntries.length === 0 
-                    ? '🟢 No hay ninguna IP bloqueada en este momento.' 
-                    : 'No se encontraron resultados para la búsqueda.';
+                const emptyMsg = allEntries.length === 0 ? noBlocksMsg : notFoundMsg;
                 desktopBody.innerHTML = `<tr><td colspan="5" class="empty-state">${emptyMsg}</td></tr>`;
                 mobileBody.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
-                document.getElementById('pagination-info').innerText = `0 de ${allEntries.length} IPs`;
+                document.getElementById('pagination-info').innerText = `0 / ${allEntries.length}`;
                 document.getElementById('prev-page').disabled = true;
                 document.getElementById('next-page').disabled = true;
                 return;
@@ -675,9 +699,15 @@
             const startIdx = (currentPage - 1) * pageSize;
             const pageItems = filteredEntries.slice(startIdx, startIdx + pageSize);
 
-            // 1. Render Desktop Table
+            const copyLabel = t('blocked.copy_btn', 'Copiar');
+            const statusEvadedLabel = t('blocked.status_evaded', 'Evadida');
+            const statusIntactLabel = t('blocked.status_intact', 'Intacta');
+            const otherLabel = t('blocked.badge_other', 'Otros');
+            const cardBannedLabel = t('blocked.card_banned', '⛔ IP Baneada');
+            const cardCleanLabel = t('blocked.card_clean_alt', '⚡ IP Alternativa Limpia');
+            const cardPrefixLabel = t('blocked.card_prefix', 'Prefijo:');
+
             let desktopHtml = '';
-            // 2. Render Mobile Cards
             let mobileHtml = '';
 
             for (const item of pageItems) {
@@ -686,7 +716,7 @@
 
                 const cfBadge = isCF 
                     ? `<span class="badge-cf"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg> Cloudflare</span>`
-                    : `<span class="badge-other">Otros</span>`;
+                    : `<span class="badge-other">${otherLabel}</span>`;
 
                 // Desktop Row
                 desktopHtml += `
@@ -694,7 +724,7 @@
                         <td>
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <span class="ip-banned mono">${item.blocked_ip}</span>
-                                <button class="copy-btn-touch" onclick="copyToClipboard('${item.blocked_ip}', this)" title="Copiar">📋</button>
+                                <button class="copy-btn-touch" onclick="copyToClipboard('${item.blocked_ip}', this)" title="${copyLabel}">📋</button>
                             </div>
                         </td>
                         <td>${cfBadge}</td>
@@ -703,14 +733,14 @@
                             ${isEvaded ? `
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <span class="ip-alt mono">${item.alternative_ip}</span>
-                                    <button class="copy-btn-touch" onclick="copyToClipboard('${item.alternative_ip}', this)" title="Copiar">📋</button>
+                                    <button class="copy-btn-touch" onclick="copyToClipboard('${item.alternative_ip}', this)" title="${copyLabel}">📋</button>
                                 </div>
-                            ` : `<span style="color: var(--text-muted); font-style: italic;">Sin cambios</span>`}
+                            ` : `<span style="color: var(--text-muted); font-style: italic;">${statusIntactLabel}</span>`}
                         </td>
                         <td>
                             ${isEvaded 
-                                ? `<span style="color: #10b981; font-weight: 600; font-size: 0.78rem;">● Evadida</span>`
-                                : `<span style="color: var(--text-muted); font-size: 0.78rem;">● Intacta</span>`}
+                                ? `<span style="color: #10b981; font-weight: 600; font-size: 0.78rem;">● ${statusEvadedLabel}</span>`
+                                : `<span style="color: var(--text-muted); font-size: 0.78rem;">● ${statusIntactLabel}</span>`}
                         </td>
                     </tr>
                 `;
@@ -720,32 +750,32 @@
                     <div class="blocked-card">
                         <div class="card-header-row">
                             <span class="card-meta-row" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: #ef4444;">
-                                ⛔ IP Baneada
+                                ${cardBannedLabel}
                             </span>
                             ${cfBadge}
                         </div>
 
                         <div class="card-ip-block">
                             <span class="ip-banned mono">${item.blocked_ip}</span>
-                            <button class="copy-btn-touch" onclick="copyToClipboard('${item.blocked_ip}', this)">📋 Copiar</button>
+                            <button class="copy-btn-touch" onclick="copyToClipboard('${item.blocked_ip}', this)">📋 ${copyLabel}</button>
                         </div>
 
                         <div class="card-meta-row">
-                            <span>Prefijo: <strong class="mono" style="color: var(--text-primary);">${item.prefix}</strong></span>
+                            <span>${cardPrefixLabel} <strong class="mono" style="color: var(--text-primary);">${item.prefix}</strong></span>
                             ${isEvaded 
-                                ? `<span style="color: #10b981; font-weight: 700;">● Evadida</span>`
-                                : `<span style="color: var(--text-muted);">● Intacta</span>`}
+                                ? `<span style="color: #10b981; font-weight: 700;">● ${statusEvadedLabel}</span>`
+                                : `<span style="color: var(--text-muted);">● ${statusIntactLabel}</span>`}
                         </div>
 
                         ${isEvaded ? `
                             <div class="card-ip-block" style="border-color: rgba(16, 185, 129, 0.25); background: rgba(16, 185, 129, 0.04);">
                                 <div>
                                     <div style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: #10b981; margin-bottom: 2px;">
-                                        ⚡ IP Alternativa Limpia
+                                        ${cardCleanLabel}
                                     </div>
                                     <span class="ip-alt mono">${item.alternative_ip}</span>
                                 </div>
-                                <button class="copy-btn-touch" style="border-color: rgba(16, 185, 129, 0.3); color: #10b981;" onclick="copyToClipboard('${item.alternative_ip}', this)">📋 Copiar</button>
+                                <button class="copy-btn-touch" style="border-color: rgba(16, 185, 129, 0.3); color: #10b981;" onclick="copyToClipboard('${item.alternative_ip}', this)">📋 ${copyLabel}</button>
                             </div>
                         ` : ''}
                     </div>
@@ -756,10 +786,27 @@
             mobileBody.innerHTML = mobileHtml;
 
             const endIdx = Math.min(startIdx + pageSize, total);
-            document.getElementById('pagination-info').innerText = `${startIdx + 1}-${endIdx} de ${total} (${allEntries.length} totales)`;
+            document.getElementById('pagination-info').innerText = `${startIdx + 1}-${endIdx} / ${total} (${allEntries.length})`;
             document.getElementById('prev-page').disabled = currentPage <= 1;
             document.getElementById('next-page').disabled = currentPage >= totalPages;
         }
+
+        function updateLiveBadge(data) {
+            const liveBadge = document.getElementById('live-badge');
+            const liveText = document.getElementById('live-text');
+            if (!liveBadge || !liveText) return;
+
+            if (data && data.evasion_active && data.total_blocked > 0) {
+                liveBadge.className = 'status-badge-live';
+                const tpl = t('blocked.live_active', 'Evasión Activa ({count} IPs)');
+                liveText.innerText = tpl.replace('{count}', data.total_blocked);
+            } else {
+                liveBadge.className = 'status-badge-live inactive';
+                liveText.innerText = t('blocked.live_inactive', 'Sin bloqueos activos (Directo)');
+            }
+        }
+
+        let cachedData = null;
 
         function loadBlockedData() {
             const refreshBtn = document.getElementById('refresh-btn');
@@ -771,17 +818,10 @@
                     return r.json();
                 })
                 .then(data => {
+                    cachedData = data;
                     allEntries = data.entries || [];
                     
-                    const liveBadge = document.getElementById('live-badge');
-                    const liveText = document.getElementById('live-text');
-                    if (data.evasion_active && data.total_blocked > 0) {
-                        liveBadge.className = 'status-badge-live';
-                        liveText.innerText = `Evasión Activa (${data.total_blocked} IPs)`;
-                    } else {
-                        liveBadge.className = 'status-badge-live inactive';
-                        liveText.innerText = 'Sin bloqueos activos (Directo)';
-                    }
+                    updateLiveBadge(data);
 
                     document.getElementById('stat-total').innerText = (data.total_blocked || 0).toLocaleString();
                     document.getElementById('stat-cf').innerText = (data.cf_blocked_count || 0).toLocaleString();
@@ -796,6 +836,11 @@
                     if (refreshBtn) refreshBtn.classList.remove('spinning');
                 });
         }
+
+        window.addEventListener('langchange', () => {
+            if (cachedData) updateLiveBadge(cachedData);
+            renderViews();
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             loadBlockedData();

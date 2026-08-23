@@ -164,6 +164,22 @@ body[data-dns-mode="standard"] [data-adblock-only] {
     gap: 16px;
 }
 
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.back-link:hover {
+    color: var(--accent);
+    transform: translateX(-2px);
+}
+
 .header-controls {
     display: inline-flex;
     align-items: center;

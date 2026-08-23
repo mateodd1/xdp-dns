@@ -149,7 +149,41 @@ const translations = {
         "about.addr_ipv4": "Dirección IPv4:",
         "about.addr_ipv6": "Dirección IPv6:",
         "about.addr_doh": "Endpoint DoH / DoH3:",
-        "about.addr_dot": "Endpoint DoT:"
+        "about.addr_dot": "Endpoint DoT:",
+
+        // Blocked IPs / Evasion Monitor Page
+        "blocked.page_title": "Monitor de Evasión de Bloqueos | xdp.es DNS",
+        "blocked.title": "Monitor de Evasión de Bloqueos",
+        "blocked.subtitle": "Seguimiento en tiempo real de IPs Anycast de Cloudflare bloqueadas y sus rutas alternativas limpias.",
+        "blocked.live_checking": "Comprobando estado...",
+        "blocked.live_active": "Evasión Activa ({count} IPs)",
+        "blocked.live_inactive": "Sin bloqueos activos (Directo)",
+        "blocked.stat_total": "IPs Baneadas",
+        "blocked.stat_cf": "En Cloudflare",
+        "blocked.stat_evaded": "Rutas Evasivas",
+        "blocked.search_placeholder": "Buscar IP o prefijo...",
+        "blocked.filter_all": "Todas",
+        "blocked.filter_cf": "Cloudflare",
+        "blocked.filter_other": "Otras CDN",
+        "blocked.refresh": "Actualizar",
+        "blocked.th_ip": "IP Bloqueada",
+        "blocked.th_network": "Red / Proveedor",
+        "blocked.th_prefix": "Prefijo BGP",
+        "blocked.th_alternative": "IP Alternativa (Evasión)",
+        "blocked.th_status": "Estado",
+        "blocked.card_banned": "⛔ IP Baneada",
+        "blocked.card_clean_alt": "⚡ IP Alternativa Limpia",
+        "blocked.card_prefix": "Prefijo:",
+        "blocked.status_evaded": "Evadida",
+        "blocked.status_intact": "Intacta",
+        "blocked.badge_other": "Otros",
+        "blocked.copy_btn": "Copiar",
+        "blocked.copied": "✓ Copiado",
+        "blocked.prev": "Anterior",
+        "blocked.next": "Siguiente",
+        "blocked.empty_no_blocks": "🟢 No hay ninguna IP bloqueada en este momento.",
+        "blocked.empty_not_found": "No se encontraron resultados para la búsqueda.",
+        "blocked.loading": "Cargando datos..."
     },
     en: {
         "site.title": "xdp.es DNS",
@@ -298,7 +332,41 @@ const translations = {
         "about.addr_ipv4": "IPv4 Address:",
         "about.addr_ipv6": "IPv6 Address:",
         "about.addr_doh": "DoH / DoH3 Endpoint:",
-        "about.addr_dot": "DoT Endpoint:"
+        "about.addr_dot": "DoT Endpoint:",
+
+        // Blocked IPs / Evasion Monitor Page
+        "blocked.page_title": "Block Evasion Monitor | xdp.es DNS",
+        "blocked.title": "Block Evasion Monitor",
+        "blocked.subtitle": "Real-time tracking of blocked Cloudflare Anycast IPs and their clean alternative routes.",
+        "blocked.live_checking": "Checking status...",
+        "blocked.live_active": "Evasion Active ({count} IPs)",
+        "blocked.live_inactive": "No active blocks (Direct)",
+        "blocked.stat_total": "Banned IPs",
+        "blocked.stat_cf": "On Cloudflare",
+        "blocked.stat_evaded": "Evaded Routes",
+        "blocked.search_placeholder": "Search IP or prefix...",
+        "blocked.filter_all": "All",
+        "blocked.filter_cf": "Cloudflare",
+        "blocked.filter_other": "Other CDNs",
+        "blocked.refresh": "Refresh",
+        "blocked.th_ip": "Blocked IP",
+        "blocked.th_network": "Network / Provider",
+        "blocked.th_prefix": "BGP Prefix",
+        "blocked.th_alternative": "Alternative IP (Evasion)",
+        "blocked.th_status": "Status",
+        "blocked.card_banned": "⛔ Banned IP",
+        "blocked.card_clean_alt": "⚡ Clean Alternative IP",
+        "blocked.card_prefix": "Prefix:",
+        "blocked.status_evaded": "Evaded",
+        "blocked.status_intact": "Direct",
+        "blocked.badge_other": "Others",
+        "blocked.copy_btn": "Copy",
+        "blocked.copied": "✓ Copied",
+        "blocked.prev": "Previous",
+        "blocked.next": "Next",
+        "blocked.empty_no_blocks": "🟢 No IPs are currently blocked at this time.",
+        "blocked.empty_not_found": "No results found for your search.",
+        "blocked.loading": "Loading data..."
     }
 };
 
@@ -340,6 +408,15 @@ function applyLanguage(lang) {
         const html = t(key, currentLang);
         if (html) {
             el.innerHTML = html;
+        }
+    });
+
+    // Update Placeholder content
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        const placeholder = t(key, currentLang);
+        if (placeholder) {
+            el.setAttribute('placeholder', placeholder);
         }
     });
 
