@@ -119,6 +119,14 @@ xdp.es {
 		file_server
 	}
 
+	@about_page path /about /about/ /about/index.html
+	handle @about_page {
+		header Content-Type "text/html; charset=utf-8"
+		header Cache-Control "public, max-age=60, must-revalidate"
+		rewrite * /about/index.html
+		file_server
+	}
+
 	@known_assets path /index.css /index.js /theme.js /i18n.js /stats.js /llms.txt /llms-full.txt /openapi.json /robots.txt /sitemap.xml /favicon.ico /site.webmanifest *.mobileconfig *.svg *.png *.ico *.webmanifest
 	handle @known_assets {
 		@css path *.css

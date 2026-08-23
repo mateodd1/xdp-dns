@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es" prefix="og: https://ogp.me/ns#">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="about.page_title">Acerca de | xdp.es DNS</title>
+    <meta name="description" content="Detalles de arquitectura, políticas de privacidad, protocolos DoH3/DoQ y funcionamiento del resolver DNS xdp.es.">
+    <link rel="canonical" href="https://xdp.es/about">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph & Social -->
+    <meta property="og:title" content="Acerca de xdp.es DNS">
+    <meta property="og:description" content="Servidor DNS recursivo público, ultrarrápido y enfocado en la privacidad sin registros.">
+    <meta property="og:url" content="https://xdp.es/about">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://xdp.es/android-chrome-512x512.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Acerca de xdp.es DNS">
+    <meta name="twitter:description" content="Servidor DNS ultrarrápido enfocado en la privacidad">
+    <meta name="twitter:image" content="https://xdp.es/android-chrome-512x512.png">
+
+    <!-- Theme Color for Mobile Browsers -->
+    <meta name="theme-color" content="#0e0f12" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+
+    <!-- Anti-FOIT Instant Theme & Language Loader -->
+    <script>
+        (function() {
+            try {
+                const theme = localStorage.getItem('xdp_theme') || 'auto';
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const effectiveTheme = theme === 'auto' ? (prefersDark ? 'dark' : 'light') : theme;
+                document.documentElement.setAttribute('data-theme', effectiveTheme);
+
+                const navLang = (navigator.language || (navigator.languages && navigator.languages[0]) || 'es').toLowerCase();
+                const userLang = navLang.startsWith('es') ? 'es' : 'en';
+                document.documentElement.setAttribute('lang', userLang);
+            } catch (e) {}
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <link rel="stylesheet" href="/index.css">
+    <style>
+        .hero-section {
+            text-align: center;
+            padding: 24px 0 20px 0;
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--text-heading);
+            margin-bottom: 10px;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto 18px auto;
+            line-height: 1.5;
+        }
+
+        .pills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 14px;
+        }
+
+        .pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+        }
+
+        .pill-badge.green {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+
+        .pill-badge.purple {
+            background: rgba(168, 85, 247, 0.1);
+            color: #a855f7;
+            border-color: rgba(168, 85, 247, 0.25);
+        }
+
+        .section-header {
+            margin: 28px 0 16px 0;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .section-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-hover);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 1.6rem;
+            margin-bottom: 2px;
+        }
+
+        .feature-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-heading);
+        }
+
+        .feature-desc {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* Pipeline / Flow */
+        .pipeline-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 4px;
+        }
+
+        .step-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Technical Specs Table */
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        .specs-table th,
+        .specs-table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .specs-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+            width: 32%;
+        }
+
+        .specs-table td {
+            color: var(--text-primary);
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        }
+
+        .specs-table tr:last-child th,
+        .specs-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .github-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-top: 24px;
+            text-decoration: none;
+            color: inherit;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .github-box:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .github-box-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .github-box-icon {
+            width: 36px;
+            height: 36px;
+            fill: currentColor;
+            color: var(--text-heading);
+        }
+
+        @media (max-width: 600px) {
+            .hero-title {
+                font-size: 1.6rem;
+            }
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            .specs-table th, .specs-table td {
+                padding: 10px 8px;
+            }
+            .github-box {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Site Header -->
+        <header>
+            <div class="header-top">
+                <a href="/" class="back-link" aria-label="Volver al inicio" data-agent-action="navigate-home" data-i18n="nav.back_home">
+                    &larr; Volver al inicio
+                </a>
+                <div class="theme-switcher" role="group" aria-label="Seleccionar tema">
+                    <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <span class="theme-text" data-i18n="theme.light">Claro</span>
+                    </button>
+                    <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <span class="theme-text" data-i18n="theme.dark">Oscuro</span>
+                    </button>
+                    <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático" aria-label="Automático">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                        <span class="theme-text" data-i18n="theme.auto">Auto</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Hero -->
+            <div class="hero-section">
+                <h1 class="hero-title" data-i18n="about.title">Arquitectura y Funcionamiento</h1>
+                <p class="hero-subtitle" data-i18n="about.subtitle">Servidor DNS recursivo público, ultrarrápido y enfocado en la privacidad sin registros.</p>
+                <div class="pills-container">
+                    <span class="pill-badge green">🛡️ <span data-i18n="about.pill_nologs">Cero Registros (No-Logs)</span></span>
+                    <span class="pill-badge">🔐 <span data-i18n="about.pill_dnssec">Validación DNSSEC</span></span>
+                    <span class="pill-badge purple">⚡ <span data-i18n="about.pill_http3">DoH3 (HTTP/3) & DoQ</span></span>
+                    <span class="pill-badge">🚫 <span data-i18n="about.pill_ecs">Sin rastreo ECS</span></span>
+                </div>
+            </div>
+
+            <!-- Privacy Section -->
+            <div class="section-header">
+                <h2 class="section-title">🔒 <span data-i18n="about.sec_privacy_title">Privacidad y Seguridad de Primera Clase</span></h2>
+                <p class="section-desc" data-i18n="about.sec_privacy_desc">La privacidad no es una opción; está integrada en cada nivel del servicio.</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <div class="feature-title" data-i18n="about.card_nologs_title">Política Estricta Sin Registros</div>
+                    <div class="feature-desc" data-i18n="about.card_nologs_desc">No registramos ni almacenamos tus consultas DNS, IPs ni identificadores de clientes. Las métricas públicas en la página de estadísticas son contadores numéricos agregados en memoria que rotan periódicamente.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <div class="feature-title" data-i18n="about.card_dnssec_title">Validación Criptográfica DNSSEC</div>
+                    <div class="feature-desc" data-i18n="about.card_dnssec_desc">Todas las respuestas de zonas firmadas son validadas con el ancla de confianza de la raíz (Root Trust Anchor), garantizando que las respuestas no hayan sido manipuladas ni sufran ataques de intermediario (MitM).</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚫</div>
+                    <div class="feature-title" data-i18n="about.card_ecs_title">Eliminación de Subred (ECS Stripping)</div>
+                    <div class="feature-desc" data-i18n="about.card_ecs_desc">Desactivamos y eliminamos cualquier extensión EDNS Client Subnet (ECS) hacia los servidores autoritativos para evitar que las redes externas rastreen tu ubicación geográfica real.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <div class="feature-title" data-i18n="about.card_qname_title">Minimización de QNAME</div>
+                    <div class="feature-desc" data-i18n="about.card_qname_desc">En lugar de enviar el dominio completo a cada servidor en la jerarquía DNS, Unbound envía únicamente la etiqueta mínima necesaria para resolver cada paso (RFC 9156).</div>
+                </div>
+            </div>
+
+            <!-- Tech Section -->
+            <div class="section-header">
+                <h2 class="section-title">⚡ <span data-i18n="about.sec_tech_title">Protocolos Modernos y Rendimiento</span></h2>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <div class="feature-title" data-i18n="about.card_quic_title">DoH3 y DNS-over-QUIC (RFC 9250)</div>
+                    <div class="feature-desc" data-i18n="about.card_quic_desc">Soporte nativo para HTTP/3 y QUIC en DoH (:443) y DoQ (:853). Elimina el bloqueo de cabeza de línea y permite reanudación de conexión 0-RTT, ideal para redes móviles inestables.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛑</div>
+                    <div class="feature-title" data-i18n="about.card_filtering_title">Filtrado de Anuncios y Telemetría</div>
+                    <div class="feature-desc" data-i18n="about.card_filtering_desc">Blocky filtra en tiempo real dominios maliciosos, publicidad invasiva, trackers y telemetría mediante listas consolidadas y verificadas sin degradar la velocidad de navegación.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <div class="feature-title" data-i18n="about.card_evasion_title">Evasión Inteligente de Bloqueos Anycast</div>
+                    <div class="feature-desc" data-i18n="about.card_evasion_desc">Un proxy dinámico detecta en tiempo real rangos de IPs bloqueados indiscriminadamente por proveedores durante eventos deportivos y entrega direcciones contiguas no afectadas en IPv4 e IPv6.</div>
+                </div>
+            </div>
+
+            <!-- Resolution Flow -->
+            <div class="section-header">
+                <h2 class="section-title">🗺️ <span data-i18n="about.sec_arch_title">Flujo de Resolución</span></h2>
+            </div>
+
+            <div class="pipeline-container">
+                <div class="pipeline-step">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <div class="step-title" data-i18n="about.step1">1. Cliente</div>
+                        <div class="step-desc" data-i18n="about.step1_desc">Realiza la consulta cifrada por DoH3, DoQ, DoT o estándar UDP/TCP 53.</div>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <div class="step-title" data-i18n="about.step2">2. Borde (Caddy / dnsproxy)</div>
+                        <div class="step-desc" data-i18n="about.step2_desc">Terminación TLS 1.3 / HTTP/3 QUIC de ultra-baja latencia con certificados ECDSA.</div>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <div class="step-title" data-i18n="about.step3">3. Filtro (Blocky)</div>
+                        <div class="step-desc" data-i18n="about.step3_desc">Inspección de listas de bloqueo, caché en memoria y reescritura de políticas.</div>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">4</div>
+                    <div class="step-content">
+                        <div class="step-title" data-i18n="about.step4">4. Proxy de Evasión (XDP Proxy)</div>
+                        <div class="step-desc" data-i18n="about.step4_desc">Inspección inteligente ante agujeros negros Anycast de operadores.</div>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">5</div>
+                    <div class="step-content">
+                        <div class="step-title" data-i18n="about.step5">5. Resolver Recursivo (Unbound)</div>
+                        <div class="step-desc" data-i18n="about.step5_desc">Resolución recursiva directa a los servidores raíz mundiales con validación DNSSEC y ECS stripped.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Specifications -->
+            <div class="section-header">
+                <h2 class="section-title">📋 <span data-i18n="about.sec_specs_title">Ficha Técnica</span></h2>
+            </div>
+
+            <div class="card" style="margin-bottom: 24px; padding: 6px 16px;">
+                <table class="specs-table">
+                    <tbody>
+                        <tr>
+                            <th data-i18n="about.spec_ipv4">Dirección IPv4:</th>
+                            <td>85.208.114.51</td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="about.spec_ipv6">Dirección IPv6:</th>
+                            <td>2a0e:97c0:c40::51</td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="about.spec_doh">Endpoint DoH / DoH3:</th>
+                            <td>https://dns.xdp.es/dns-query</td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="about.spec_doq">Endpoint DoQ:</th>
+                            <td>quic://dns.xdp.es:853</td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="about.spec_dot">Endpoint DoT:</th>
+                            <td>tls://dns.xdp.es:853</td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="about.spec_ports">Puertos abiertos:</th>
+                            <td>53 (UDP/TCP), 443 (TCP/UDP HTTP/3), 853 (TCP DoT / UDP DoQ)</td>
+                        </tr>
+                        <tr>
+                            <th data-i18n="about.spec_github">Código Fuente:</th>
+                            <td><a href="https://github.com/mateodd1/xdp-dns" target="_blank" rel="noopener noreferrer" class="text-link" data-i18n="about.spec_github_desc">100% Código Abierto en GitHub</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- GitHub Box -->
+            <a href="https://github.com/mateodd1/xdp-dns" target="_blank" rel="noopener noreferrer" class="github-box">
+                <div class="github-box-left">
+                    <svg class="github-box-icon" viewBox="0 0 24 24">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    <div>
+                        <div style="font-weight: 700; font-size: 1rem; color: var(--text-heading);">mateodd1/xdp-dns</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Repositorio oficial, configuraciones y documentación.</div>
+                    </div>
+                </div>
+                <div style="font-size: 0.85rem; font-weight: 600; color: var(--accent);">Ver repositorio &rarr;</div>
+            </a>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/i18n.js"></script>
+    <script src="/theme.js" defer></script>
+</body>
+</html>
