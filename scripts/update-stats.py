@@ -158,7 +158,7 @@ def resolve_asn(ip_str):
 KNOWN_ISP_ASNS = {
     # Spanish National and Regional ISPs & Operators + Satellite / Starlink Residential
     '3352', '12338', '6739', '12430', '12353', '12715', '12479', '34048', '29259', '15704',
-    '57269', '206238', '20743', '197828', '200543', '50392', '43590', '59432', '206385',
+    '57269', '206238', '20743', '197828', '200543', '50392', '43590', '206385',
     '212456', '29119', '202673', '203870', '205423', '210100', '208880', '210678', '209867',
     '207421', '208272', '205779', '206979', '206412', '206684', '29647', '15399', '208861',
     '14593', '27277', '397446', '200845', '34977', '12946', '41368'
@@ -173,7 +173,7 @@ KNOWN_DC_ASNS = {
     '12735', '131111', '133774', '14080', '142403', '17639', '20454', '207326',
     '209630', '212238', '212477', '215124', '215925', '219139', '21928', '23724', '2856',
     '31083', '33363', '400556', '41653', '45102', '47331', '4837', '51396', '54936', '60068',
-    '63859', '680', '701', '7713', '8386', '8560', '9121', '9198', '9299', '9465'
+    '63859', '680', '701', '7713', '8386', '8560', '9121', '9198', '9299', '9465', '59432'
 }
 
 def classify_asn(name, asn_num='', country=''):
@@ -186,17 +186,17 @@ def classify_asn(name, asn_num='', country=''):
     country_clean = str(country).strip().upper()
     name_lower = name.lower()
 
-    # 1. Direct Known ISP / Residential Whitelist
+    # 1. Known Datacenter / Hosting / Transit ASNs (checked first so DCs like Ginernet never get flagged as ISP)
+    if asn_clean in KNOWN_DC_ASNS or 'ginernet' in name_lower:
+        return 'datacenter'
+
+    # 2. Direct Known ISP / Residential Whitelist
     if asn_clean in KNOWN_ISP_ASNS:
         return 'isp'
 
-    # 2. Starlink / SpaceX residential satellite check
+    # 3. Starlink / SpaceX residential satellite check
     if 'starlink' in name_lower or 'spacex' in name_lower or 'space exploration technologies' in name_lower:
         return 'isp'
-
-    # 3. Known Datacenter / Transit / Foreign ASNs
-    if asn_clean in KNOWN_DC_ASNS:
-        return 'datacenter'
 
     # 4. Foreign ASNs (outside Spain) -> Always Datacenter (unless matched above)
     if country_clean and country_clean != 'ES':
@@ -210,7 +210,7 @@ def classify_asn(name, asn_num='', country=''):
         'linode', 'vultr', 'leaseweb', 'contabo', 'scaleway', 'namecheap', 'fastly', 'cdn', 'akamai',
         'equinix', 'interxion', 'cogent', 'lumen', 'level3', 'hurricane', 'netundweb', 'layerip',
         'tcpshield', 'nextgen', 'comcast', 'charter', 'spectrum', 'verizon', 'at&t', 't-mobile',
-        'centurylink', 'cogentco', 'telia', 'arelion', 'gtt', 'zayo', 'turknet',
+        'centurylink', 'cogentco', 'telia', 'arelion', 'gtt', 'zayo', 'turknet', 'ginernet',
         'telecomunikasyon', 'iletisim', 'shirkat', 'sirketi', 'ltd', 'gmbh', 'corp', 'inc', 'sasu', 'bv', 'llc'
     ]
     for kw in dc_keywords:
