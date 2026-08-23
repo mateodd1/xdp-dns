@@ -6,6 +6,10 @@
 	servers {
 		protocols h1 h2 h3
 	}
+	# Zero-Logs Guarantee: Discard all server access logs
+	log {
+		output discard
+	}
 }
 
 # Lite resolver: IP-evasion and DNSSEC, deliberately without ad blocking.
@@ -30,13 +34,6 @@ lite.xdp.es {
 		Access-Control-Allow-Origin "*"
 		Access-Control-Allow-Methods "GET, POST, OPTIONS"
 		Access-Control-Allow-Headers "Content-Type, Accept"
-	}
-
-	log {
-		output file /var/log/caddy/lite.xdp.es.access.log {
-			roll_size 20mb
-			roll_keep 5
-		}
 	}
 }
 
@@ -78,13 +75,6 @@ dns.xdp.es {
 		Access-Control-Allow-Origin "*"
 		Access-Control-Allow-Methods "GET, POST, OPTIONS"
 		Access-Control-Allow-Headers "Content-Type, Accept"
-	}
-
-	log {
-		output file /var/log/caddy/dns.xdp.es.access.log {
-			roll_size 20mb
-			roll_keep 5
-		}
 	}
 }
 
@@ -227,13 +217,6 @@ xdp.es {
 		Access-Control-Allow-Origin "*"
 		Access-Control-Allow-Methods "GET, POST, OPTIONS"
 		Access-Control-Allow-Headers "Content-Type, Accept"
-	}
-
-	log {
-		output file /var/log/caddy/xdp.es.access.log {
-			roll_size 20mb
-			roll_keep 5
-		}
 	}
 }
 
