@@ -748,11 +748,6 @@
                 grid-template-columns: 1fr;
                 gap: 10px;
             }
-            .connection-card {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 14px;
-            }
             .connection-right {
                 align-items: flex-start;
                 text-align: left;
@@ -760,6 +755,37 @@
                 border-top: 1px solid var(--border);
                 padding-top: 10px;
             }
+        }
+
+        /* Site Footer */
+        .site-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 24px 0 12px 0;
+            margin-top: 32px;
+            border-top: 1px solid var(--border);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .site-footer-links {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .site-footer-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .site-footer-link:hover {
+            color: var(--accent);
         }
     </style>
 </head>
@@ -946,7 +972,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=3.1"></script>
+    <script src="/i18n.js?v=3.2"></script>
     <script>
         // Theme Management
         const THEME_KEY = 'xdp_theme';
