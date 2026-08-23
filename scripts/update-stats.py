@@ -63,6 +63,8 @@ CUSTOM_ASN_NAMES = {
     '43590': 'AireNetworks',
     '200845': 'Avatel Telecom S.A.',
     '34977': 'Procono SA',
+    '12338': 'Euskaltel S.A.',
+    '12946': 'R Cable y Telecable Telecomunicaciones S.A.U.',
 }
 
 def normalize_cached_asns(cache_dict):
@@ -158,7 +160,7 @@ KNOWN_ISP_ASNS = {
     '57269', '206238', '20743', '197828', '200543', '50392', '43590', '59432', '206385',
     '212456', '29119', '202673', '203870', '205423', '210100', '208880', '210678', '209867',
     '207421', '208272', '205779', '206979', '206412', '206684', '29647', '15399', '208861',
-    '14593', '27277', '397446', '200845', '34977'
+    '14593', '27277', '397446', '200845', '34977', '12946'
 }
 
 KNOWN_DC_ASNS = {
@@ -220,7 +222,7 @@ def classify_asn(name, asn_num='', country=''):
         'pepephone', 'jazztel', 'ono', 'adamo', 'avatel', 'euskaltel', 'fibercat',
         'fibracat', 'parlem', 'goufone', 'simyo', 'lowi', 'o2', 'finetwork', 'silbo',
         'guuk', 'avanza fibra', 'wewi', 'asteo', 'bluevia', 'oniti', 'starlink', 'spacex',
-        'procono', 'ptv telecom'
+        'procono', 'ptv telecom', 'telecable', 'r cable'
     ]
     for kw in isp_keywords:
         if kw in name_lower:
