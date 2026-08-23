@@ -113,7 +113,7 @@ const translations = {
 
         // Section 1: Privacy & Infrastructure
         "about.sec_privacy_title": "Privacidad e Infraestructura",
-        "about.sec_privacy_desc": "xdp DNS nace con la idea de ofrecer un servicio de resolución DNS super rápido, con protocolos modernos enfocado en la privacidad y capaz de esquivar los bloqueos a los CDN durante ciertos eventos deportivos. No almacenamos ningún registro de consulta más que un contador de resoluciones.",
+        "about.sec_privacy_desc": "xdp.es DNS nace con el objetivo de ofrecer un servicio de resolución ultrarrápido, respaldado por protocolos modernos y con un firme compromiso con la privacidad. Su infraestructura está diseñada para mitigar y sortear bloqueos indiscriminados a CDNs durante eventos en directo. No almacenamos ningún registro de consulta ni datos de actividad, manteniendo únicamente contadores numéricos agregados de resolución.",
         "about.card_nologs_title": "Política Zero-Logs",
         "about.card_nologs_desc": "No registramos, rastreamos ni almacenamos tus consultas DNS ni tu dirección IP. Las estadísticas públicas son contadores numéricos agregados en memoria sin ninguna información identificable.",
         "about.card_dnssec_title": "Validación Criptográfica DNSSEC",
@@ -248,7 +248,7 @@ const translations = {
 
         // Section 1: Privacy & Infrastructure
         "about.sec_privacy_title": "Privacy & Infrastructure",
-        "about.sec_privacy_desc": "xdp DNS was created to provide an ultra-fast DNS resolution service with modern protocols, focused on privacy, and capable of bypassing CDN blocks during certain sporting events. We do not store any query logs other than a resolution counter.",
+        "about.sec_privacy_desc": "xdp.es DNS was created to provide an ultra-fast resolution service based on modern protocols and a strict commitment to privacy. Its infrastructure is designed to mitigate and circumvent indiscriminate CDN blocks during live events. We do not store any query logs or user activity data, maintaining only aggregated numeric resolution counters.",
         "about.card_nologs_title": "Zero-Logs Policy",
         "about.card_nologs_desc": "We never log, track, or store your DNS queries or IP address. Public dashboard statistics are in-memory integer metrics with zero personally identifiable information.",
         "about.card_dnssec_title": "DNSSEC Validation",
