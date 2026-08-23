@@ -124,10 +124,8 @@ const translations = {
 
         // Section 2: Protocols & Performance
         "about.sec_tech_title": "Protocolos Modernos y Rendimiento",
-        "about.card_doh3_title": "DoH3 (DNS sobre HTTP/3)",
-        "about.card_doh3_desc": "Cifrado de última generación mediante HTTP/3 sobre QUIC. Ofrece reanudación rápida de conexión (0-RTT) y elimina el bloqueo de cabeza de línea, ideal para redes móviles e inestables.",
-        "about.card_dot_title": "DoT (DNS sobre TLS)",
-        "about.card_dot_desc": "Soporte estándar para DNS sobre TLS (RFC 7858), proporcionando cifrado seguro de extremo a extremo directamente integrado a nivel de sistema operativo y DNS privado.",
+        "about.card_encrypted_title": "Cifrado Moderno con DoH3 y DoT",
+        "about.card_encrypted_desc": "Soporte completo para DNS sobre HTTP/3 (DoH3 con QUIC) con 0-RTT y sin bloqueo de cabeza de línea, junto con DNS sobre TLS (DoT RFC 7858) para cifrado seguro integrado a nivel de sistema operativo.",
         "about.card_filtering_title": "Filtrado de Publicidad y Rastreo",
         "about.card_filtering_desc": "Bloqueo preventivo en tiempo real de anuncios invasivos, rastreadores de telemetría y dominios maliciosos, mejorando la velocidad de navegación y el ahorro de datos.",
 
@@ -260,10 +258,8 @@ const translations = {
 
         // Section 2: Protocols & Performance
         "about.sec_tech_title": "Modern Protocols & Performance",
-        "about.card_doh3_title": "DoH3 (DNS over HTTP/3)",
-        "about.card_doh3_desc": "Next-generation encryption using HTTP/3 over QUIC. Offers 0-RTT connection handshakes and eliminates head-of-line blocking, ideal for cellular networks.",
-        "about.card_dot_title": "DoT (DNS over TLS)",
-        "about.card_dot_desc": "Standard DNS over TLS (RFC 7858) support, providing secure end-to-end encryption integrated natively into mobile and desktop operating systems.",
+        "about.card_encrypted_title": "Modern Encryption with DoH3 & DoT",
+        "about.card_encrypted_desc": "Full support for DNS over HTTP/3 (DoH3 with QUIC) offering 0-RTT handshakes and zero head-of-line blocking, alongside standard DNS over TLS (DoT RFC 7858) for native OS-level encryption.",
         "about.card_filtering_title": "Ad & Tracker Filtering",
         "about.card_filtering_desc": "Real-time proactive filtering of intrusive ads, tracking telemetry, and malicious domains, improving browsing speed and reducing bandwidth usage.",
 
