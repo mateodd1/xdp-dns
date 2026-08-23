@@ -131,11 +131,11 @@ xdp.es {
 	handle @known_assets {
 		@css path *.css
 		header @css Content-Type "text/css; charset=utf-8"
-		header @css Cache-Control "public, max-age=31536000, immutable"
+		header @css Cache-Control "public, no-cache, must-revalidate"
 
 		@js path *.js
 		header @js Content-Type "application/javascript; charset=utf-8"
-		header @js Cache-Control "public, max-age=31536000, immutable"
+		header @js Cache-Control "public, no-cache, must-revalidate"
 
 		@json path *.json
 		header @json Content-Type "application/json; charset=utf-8"

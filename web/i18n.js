@@ -290,7 +290,7 @@ function t(key, lang) {
     if (key === 'stats.asn_toggle_to_isp') return activeLang === 'es' ? 'Operadores (ISP)' : 'Operators (ISP)';
     if (key === 'stats.asn_toggle_to_isp_sub') return activeLang === 'es' ? 'Proveedores de Internet y móvil' : 'Internet Service Providers';
     if (key === 'stats.asn_switch_btn') return activeLang === 'es' ? '⇄ Cambiar' : '⇄ Switch';
-    return key;
+    return null;
 }
 
 function applyLanguage(lang) {
