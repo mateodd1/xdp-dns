@@ -49,14 +49,29 @@ def load_blocked_ips(force=False):
             pass
 
 def get_contiguous_ip(ip_str):
-    octets = [int(x) for x in ip_str.split('.')]
-    for delta in [1, -1, 2, -2, 3, -3, 4, -4, 5, -5]:
-        new_last = octets[3] + delta
-        if 1 <= new_last <= 254:
-            cand = f"{octets[0]}.{octets[1]}.{octets[2]}.{new_last}"
-            if cand not in BLOCKED_IPS:
-                return cand
-    return f"{octets[0]}.{octets[1]}.{octets[2]}.{octets[3]+1}"
+    try:
+        octets = [int(x) for x in ip_str.split('.')]
+        base_last = octets[3]
+
+        for offset in range(1, 255):
+            for delta in (offset, -offset):
+                cand_last = base_last + delta
+                if 1 <= cand_last <= 254:
+                    cand = f"{octets[0]}.{octets[1]}.{octets[2]}.{cand_last}"
+                    if cand not in BLOCKED_IPS:
+                        return cand
+
+        for sub_offset in range(1, 255):
+            for sub_delta in (sub_offset, -sub_offset):
+                cand_sub = octets[2] + sub_delta
+                if 0 <= cand_sub <= 255:
+                    cand = f"{octets[0]}.{octets[1]}.{cand_sub}.{base_last}"
+                    if cand not in BLOCKED_IPS:
+                        return cand
+
+        return ip_str
+    except Exception:
+        return ip_str
 
 def init_standard(id, env):
     load_blocked_ips(force=True)

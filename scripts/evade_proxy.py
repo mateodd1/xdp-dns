@@ -82,13 +82,27 @@ def load_blocked_ips(force=False):
 def get_contiguous_ipv4(ip_str):
     try:
         octets = [int(x) for x in ip_str.split('.')]
-        for delta in [1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10, -10, 11, -11, 12, -12]:
-            new_last = octets[3] + delta
-            if 1 <= new_last <= 254:
-                cand = f"{octets[0]}.{octets[1]}.{octets[2]}.{new_last}"
-                if cand not in BLOCKED_IPS_V4:
-                    return cand
-        return f"{octets[0]}.{octets[1]}.{octets[2]}.{octets[3]+1}"
+        base_last = octets[3]
+
+        # 1. Search alternating nearby offsets (+1, -1, +2, -2, ...) within the same /24 subnet
+        for offset in range(1, 255):
+            for delta in (offset, -offset):
+                cand_last = base_last + delta
+                if 1 <= cand_last <= 254:
+                    cand = f"{octets[0]}.{octets[1]}.{octets[2]}.{cand_last}"
+                    if cand not in BLOCKED_IPS_V4:
+                        return cand
+
+        # 2. Fallback: Search contiguous /24 subnets in the same /16
+        for sub_offset in range(1, 255):
+            for sub_delta in (sub_offset, -sub_offset):
+                cand_sub = octets[2] + sub_delta
+                if 0 <= cand_sub <= 255:
+                    cand = f"{octets[0]}.{octets[1]}.{cand_sub}.{base_last}"
+                    if cand not in BLOCKED_IPS_V4:
+                        return cand
+
+        return ip_str
     except Exception:
         return ip_str
 
@@ -96,13 +110,17 @@ def get_contiguous_ipv6(ip_str):
     try:
         ip = ipaddress.IPv6Address(ip_str)
         ip_int = int(ip)
-        for delta in [1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10, -10, 16, -16, 32, -32]:
-            cand_int = ip_int + delta
-            if 0 < cand_int < (1 << 128) - 1:
-                cand = ipaddress.IPv6Address(cand_int)
-                if cand.compressed not in BLOCKED_IPS_V6 and str(cand) not in BLOCKED_IPS_V6:
-                    return cand.compressed
-        return str(ipaddress.IPv6Address(ip_int + 1))
+
+        # Search alternating nearby offsets (+1, -1, +2, -2, ...)
+        for offset in range(1, 256):
+            for delta in (offset, -offset):
+                cand_int = ip_int + delta
+                if 0 < cand_int < (1 << 128) - 1:
+                    cand = ipaddress.IPv6Address(cand_int)
+                    if cand.compressed not in BLOCKED_IPS_V6 and str(cand) not in BLOCKED_IPS_V6:
+                        return cand.compressed
+
+        return ip_str
     except Exception:
         return ip_str
 
