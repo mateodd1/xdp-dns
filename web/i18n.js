@@ -123,7 +123,7 @@ const translations = {
 
         "about.sec_tech_title": "Protocolos Modernos y Rendimiento",
         "about.card_quic_title": "DoH3 y DNS-over-QUIC (RFC 9250)",
-        "about.card_quic_desc": "Soporte nativo para HTTP/3 y QUIC en DoH (:443) y DoQ (:853). Elimina el bloqueo de cabeza de línea y permite reanudación de conexión 0-RTT, ideal para redes móviles inestables.",
+        "about.card_quic_desc": "Soporte nativo para HTTP/3 y QUIC en DoH y DoQ. Elimina el bloqueo de cabeza de línea y permite reanudación de conexión 0-RTT, ideal para redes móviles inestables.",
         "about.card_filtering_title": "Filtrado de Anuncios y Telemetría",
         "about.card_filtering_desc": "Filtrado en tiempo real de dominios maliciosos, publicidad invasiva, trackers y telemetría mediante listas consolidadas y verificadas sin degradar la velocidad de navegación.",
         "about.card_caching_title": "Caché en Memoria de Alta Velocidad",
@@ -131,7 +131,7 @@ const translations = {
 
         "about.sec_arch_title": "Flujo de Resolución",
         "about.step1": "1. Cliente",
-        "about.step1_desc": "Realiza la consulta cifrada por DoH3, DoQ, DoT o estándar UDP/TCP 53.",
+        "about.step1_desc": "Realiza la consulta cifrada por DoH3, DoQ, DoT o estándar.",
         "about.step2": "2. Borde y Cifrado (Edge Proxy)",
         "about.step2_desc": "Terminación TLS 1.3 / HTTP/3 QUIC de ultra-baja latencia con certificados ECDSA.",
         "about.step3": "3. Filtrado y Caché",
@@ -144,8 +144,7 @@ const translations = {
         "about.spec_ipv6": "Dirección IPv6:",
         "about.spec_doh": "Endpoint DoH / DoH3:",
         "about.spec_doq": "Endpoint DoQ:",
-        "about.spec_dot": "Endpoint DoT:",
-        "about.spec_ports": "Puertos abiertos:"
+        "about.spec_dot": "Endpoint DoT:"
     },
     en: {
         "site.title": "xdp.es DNS",
@@ -268,7 +267,7 @@ const translations = {
 
         "about.sec_tech_title": "Next-Gen Protocols & Performance",
         "about.card_quic_title": "DoH3 & DNS-over-QUIC (RFC 9250)",
-        "about.card_quic_desc": "Native support for HTTP/3 and QUIC across DoH (:443) and DoQ (:853). Eliminates head-of-line blocking and allows 0-RTT handshakes, ideal for cellular networks.",
+        "about.card_quic_desc": "Native support for HTTP/3 and QUIC across DoH and DoQ. Eliminates head-of-line blocking and allows 0-RTT handshakes, ideal for cellular networks.",
         "about.card_filtering_title": "Malware & Telemetry Filtering",
         "about.card_filtering_desc": "Real-time filtering of malicious domains, intrusive trackers, and telemetry using verified blocklists without degrading resolution speed.",
         "about.card_caching_title": "High-Speed In-Memory Caching",
@@ -276,7 +275,7 @@ const translations = {
 
         "about.sec_arch_title": "Resolution Flow",
         "about.step1": "1. Client",
-        "about.step1_desc": "Sends encrypted queries via DoH3, DoQ, DoT, or standard UDP/TCP 53.",
+        "about.step1_desc": "Sends encrypted queries via DoH3, DoQ, DoT, or standard DNS.",
         "about.step2": "2. Edge & TLS Proxy",
         "about.step2_desc": "Ultra-low latency TLS 1.3 / HTTP/3 QUIC termination with ECDSA certificates.",
         "about.step3": "3. Filtering & Cache",
@@ -289,8 +288,7 @@ const translations = {
         "about.spec_ipv6": "IPv6 Address:",
         "about.spec_doh": "DoH / DoH3 Endpoint:",
         "about.spec_doq": "DoQ Endpoint:",
-        "about.spec_dot": "DoT Endpoint:",
-        "about.spec_ports": "Open Ports:"
+        "about.spec_dot": "DoT Endpoint:"
     }
 };
 
