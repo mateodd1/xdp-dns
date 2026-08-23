@@ -13,7 +13,6 @@ const translations = {
         "nav.home": "← Inicio",
         "nav.stats": "Estadísticas",
         "nav.about": "Acerca de",
-        "nav.ota": "Bloqueo OTA",
         "nav.github": "GitHub",
 
         // Protocols
@@ -149,7 +148,6 @@ const translations = {
         "nav.home": "← Home",
         "nav.stats": "Statistics",
         "nav.about": "About",
-        "nav.ota": "OTA Block",
         "nav.github": "GitHub",
 
         // Protocols

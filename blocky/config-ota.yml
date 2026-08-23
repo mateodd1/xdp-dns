@@ -50,6 +50,10 @@ prometheus:
   enable: true
   path: /metrics
 
+ecs:
+  useAsClient: true
+  forward: false
+
 log:
   level: info
   format: text

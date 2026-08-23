@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
     <title>xdp.es DNS</title>
     <meta name="description" content="Servidor DNS ultrarrápido enfocado en la privacidad">
     <link rel="canonical" href="https://xdp.es/">
@@ -18,6 +19,8 @@
     <meta property="og:description" content="Servidor DNS ultrarrápido enfocado en la privacidad">
     <meta property="og:url" content="https://xdp.es/">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="xdp.es">
+    <meta property="og:locale" content="es_ES">
     <meta property="og:image" content="https://xdp.es/android-chrome-512x512.png">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="xdp.es DNS">
@@ -219,15 +222,15 @@
                 </div>
                 <div class="card-content">
                     <div class="guide-tabs" role="tablist" aria-label="Plataformas">
-                        <button type="button" class="guide-tab active" data-platform="android" role="tab" aria-selected="true" aria-controls="guide-android" onclick="switchGuide('android', this)" data-agent-tab="android" data-i18n="guide.tab_android">Android</button>
-                        <button type="button" class="guide-tab" data-platform="ios" role="tab" aria-selected="false" aria-controls="guide-ios" onclick="switchGuide('ios', this)" data-agent-tab="ios" data-i18n="guide.tab_ios">iOS / Mac</button>
-                        <button type="button" class="guide-tab" data-platform="windows" role="tab" aria-selected="false" aria-controls="guide-windows" onclick="switchGuide('windows', this)" data-agent-tab="windows" data-i18n="guide.tab_windows">Windows 11</button>
-                        <button type="button" class="guide-tab" data-platform="linux" role="tab" aria-selected="false" aria-controls="guide-linux" onclick="switchGuide('linux', this)" data-agent-tab="linux" data-i18n="guide.tab_linux">Linux</button>
-                        <button type="button" class="guide-tab" data-platform="browser" role="tab" aria-selected="false" aria-controls="guide-browser" onclick="switchGuide('browser', this)" data-agent-tab="browser" data-i18n="guide.tab_browser">Navegadores</button>
+                        <button type="button" class="guide-tab active" id="tab-android" data-platform="android" role="tab" aria-selected="true" aria-controls="guide-android" onclick="switchGuide('android', this)" data-agent-tab="android" data-i18n="guide.tab_android">Android</button>
+                        <button type="button" class="guide-tab" id="tab-ios" data-platform="ios" role="tab" aria-selected="false" aria-controls="guide-ios" onclick="switchGuide('ios', this)" data-agent-tab="ios" data-i18n="guide.tab_ios">iOS / Mac</button>
+                        <button type="button" class="guide-tab" id="tab-windows" data-platform="windows" role="tab" aria-selected="false" aria-controls="guide-windows" onclick="switchGuide('windows', this)" data-agent-tab="windows" data-i18n="guide.tab_windows">Windows 11</button>
+                        <button type="button" class="guide-tab" id="tab-linux" data-platform="linux" role="tab" aria-selected="false" aria-controls="guide-linux" onclick="switchGuide('linux', this)" data-agent-tab="linux" data-i18n="guide.tab_linux">Linux</button>
+                        <button type="button" class="guide-tab" id="tab-browser" data-platform="browser" role="tab" aria-selected="false" aria-controls="guide-browser" onclick="switchGuide('browser', this)" data-agent-tab="browser" data-i18n="guide.tab_browser">Navegadores</button>
                     </div>
 
                     <!-- Android Guide -->
-                    <div id="guide-android" class="guide-panel active" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="android">
+                    <div id="guide-android" class="guide-panel active" role="tabpanel" aria-labelledby="tab-android" data-platform-guide="android">
                         <ol class="steps-list">
                             <li data-i18n-html="guide.android.s1">Ve a <strong>Ajustes</strong> &rarr; <strong>Redes e Internet / Conexiones</strong> &rarr; <strong>Más ajustes de conexión</strong>.</li>
                             <li data-i18n-html="guide.android.s2">Pulsa sobre <strong>DNS privado</strong> (Private DNS).</li>
@@ -237,7 +240,7 @@
                     </div>
 
                     <!-- iOS / Mac Guide -->
-                    <div id="guide-ios" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="ios">
+                    <div id="guide-ios" class="guide-panel" role="tabpanel" aria-labelledby="tab-ios" data-platform-guide="ios">
                         <ol class="steps-list">
                             <li data-i18n-html="guide.ios.s1">Descarga el perfil <a href="dns_xdp_es_doh.mobileconfig" class="text-link">.mobileconfig (DoH)</a> desde el navegador Safari.</li>
                             <li data-i18n-html="guide.ios.s2">Abre <strong>Ajustes</strong> y pulsa en <em>"Perfil descargado"</em> en la parte superior.</li>
@@ -246,7 +249,7 @@
                     </div>
 
                     <!-- Windows 11 Guide -->
-                    <div id="guide-windows" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="windows">
+                    <div id="guide-windows" class="guide-panel" role="tabpanel" aria-labelledby="tab-windows" data-platform-guide="windows">
                         <ol class="steps-list">
                             <li data-i18n-html="guide.windows.s1">Abre <strong>Configuración</strong> &rarr; <strong>Red e Internet</strong> &rarr; <strong>Wi-Fi o Ethernet</strong>.</li>
                             <li data-i18n-html="guide.windows.s2">En <em>"Asignación de DNS"</em>, pulsa <strong>Editar</strong> y selecciona <strong>Manual</strong>.</li>
@@ -256,7 +259,7 @@
                     </div>
 
                     <!-- Linux Guide -->
-                    <div id="guide-linux" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="linux">
+                    <div id="guide-linux" class="guide-panel" role="tabpanel" aria-labelledby="tab-linux" data-platform-guide="linux">
                         <p data-i18n-html="guide.linux.desc" style="margin-bottom: 8px;">Para <code>systemd-resolved</code>, edita el archivo <code class="code-inline">/etc/systemd/resolved.conf</code>:</p>
                         <pre class="code-block"><code>[Resolve]
 DNS=85.208.114.51#dns.xdp.es 2a0e:97c0:c40::51#dns.xdp.es
@@ -266,7 +269,7 @@ DNSSEC=allow-downgrade</code></pre>
                     </div>
 
                     <!-- Browser Guide -->
-                    <div id="guide-browser" class="guide-panel" role="tabpanel" aria-labelledby="heading-guide" data-platform-guide="browser">
+                    <div id="guide-browser" class="guide-panel" role="tabpanel" aria-labelledby="tab-browser" data-platform-guide="browser">
                         <p data-i18n-html="guide.browser.ff" style="margin-bottom: 6px;"><strong>Firefox:</strong> Ajustes &rarr; Privacidad y Seguridad &rarr; DNS sobre HTTPS &rarr; Protección máxima &rarr; Proveedor personalizado: <code class="code-inline">https://dns.xdp.es/dns-query</code></p>
                         <p data-i18n-html="guide.browser.chrome"><strong>Chrome / Brave / Edge:</strong> Configuración &rarr; Privacidad y Seguridad &rarr; Usar DNS seguro &rarr; Con: Personalizado &rarr; <code class="code-inline">https://dns.xdp.es/dns-query</code></p>
                     </div>

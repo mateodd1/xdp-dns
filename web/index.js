@@ -4,11 +4,14 @@ function copyEndpoint(text, wrapper) {
     navigator.clipboard.writeText(text).then(() => {
         const tooltip = wrapper.querySelector('.tooltip');
         if (tooltip) {
-            const originalText = tooltip.innerText;
-            const copiedText = (window.i18n && window.i18n.t('copy.copied')) || '¡Copiado!';
-            tooltip.innerText = copiedText;
-            setTimeout(() => {
-                tooltip.innerText = originalText;
+            if (!tooltip.dataset.defaultText) {
+                tooltip.dataset.defaultText = tooltip.innerText;
+            }
+            tooltip.innerText = (window.i18n && window.i18n.t('copy.copied')) || '¡Copiado!';
+            clearTimeout(copyEndpoint._restoreTimer);
+            copyEndpoint._restoreTimer = setTimeout(() => {
+                // Prefer the i18n value so the restored text follows the active language
+                tooltip.innerText = (window.i18n && window.i18n.t('copy.tooltip')) || tooltip.dataset.defaultText;
             }, 2000);
         }
     }).catch(err => {
@@ -22,6 +25,7 @@ function switchGuide(guideId, btn) {
     });
     document.querySelectorAll('.guide-tab').forEach(tab => {
         tab.classList.remove('active');
+        tab.setAttribute('aria-selected', 'false');
     });
 
     const targetPanel = document.getElementById('guide-' + guideId);
@@ -30,6 +34,7 @@ function switchGuide(guideId, btn) {
     }
     if (btn) {
         btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
     }
 }
 
@@ -93,7 +98,7 @@ function autoSelectPlatformTab() {
 }
 
 function loadStats() {
-    fetch('stats.json')
+    fetch('stats.json?t=' + Date.now())
         .then(response => {
             if (!response.ok) throw new Error('Network response not ok');
             return response.json();

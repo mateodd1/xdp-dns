@@ -13,6 +13,8 @@
     <meta property="og:description" content="Servidor DNS recursivo público, ultrarrápido y enfocado en la privacidad con servidores en Madrid.">
     <meta property="og:url" content="https://xdp.es/about">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="xdp.es">
+    <meta property="og:locale" content="es_ES">
     <meta property="og:image" content="https://xdp.es/android-chrome-512x512.png">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Acerca de xdp.es DNS">
@@ -41,7 +43,11 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    </noscript>
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -174,6 +180,22 @@
             font-size: 0.85rem;
             color: var(--text-primary);
             line-height: 1.5;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            gap: 6px;
+            transition: opacity 0.2s ease;
+        }
+
+        .back-link:hover {
+            opacity: 0.8;
+            text-decoration: underline;
         }
 
         /* Technical Specs / Addresses Table */
@@ -337,20 +359,40 @@
                 <table class="specs-table">
                     <tbody>
                         <tr>
-                            <th data-i18n="about.addr_ipv4">Dirección IPv4:</th>
-                            <td>85.208.114.51</td>
+                            <th scope="row" data-i18n="about.addr_ipv4">Dirección IPv4:</th>
+                            <td>
+                                <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyValue('85.208.114.51', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyValue('85.208.114.51', this)" aria-label="Copiar dirección IPv4">
+                                    <span class="code-val">85.208.114.51</span>
+                                    <span class="tooltip" data-i18n="copy.tooltip">Click para copiar</span>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
-                            <th data-i18n="about.addr_ipv6">Dirección IPv6:</th>
-                            <td>2a0e:97c0:c40::51</td>
+                            <th scope="row" data-i18n="about.addr_ipv6">Dirección IPv6:</th>
+                            <td>
+                                <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyValue('2a0e:97c0:c40::51', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyValue('2a0e:97c0:c40::51', this)" aria-label="Copiar dirección IPv6">
+                                    <span class="code-val">2a0e:97c0:c40::51</span>
+                                    <span class="tooltip" data-i18n="copy.tooltip">Click para copiar</span>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
-                            <th data-i18n="about.addr_doh">Endpoint DoH / DoH3:</th>
-                            <td>https://dns.xdp.es/dns-query</td>
+                            <th scope="row" data-i18n="about.addr_doh">Endpoint DoH / DoH3:</th>
+                            <td>
+                                <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyValue('https://dns.xdp.es/dns-query', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyValue('https://dns.xdp.es/dns-query', this)" aria-label="Copiar endpoint DoH">
+                                    <span class="code-val">https://dns.xdp.es/dns-query</span>
+                                    <span class="tooltip" data-i18n="copy.tooltip">Click para copiar</span>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
-                            <th data-i18n="about.addr_dot">Endpoint DoT:</th>
-                            <td>dns.xdp.es</td>
+                            <th scope="row" data-i18n="about.addr_dot">Endpoint DoT:</th>
+                            <td>
+                                <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyValue('dns.xdp.es', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyValue('dns.xdp.es', this)" aria-label="Copiar endpoint DoT">
+                                    <span class="code-val">dns.xdp.es</span>
+                                    <span class="tooltip" data-i18n="copy.tooltip">Click para copiar</span>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -360,14 +402,30 @@
         <!-- Site Footer -->
         <footer class="site-footer">
             <div>xdp.es DNS</div>
-            <div class="site-footer-links">
-                <a href="/about" class="site-footer-link" data-i18n="nav.about">Acerca de</a>
-            </div>
         </footer>
     </div>
 
     <!-- Scripts -->
     <script src="/i18n.js?v=3.2"></script>
     <script src="/theme.js?v=3.2" defer></script>
+    <script>
+        // Copy-to-clipboard for the addresses table
+        function copyValue(text, wrapper) {
+            navigator.clipboard.writeText(text).then(() => {
+                const tooltip = wrapper.querySelector('.tooltip');
+                if (!tooltip) return;
+                if (!tooltip.dataset.defaultText) {
+                    tooltip.dataset.defaultText = tooltip.innerText;
+                }
+                tooltip.innerText = (window.i18n && window.i18n.t('copy.copied')) || '¡Copiado!';
+                clearTimeout(copyValue._restoreTimer);
+                copyValue._restoreTimer = setTimeout(() => {
+                    tooltip.innerText = (window.i18n && window.i18n.t('copy.tooltip')) || tooltip.dataset.defaultText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Error al copiar al portapapeles:', err);
+            });
+        }
+    </script>
 </body>
 </html>

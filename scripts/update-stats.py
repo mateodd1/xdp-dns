@@ -223,13 +223,13 @@ def parse_raw_metrics(raw_text):
                 qtype = match.group(2)
                 cnt = float(match.group(3))
 
-                # Ignore localhost / internal probe traffic
-                if is_local_ip(client):
-                    continue
-
+                # Count all queries towards total and query types
                 total_queries += cnt
                 query_types[qtype] = query_types.get(qtype, 0.0) + cnt
-                client_ips[client] = client_ips.get(client, 0.0) + cnt
+
+                # Only include public client IPs in ASN analysis
+                if not is_local_ip(client):
+                    client_ips[client] = client_ips.get(client, 0.0) + cnt
 
         # Parse blocky_response_total
         elif line.startswith("blocky_response_total"):
