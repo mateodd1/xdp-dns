@@ -18,9 +18,12 @@ import dns.rdataclass
 import dns.rdata
 
 LISTEN_HOST = "127.0.0.1"
-LISTEN_PORT = 5335
 UPSTREAM_HOST = "127.0.0.1"
-UPSTREAM_PORT = 5336
+
+PORT_PAIRS = [
+    (5335, 5336),  # Adblock (.51 egress)
+    (5337, 5338)   # Lite (.52 egress)
+]
 
 BLOCKED_IPV4_FILE = "/etc/unbound/blocked_ips.txt"
 BLOCKED_IPV6_FILE = "/etc/unbound/blocked_ipv6.txt"
@@ -289,8 +292,8 @@ def rewrite_dns_payload(wire_data):
     return wire_data
 
 class UDPDnsProtocol(asyncio.DatagramProtocol):
-    def __init__(self, upstream_sock):
-        self.upstream_sock = upstream_sock
+    def __init__(self, upstream_port):
+        self.upstream_port = upstream_port
         self.transport = None
 
     def connection_made(self, transport):
@@ -314,7 +317,7 @@ class UDPDnsProtocol(asyncio.DatagramProtocol):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setblocking(False)
         try:
-            await loop.sock_connect(s, (UPSTREAM_HOST, UPSTREAM_PORT))
+            await loop.sock_connect(s, (UPSTREAM_HOST, self.upstream_port))
             await loop.sock_sendall(s, data)
             resp = await asyncio.wait_for(loop.sock_recv(s, 4096), timeout=3.0)
             return resp
@@ -326,63 +329,67 @@ class UDPDnsProtocol(asyncio.DatagramProtocol):
     def error_received(self, exc):
         pass
 
-async def handle_tcp_client(reader, writer):
-    try:
-        len_bytes = await reader.readexactly(2)
-        query_len = struct.unpack("!H", len_bytes)[0]
-        query_data = await reader.readexactly(query_len)
-
-        up_reader, up_writer = await asyncio.open_connection(UPSTREAM_HOST, UPSTREAM_PORT)
-        up_writer.write(len_bytes + query_data)
-        await up_writer.drain()
-
-        resp_len_bytes = await up_reader.readexactly(2)
-        resp_len = struct.unpack("!H", resp_len_bytes)[0]
-        resp_data = await up_reader.readexactly(resp_len)
-
-        up_writer.close()
-        await up_writer.wait_closed()
-
-        rewritten = rewrite_dns_payload(resp_data)
-        new_len_bytes = struct.pack("!H", len(rewritten))
-
-        writer.write(new_len_bytes + rewritten)
-        await writer.drain()
-    except Exception:
-        pass
-    finally:
+def make_tcp_handler(upstream_port):
+    async def handle_tcp_client(reader, writer):
         try:
-            writer.close()
-            await writer.wait_closed()
+            len_bytes = await reader.readexactly(2)
+            query_len = struct.unpack("!H", len_bytes)[0]
+            query_data = await reader.readexactly(query_len)
+
+            up_reader, up_writer = await asyncio.open_connection(UPSTREAM_HOST, upstream_port)
+            up_writer.write(len_bytes + query_data)
+            await up_writer.drain()
+
+            resp_len_bytes = await up_reader.readexactly(2)
+            resp_len = struct.unpack("!H", resp_len_bytes)[0]
+            resp_data = await up_reader.readexactly(resp_len)
+
+            up_writer.close()
+            await up_writer.wait_closed()
+
+            rewritten = rewrite_dns_payload(resp_data)
+            new_len_bytes = struct.pack("!H", len(rewritten))
+
+            writer.write(new_len_bytes + rewritten)
+            await writer.drain()
         except Exception:
             pass
+        finally:
+            try:
+                writer.close()
+                await writer.wait_closed()
+            except Exception:
+                pass
+    return handle_tcp_client
 
 async def main():
     load_data(force=True)
     loop = asyncio.get_running_loop()
 
-    # UDP Server on 127.0.0.1:5335
-    transport, protocol = await loop.create_datagram_endpoint(
-        lambda: UDPDnsProtocol(None),
-        local_addr=(LISTEN_HOST, LISTEN_PORT),
-        reuse_port=True
-    )
-    print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] DNS Evasion Proxy UDP listening on {LISTEN_HOST}:{LISTEN_PORT}", flush=True)
-
-    # TCP Server on 127.0.0.1:5335
-    tcp_server = await asyncio.start_server(
-        handle_tcp_client,
-        LISTEN_HOST,
-        LISTEN_PORT,
-        reuse_port=True
-    )
-    print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] DNS Evasion Proxy TCP listening on {LISTEN_HOST}:{LISTEN_PORT}", flush=True)
-
-    async with tcp_server:
-        await asyncio.gather(
-            tcp_server.serve_forever(),
-            asyncio.Event().wait()
+    servers = []
+    for listen_p, upstream_p in PORT_PAIRS:
+        # UDP Server
+        transport, protocol = await loop.create_datagram_endpoint(
+            lambda up_p=upstream_p: UDPDnsProtocol(up_p),
+            local_addr=(LISTEN_HOST, listen_p),
+            reuse_port=True
         )
+        print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] DNS Evasion Proxy UDP listening on {LISTEN_HOST}:{listen_p} -> upstream {UPSTREAM_HOST}:{upstream_p}", flush=True)
+
+        # TCP Server
+        tcp_server = await asyncio.start_server(
+            make_tcp_handler(upstream_p),
+            LISTEN_HOST,
+            listen_p,
+            reuse_port=True
+        )
+        print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] DNS Evasion Proxy TCP listening on {LISTEN_HOST}:{listen_p} -> upstream {UPSTREAM_HOST}:{upstream_p}", flush=True)
+        servers.append(tcp_server)
+
+    await asyncio.gather(
+        *(s.serve_forever() for s in servers),
+        asyncio.Event().wait()
+    )
 
 if __name__ == "__main__":
     asyncio.run(main())

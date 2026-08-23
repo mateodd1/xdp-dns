@@ -19,12 +19,12 @@ keyFile: /etc/letsencrypt/live/xdp.es/privkey.pem
 upstreams:
   groups:
     default:
-      - tcp+udp:127.0.0.1:5335
+      - tcp+udp:127.0.0.1:5337
   strategy: strict
   timeout: 4s
 
 bootstrapDns:
-  - 127.0.0.1:5335
+  - 127.0.0.1:5337
 
 caching:
   minTime: 10m

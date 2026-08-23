@@ -42,9 +42,11 @@ if curl -s -f -L --connect-timeout 10 --max-time 20 -H "User-Agent: xdp-dns-sync
         logger -t update-blocked-ips "Blocked IPv4 updated: ${COUNT} active entries" || true
 
         # Flush resolvers cache to immediately apply evasive routing to all cached domains
-        /usr/local/bin/blocky cache flush --apiPort 4000 >/dev/null 2>&1 || blocky cache flush --apiPort 4000 >/dev/null 2>&1 || true
-        /usr/local/bin/blocky cache flush --apiPort 4001 >/dev/null 2>&1 || blocky cache flush --apiPort 4001 >/dev/null 2>&1 || true
-        unbound-control flush_zone . >/dev/null 2>&1 || true
+        /usr/local/bin/blocky cache flush --apiPort 4000 >/dev/null 2>&1 || true
+        /usr/local/bin/blocky cache flush --apiPort 4001 >/dev/null 2>&1 || true
+        /usr/local/bin/blocky cache flush --apiPort 4002 >/dev/null 2>&1 || true
+        unbound-control -c /etc/unbound/unbound.conf flush_zone . >/dev/null 2>&1 || true
+        unbound-control -c /etc/unbound/unbound-lite.conf -s 127.0.0.1@8954 flush_zone . >/dev/null 2>&1 || true
     else
         rm -f "$FILTERED_TEMP"
         echo "[$(date -u '+%Y-%m-%d %H:%M:%S UTC')] No changes in blocked IPv4 (${COUNT} entries active)."
