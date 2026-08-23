@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # /root/xpd-dns/scripts/update-blocked-ips.sh
-# Checks and updates the blocked IP list from https://hayahora.futbol/estado/blocked-any.txt every 5 minutes
+# Checks and updates the blocked IP list from https://hayahora.futbol/estado/blocked-any.txt every 1 minute
 # and synchronizes blocked IPv6 list from /root/ooni_bloqueados_ipv6.txt
 
 set -euo pipefail

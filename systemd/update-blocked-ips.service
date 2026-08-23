@@ -1,0 +1,13 @@
+[Unit]
+Description=Update Blocked Anycast IPs for Unbound Blackhole Evasion
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/root/xpd-dns/scripts/update-blocked-ips.sh
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
