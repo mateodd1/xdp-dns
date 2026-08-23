@@ -28,8 +28,20 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="shortcut icon" href="/favicon.ico">
 
-    <link rel="stylesheet" href="/index.css?v=3.3">
+    <link rel="stylesheet" href="/index.css?v=3.8">
     <style>
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 36px 24px 60px 24px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px 14px 40px 14px;
+            }
+        }
+
         .mono {
             font-family: 'JetBrains Mono', monospace;
             font-variant-numeric: tabular-nums;
@@ -108,28 +120,28 @@
         }
 
         .stat-card {
-            background: var(--card-bg, rgba(255, 255, 255, 0.04));
-            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 14px;
-            padding: 14px 16px;
+            padding: 16px 18px;
             display: flex;
             flex-direction: column;
             gap: 4px;
-            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-card);
         }
 
         .stat-card-label {
-            font-size: 0.72rem;
+            font-size: 0.74rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: var(--text-muted, #94a3b8);
+            color: var(--text-muted);
         }
 
         .stat-card-value {
-            font-size: 1.55rem;
+            font-size: 1.6rem;
             font-weight: 800;
-            color: var(--text-main, #f8fafc);
+            color: var(--text-heading);
             letter-spacing: -0.02em;
         }
 
@@ -143,16 +155,17 @@
         }
 
         .controls-card {
-            background: var(--card-bg, rgba(255, 255, 255, 0.04));
-            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 14px;
-            padding: 14px 16px;
-            margin-bottom: 16px;
+            padding: 14px 18px;
+            margin-bottom: 18px;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
+            box-shadow: var(--shadow-card);
         }
 
         .search-wrapper {
@@ -165,9 +178,9 @@
             height: 42px;
             padding: 0 14px 0 38px;
             border-radius: 10px;
-            background: var(--input-bg, rgba(0, 0, 0, 0.25));
-            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
-            color: var(--text-main, #f8fafc);
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
             font-size: 0.88rem;
             outline: none;
             transition: border-color 0.2s ease;
@@ -175,7 +188,7 @@
         }
 
         .search-input:focus {
-            border-color: #3b82f6;
+            border-color: var(--accent);
         }
 
         .search-icon {
@@ -183,7 +196,7 @@
             left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted, #94a3b8);
+            color: var(--text-muted);
             pointer-events: none;
         }
 
@@ -199,8 +212,8 @@
 
         .filter-btn {
             background: transparent;
-            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
-            color: var(--text-muted, #94a3b8);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
             padding: 7px 12px;
             border-radius: 8px;
             font-size: 0.8rem;
@@ -212,14 +225,14 @@
         }
 
         .filter-btn:hover {
-            color: var(--text-main, #f8fafc);
-            border-color: rgba(255, 255, 255, 0.3);
+            color: var(--text-heading);
+            border-color: var(--border-hover);
         }
 
         .filter-btn.active {
-            background: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
-            border-color: rgba(59, 130, 246, 0.4);
+            background: var(--accent-dim);
+            color: var(--accent);
+            border-color: var(--accent);
         }
 
         .refresh-btn {
@@ -227,9 +240,9 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            background: rgba(59, 130, 246, 0.12);
-            color: #60a5fa;
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid var(--accent);
             padding: 8px 14px;
             border-radius: 8px;
             font-size: 0.82rem;
@@ -240,8 +253,7 @@
         }
 
         .refresh-btn:hover {
-            background: rgba(59, 130, 246, 0.2);
-            border-color: rgba(59, 130, 246, 0.5);
+            opacity: 0.9;
         }
 
         .refresh-btn.spinning svg {
@@ -262,11 +274,11 @@
         }
 
         .table-container {
-            background: var(--card-bg, rgba(255, 255, 255, 0.04));
-            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 14px;
             overflow: hidden;
-            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-card);
             margin-bottom: 20px;
         }
 
@@ -278,25 +290,21 @@
         }
 
         table.blocked-table th {
-            background: rgba(0, 0, 0, 0.18);
-            padding: 12px 16px;
+            background: var(--bg-code);
+            padding: 13px 18px;
             font-weight: 700;
             font-size: 0.74rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: var(--text-muted, #94a3b8);
-            border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
             white-space: nowrap;
         }
 
-        [data-theme="light"] table.blocked-table th {
-            background: rgba(0, 0, 0, 0.04);
-        }
-
         table.blocked-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
-            color: var(--text-main, #f8fafc);
+            padding: 13px 18px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
             vertical-align: middle;
         }
 
@@ -305,7 +313,7 @@
         }
 
         table.blocked-table tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--bg-card-hover);
         }
 
         /* Mobile Cards List */
@@ -317,19 +325,14 @@
         }
 
         .blocked-card {
-            background: var(--card-bg, rgba(255, 255, 255, 0.04));
-            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 12px;
             padding: 14px 16px;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            backdrop-filter: blur(12px);
-            transition: transform 0.15s ease, border-color 0.15s ease;
-        }
-
-        .blocked-card:active {
-            transform: scale(0.99);
+            box-shadow: var(--shadow-card);
         }
 
         .card-header-row {
@@ -343,14 +346,10 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(0, 0, 0, 0.2);
+            background: var(--bg-code);
             padding: 8px 12px;
             border-radius: 8px;
-            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
-        }
-
-        [data-theme="light"] .card-ip-block {
-            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border);
         }
 
         .card-meta-row {
@@ -358,7 +357,7 @@
             align-items: center;
             justify-content: space-between;
             font-size: 0.78rem;
-            color: var(--text-muted, #94a3b8);
+            color: var(--text-muted);
         }
 
         .badge-cf {
@@ -405,11 +404,11 @@
         }
 
         .copy-btn-touch {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-            color: var(--text-muted, #94a3b8);
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
             cursor: pointer;
-            padding: 5px 8px;
+            padding: 5px 9px;
             border-radius: 6px;
             font-size: 0.78rem;
             display: inline-flex;
@@ -419,27 +418,29 @@
         }
 
         .copy-btn-touch:hover, .copy-btn-touch:active {
-            color: var(--text-main, #f8fafc);
-            background: rgba(255, 255, 255, 0.14);
+            color: var(--text-heading);
+            background: var(--bg-code-hover);
+            border-color: var(--border-hover);
         }
 
         .pagination {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 16px;
-            background: var(--card-bg, rgba(255, 255, 255, 0.04));
-            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 12px;
-            font-size: 0.82rem;
-            color: var(--text-muted, #94a3b8);
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            box-shadow: var(--shadow-card);
             margin-bottom: 24px;
         }
 
         .page-btn {
             background: transparent;
-            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
-            color: var(--text-main, #f8fafc);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
             padding: 6px 14px;
             border-radius: 6px;
             font-size: 0.8rem;
@@ -455,14 +456,15 @@
         }
 
         .page-btn:not(:disabled):hover, .page-btn:not(:disabled):active {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
         }
 
         .empty-state {
-            padding: 36px 16px;
+            padding: 40px 16px;
             text-align: center;
-            color: var(--text-muted, #94a3b8);
-            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-size: 0.92rem;
         }
 
         /* Mobile Switch Breakpoint */
@@ -490,116 +492,141 @@
     </style>
 </head>
 <body>
-    <div class="layout-container">
-        <!-- Top Header -->
-        <header class="site-header">
-            <div class="header-content">
-                <a href="/" class="brand-logo" aria-label="xdp.es Inicio">
-                    <span class="logo-accent">xdp</span><span class="logo-suffix">.es</span>
-                    <span style="margin-left: 8px; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(239, 68, 68, 0.15); color: #ef4444; font-weight: 800; border: 1px solid rgba(239, 68, 68, 0.3);">INTERNAL</span>
+    <div class="container">
+        <!-- Site Header -->
+        <header>
+            <div class="header-top">
+                <a href="/" class="back-link" aria-label="Volver al inicio">
+                    &larr; Volver al inicio
                 </a>
-                <div class="header-controls">
-                    <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">
-                        <svg class="sun-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                        <svg class="moon-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <div class="theme-switcher" role="group" aria-label="Seleccionar tema">
+                    <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <span class="theme-text">Claro</span>
+                    </button>
+                    <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <span class="theme-text">Oscuro</span>
+                    </button>
+                    <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático" aria-label="Automático">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                        <span class="theme-text">Auto</span>
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- Hero Section -->
-        <div class="hero-section">
-            <div class="hero-badge-container">
-                <div class="status-badge-live" id="live-badge">
-                    <span class="pulse-dot"></span>
-                    <span id="live-text">Comprobando estado...</span>
+        <main>
+            <!-- Hero Section -->
+            <div class="hero-section">
+                <div class="hero-badge-container">
+                    <div class="status-badge-live" id="live-badge">
+                        <span class="pulse-dot"></span>
+                        <span id="live-text">Comprobando estado...</span>
+                    </div>
+                </div>
+                <h1 class="hero-title" style="font-size: 2rem; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.02em; color: var(--text-heading);">
+                    Monitor de Evasión de Bloqueos
+                </h1>
+                <p style="color: var(--text-muted); max-width: 620px; margin: 0 auto; font-size: 0.9rem; line-height: 1.45;">
+                    Seguimiento en tiempo real de IPs Anycast de Cloudflare bloqueadas y sus rutas alternativas limpias.
+                </p>
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-card-label">IPs Baneadas</span>
+                    <span class="stat-card-value" id="stat-total" style="color: #ef4444;">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-card-label">En Cloudflare</span>
+                    <span class="stat-card-value" id="stat-cf" style="color: #f97316;">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-card-label">Rutas Evasivas</span>
+                    <span class="stat-card-value" id="stat-evaded" style="color: #10b981;">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-card-label">Último Sync</span>
+                    <span class="stat-card-value" id="stat-updated" style="font-size: 0.95rem; padding-top: 6px; line-height: 1.2;">-</span>
                 </div>
             </div>
-            <h1 class="hero-title" style="font-size: 2rem; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.02em;">
-                Monitor de Evasión de Bloqueos
-            </h1>
-            <p style="color: var(--text-muted, #94a3b8); max-width: 620px; margin: 0 auto; font-size: 0.9rem; line-height: 1.45;">
-                Seguimiento en tiempo real de IPs Anycast de Cloudflare bloqueadas y sus rutas alternativas limpias.
-            </p>
-        </div>
 
-        <!-- Metrics Grid -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-card-label">IPs Baneadas</span>
-                <span class="stat-card-value" id="stat-total" style="color: #ef4444;">-</span>
+            <!-- Controls: Search & Filters -->
+            <div class="controls-card">
+                <div class="search-wrapper">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" class="search-input" id="search-input" placeholder="Buscar IP o prefijo...">
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">Todas</button>
+                    <button class="filter-btn" data-filter="cf">Cloudflare</button>
+                    <button class="filter-btn" data-filter="other">Otras CDN</button>
+                </div>
+                <button class="refresh-btn" id="refresh-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                    <span>Actualizar</span>
+                </button>
             </div>
-            <div class="stat-card">
-                <span class="stat-card-label">En Cloudflare</span>
-                <span class="stat-card-value" id="stat-cf" style="color: #f97316;">-</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-card-label">Rutas Evasivas</span>
-                <span class="stat-card-value" id="stat-evaded" style="color: #10b981;">-</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-card-label">Último Sync</span>
-                <span class="stat-card-value" id="stat-updated" style="font-size: 0.95rem; padding-top: 6px; line-height: 1.2;">-</span>
-            </div>
-        </div>
 
-        <!-- Controls: Search & Filters -->
-        <div class="controls-card">
-            <div class="search-wrapper">
-                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" class="search-input" id="search-input" placeholder="Buscar IP o prefijo...">
+            <!-- Desktop View (Data Table) -->
+            <div class="desktop-view">
+                <div class="table-container">
+                    <table class="blocked-table">
+                        <thead>
+                            <tr>
+                                <th>IP Bloqueada</th>
+                                <th>Red / Proveedor</th>
+                                <th>Prefijo BGP</th>
+                                <th>IP Alternativa (Evasión)</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="desktop-table-body">
+                            <tr>
+                                <td colspan="5" class="empty-state">Cargando datos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">Todas</button>
-                <button class="filter-btn" data-filter="cf">Cloudflare</button>
-                <button class="filter-btn" data-filter="other">Otras CDN</button>
-            </div>
-            <button class="refresh-btn" id="refresh-btn">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                <span>Actualizar</span>
-            </button>
-        </div>
 
-        <!-- Desktop View (Data Table) -->
-        <div class="desktop-view">
-            <div class="table-container">
-                <table class="blocked-table">
-                    <thead>
-                        <tr>
-                            <th>IP Bloqueada</th>
-                            <th>Red / Proveedor</th>
-                            <th>Prefijo BGP</th>
-                            <th>IP Alternativa (Evasión)</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="desktop-table-body">
-                        <tr>
-                            <td colspan="5" class="empty-state">Cargando datos...</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- Mobile View (Card List) -->
+            <div class="mobile-view">
+                <div class="cards-list" id="mobile-cards-body">
+                    <div class="empty-state">Cargando datos...</div>
+                </div>
             </div>
-        </div>
 
-        <!-- Mobile View (Card List) -->
-        <div class="mobile-view">
-            <div class="cards-list" id="mobile-cards-body">
-                <div class="empty-state">Cargando datos...</div>
+            <!-- Pagination Controls -->
+            <div class="pagination">
+                <span id="pagination-info">Cargando...</span>
+                <div style="display: flex; gap: 8px;">
+                    <button class="page-btn" id="prev-page" disabled>Anterior</button>
+                    <button class="page-btn" id="next-page" disabled>Siguiente</button>
+                </div>
             </div>
-        </div>
-
-        <!-- Pagination Controls -->
-        <div class="pagination">
-            <span id="pagination-info">Cargando...</span>
-            <div style="display: flex; gap: 8px;">
-                <button class="page-btn" id="prev-page" disabled>Anterior</button>
-                <button class="page-btn" id="next-page" disabled>Siguiente</button>
-            </div>
-        </div>
+        </main>
     </div>
 
-    <script src="/theme.js?v=3.3"></script>
+    <script src="/theme.js?v=3.8"></script>
     <script>
         let allEntries = [];
         let filteredEntries = [];
@@ -682,19 +709,19 @@
                             </div>
                         </td>
                         <td>${cfBadge}</td>
-                        <td><span class="mono" style="font-size: 0.78rem; color: var(--text-muted, #94a3b8);">${item.prefix}</span></td>
+                        <td><span class="mono" style="font-size: 0.78rem; color: var(--text-muted);">${item.prefix}</span></td>
                         <td>
                             ${isEvaded ? `
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <span class="ip-alt mono">${item.alternative_ip}</span>
                                     <button class="copy-btn-touch" onclick="copyToClipboard('${item.alternative_ip}', this)" title="Copiar">📋</button>
                                 </div>
-                            ` : `<span style="color: var(--text-muted, #94a3b8); font-style: italic;">Sin cambios</span>`}
+                            ` : `<span style="color: var(--text-muted); font-style: italic;">Sin cambios</span>`}
                         </td>
                         <td>
                             ${isEvaded 
                                 ? `<span style="color: #10b981; font-weight: 600; font-size: 0.78rem;">● Evadida</span>`
-                                : `<span style="color: #94a3b8; font-size: 0.78rem;">● Intacta</span>`}
+                                : `<span style="color: var(--text-muted); font-size: 0.78rem;">● Intacta</span>`}
                         </td>
                     </tr>
                 `;
@@ -715,10 +742,10 @@
                         </div>
 
                         <div class="card-meta-row">
-                            <span>Prefijo: <strong class="mono" style="color: var(--text-main, #f8fafc);">${item.prefix}</strong></span>
+                            <span>Prefijo: <strong class="mono" style="color: var(--text-primary);">${item.prefix}</strong></span>
                             ${isEvaded 
                                 ? `<span style="color: #10b981; font-weight: 700;">● Evadida</span>`
-                                : `<span style="color: #94a3b8;">● Intacta</span>`}
+                                : `<span style="color: var(--text-muted);">● Intacta</span>`}
                         </div>
 
                         ${isEvaded ? `
