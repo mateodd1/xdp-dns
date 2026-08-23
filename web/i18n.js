@@ -114,6 +114,7 @@ const translations = {
         // Section 1: Privacy & Infrastructure
         "about.sec_privacy_title": "Privacidad e Infraestructura",
         "about.sec_privacy_desc": "xdp.es DNS nace con el objetivo de ofrecer un servicio de resolución ultrarrápido, respaldado por protocolos modernos y con un firme compromiso con la privacidad. Su infraestructura está diseñada para mitigar y sortear bloqueos indiscriminados a CDNs durante eventos deportivos. No almacenamos ningún registro de consulta ni datos de actividad, manteniendo únicamente contadores numéricos agregados de resolución.",
+        "about.sec_privacy_link": "Puedes obtener más información acerca de los bloqueos indiscriminados en el foro de <a href=\"https://bandaancha.eu/articulos/laliga-estira-bloqueo-ips-cloudflare-11797\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-link\">BandaAncha</a>.",
         "about.card_nologs_title": "Política Zero-Logs",
         "about.card_nologs_desc": "No registramos, rastreamos ni almacenamos tus consultas DNS ni tu dirección IP. Las estadísticas públicas son contadores numéricos agregados en memoria sin ninguna información identificable.",
         "about.card_dnssec_title": "Validación Criptográfica DNSSEC",
@@ -249,6 +250,7 @@ const translations = {
         // Section 1: Privacy & Infrastructure
         "about.sec_privacy_title": "Privacy & Infrastructure",
         "about.sec_privacy_desc": "xdp.es DNS was created to provide an ultra-fast resolution service based on modern protocols and a strict commitment to privacy. Its infrastructure is designed to mitigate and circumvent indiscriminate CDN blocks during sporting events. We do not store any query logs or user activity data, maintaining only aggregated numeric resolution counters.",
+        "about.sec_privacy_link": "You can find more information about these indiscriminate blocks on the <a href=\"https://bandaancha.eu/articulos/laliga-estira-bloqueo-ips-cloudflare-11797\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-link\">BandaAncha forum</a> (in Spanish).",
         "about.card_nologs_title": "Zero-Logs Policy",
         "about.card_nologs_desc": "We never log, track, or store your DNS queries or IP address. Public dashboard statistics are in-memory integer metrics with zero personally identifiable information.",
         "about.card_dnssec_title": "DNSSEC Validation",
