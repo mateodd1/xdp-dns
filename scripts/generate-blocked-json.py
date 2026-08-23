@@ -8,6 +8,7 @@ import bisect
 import os
 import sys
 import datetime
+import subprocess
 
 BLOCKED_V4_FILE = "/etc/unbound/blocked_ips.txt"
 BLOCKED_V6_FILE = "/etc/unbound/blocked_ipv6.txt"
@@ -16,6 +17,86 @@ CF_V6_FILE = "/etc/unbound/cloudflare_prefixes_v6.txt"
 
 OUT_WEB = "/root/xpd-dns/web/blocked/data.json"
 OUT_WWW = "/var/www/xdp.es/blocked/data.json"
+
+# Team Cymru IP-to-ASN mapping (DNS) for identifying non-Cloudflare origins
+ASN_CACHE_FILE = "/root/xpd-dns/scripts/asn_cache.json"
+ASN_CACHE_TTL = 7 * 24 * 3600  # 7 days
+
+def load_asn_cache():
+    try:
+        with open(ASN_CACHE_FILE) as f:
+            cache = json.load(f)
+            if isinstance(cache, dict):
+                return cache
+    except Exception:
+        pass
+    return {}
+
+def save_asn_cache(cache):
+    try:
+        temp = ASN_CACHE_FILE + ".tmp"
+        with open(temp, "w", encoding="utf-8") as f:
+            json.dump(cache, f)
+        os.replace(temp, ASN_CACHE_FILE)
+    except Exception as e:
+        print("Warning: could not save ASN cache:", e, file=sys.stderr)
+
+def dig_txt(query):
+    try:
+        result = subprocess.run(
+            ["/usr/bin/dig", "+short", "+time=2", "+tries=1", "TXT", query],
+            capture_output=True, text=True, timeout=5
+        )
+        lines = [l.strip().strip('"') for l in result.stdout.splitlines() if l.strip()]
+        return lines[0] if lines else None
+    except Exception:
+        return None
+
+_org_name_memo = {}
+
+def get_org_for_asn(asn):
+    if asn in _org_name_memo:
+        return _org_name_memo[asn]
+    org = None
+    raw = dig_txt(f"AS{asn}.asn.cymru.com")
+    if raw and '|' in raw:
+        fields = [f.strip() for f in raw.split('|')]
+        if len(fields) >= 5 and fields[4]:
+            org = fields[4].rstrip(',').strip()
+    _org_name_memo[asn] = org
+    return org
+
+def resolve_origin(ip_str):
+    """Resolve origin ASN, BGP prefix and org name via Team Cymru DNS."""
+    try:
+        ip = ipaddress.ip_address(ip_str)
+    except ValueError:
+        return None
+    zone = "origin.asn.cymru.com" if ip.version == 4 else "origin6.asn.cymru.com"
+    base = ip.reverse_pointer.rsplit('.', 2)[0]  # strip in-addr.arpa / ip6.arpa
+    raw = dig_txt(f"{base}.{zone}")
+    if not raw or '|' not in raw:
+        return None
+    fields = [f.strip() for f in raw.split('|')]
+    origin_asn = fields[0] if fields and fields[0].isdigit() else None
+    bgp_prefix = fields[1] if len(fields) > 1 and fields[1] else None
+    if not origin_asn:
+        return None
+    return {
+        "origin_asn": int(origin_asn),
+        "bgp_prefix": bgp_prefix,
+        "org": get_org_for_asn(origin_asn)
+    }
+
+def get_origin_info(ip_str, cache):
+    """Cached wrapper around resolve_origin(). Negative results are cached too."""
+    now = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+    cached = cache.get(ip_str)
+    if isinstance(cached, dict) and (now - cached.get("ts", 0)) < ASN_CACHE_TTL:
+        return cached.get("info")
+    info = resolve_origin(ip_str)
+    cache[ip_str] = {"ts": now, "info": info}
+    return info
 
 # 1. Load Cloudflare IPv4 Prefixes
 v4_intervals = []
@@ -157,32 +238,51 @@ def get_evasive_v6(ip_str):
         return ip_str, None, False
 
 entries = []
+origin_cache = load_asn_cache()
 
 # Process IPv4
 for ip in sorted(blocked_v4, key=lambda x: [int(p) for p in x.split('.') if p.isdigit()]):
     alt_ip, net_str, is_evaded = get_evasive_v4(ip)
     is_cf = net_str is not None
-    entries.append({
+    origin = None if is_cf else get_origin_info(ip, origin_cache)
+    prefix = net_str
+    if prefix is None:
+        prefix = origin.get("bgp_prefix") if origin else None
+    entry = {
         "blocked_ip": ip,
         "type": "IPv4",
         "is_cloudflare": is_cf,
-        "prefix": net_str or "Non-Cloudflare",
+        "prefix": prefix or "Otros",
         "alternative_ip": alt_ip,
-        "status": "Evadida (Limpia)" if is_evaded else ("No Cloudflare (Intacta)" if not is_cf else "Sin alternativa disponible")
-    })
+        "status": "Evadida (Limpia)" if is_evaded else ("Otros (Intacta)" if not is_cf else "Sin alternativa disponible")
+    }
+    if origin and not is_cf:
+        entry["origin_asn"] = origin.get("origin_asn")
+        entry["org"] = origin.get("org")
+    entries.append(entry)
 
 # Process IPv6
 for ip in sorted(blocked_v6):
     alt_ip, net_str, is_evaded = get_evasive_v6(ip)
     is_cf = net_str is not None
-    entries.append({
+    origin = None if is_cf else get_origin_info(ip, origin_cache)
+    prefix = net_str
+    if prefix is None:
+        prefix = origin.get("bgp_prefix") if origin else None
+    entry = {
         "blocked_ip": ip,
         "type": "IPv6",
         "is_cloudflare": is_cf,
-        "prefix": net_str or "Non-Cloudflare",
+        "prefix": prefix or "Otros",
         "alternative_ip": alt_ip,
-        "status": "Evadida (Limpia)" if is_evaded else ("No Cloudflare (Intacta)" if not is_cf else "Sin alternativa disponible")
-    })
+        "status": "Evadida (Limpia)" if is_evaded else ("Otros (Intacta)" if not is_cf else "Sin alternativa disponible")
+    }
+    if origin and not is_cf:
+        entry["origin_asn"] = origin.get("origin_asn")
+        entry["org"] = origin.get("org")
+    entries.append(entry)
+
+save_asn_cache(origin_cache)
 
 total_blocked = len(entries)
 cf_blocked_count = sum(1 for e in entries if e["is_cloudflare"])
