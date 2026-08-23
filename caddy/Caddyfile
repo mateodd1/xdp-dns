@@ -8,6 +8,38 @@
 	}
 }
 
+# Lite resolver: IP-evasion and DNSSEC, deliberately without ad blocking.
+lite.xdp.es {
+	tls /etc/letsencrypt/live/xdp.es/fullchain.pem /etc/letsencrypt/live/xdp.es/privkey.pem
+
+	handle /dns-query* {
+		reverse_proxy 127.0.0.1:4002 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	handle {
+		redir https://xdp.es{uri} permanent
+	}
+
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		Access-Control-Allow-Origin "*"
+		Access-Control-Allow-Methods "GET, POST, OPTIONS"
+		Access-Control-Allow-Headers "Content-Type, Accept"
+	}
+
+	log {
+		output file /var/log/caddy/lite.xdp.es.access.log {
+			roll_size 20mb
+			roll_keep 5
+		}
+	}
+}
+
 # Dedicated DoH & DoT Subdomain (dns.xdp.es) - EXCLUSIVELY FOR DNS QUERIES
 dns.xdp.es {
 	tls /etc/letsencrypt/live/xdp.es/fullchain.pem /etc/letsencrypt/live/xdp.es/privkey.pem
