@@ -100,21 +100,14 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 14px;
             margin-bottom: 20px;
         }
 
-        @media (max-width: 860px) {
+        @media (max-width: 640px) {
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: repeat(3, 1fr);
                 gap: 8px;
             }
         }
@@ -563,10 +556,6 @@
                     <span class="stat-card-label">Rutas Evasivas</span>
                     <span class="stat-card-value" id="stat-evaded" style="color: #10b981;">-</span>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-card-label">Último Sync</span>
-                    <span class="stat-card-value" id="stat-updated" style="font-size: 0.95rem; padding-top: 6px; line-height: 1.2;">-</span>
-                </div>
             </div>
 
             <!-- Controls: Search & Filters -->
@@ -797,7 +786,6 @@
                     document.getElementById('stat-total').innerText = (data.total_blocked || 0).toLocaleString();
                     document.getElementById('stat-cf').innerText = (data.cf_blocked_count || 0).toLocaleString();
                     document.getElementById('stat-evaded').innerText = (data.evaded_count || 0).toLocaleString();
-                    document.getElementById('stat-updated').innerText = data.last_updated ? data.last_updated.replace(' UTC', '') : '-';
 
                     filterAndRender();
                 })
