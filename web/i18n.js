@@ -107,7 +107,7 @@ const translations = {
         "about.subtitle": "Servidor DNS recursivo público, ultrarrápido y enfocado en la privacidad.",
         "about.pill_nologs": "Zero-Logs",
         "about.pill_dnssec": "DNSSEC",
-        "about.pill_madrid": "Madrid (Baja Latencia)",
+        "about.pill_madrid": "Alojado en Madrid",
         "about.pill_dualstack": "IPv4 / IPv6",
         "about.pill_doh3": "DoH3 & DoT",
 
@@ -242,7 +242,7 @@ const translations = {
         "about.subtitle": "A high-performance, privacy-first, zero-logging recursive DNS resolver.",
         "about.pill_nologs": "Zero-Logs",
         "about.pill_dnssec": "DNSSEC",
-        "about.pill_madrid": "Madrid (Low Latency)",
+        "about.pill_madrid": "Hosted in Madrid",
         "about.pill_dualstack": "IPv4 / IPv6",
         "about.pill_doh3": "DoH3 & DoT",
 
