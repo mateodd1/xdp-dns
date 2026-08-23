@@ -226,6 +226,7 @@
                         <button type="button" class="guide-tab" id="tab-ios" data-platform="ios" role="tab" aria-selected="false" aria-controls="guide-ios" onclick="switchGuide('ios', this)" data-agent-tab="ios" data-i18n="guide.tab_ios">iOS / Mac</button>
                         <button type="button" class="guide-tab" id="tab-windows" data-platform="windows" role="tab" aria-selected="false" aria-controls="guide-windows" onclick="switchGuide('windows', this)" data-agent-tab="windows" data-i18n="guide.tab_windows">Windows 11</button>
                         <button type="button" class="guide-tab" id="tab-linux" data-platform="linux" role="tab" aria-selected="false" aria-controls="guide-linux" onclick="switchGuide('linux', this)" data-agent-tab="linux" data-i18n="guide.tab_linux">Linux</button>
+                        <button type="button" class="guide-tab" id="tab-mikrotik" data-platform="mikrotik" role="tab" aria-selected="false" aria-controls="guide-mikrotik" onclick="switchGuide('mikrotik', this)" data-agent-tab="mikrotik" data-i18n="guide.tab_mikrotik">MikroTik</button>
                         <button type="button" class="guide-tab" id="tab-browser" data-platform="browser" role="tab" aria-selected="false" aria-controls="guide-browser" onclick="switchGuide('browser', this)" data-agent-tab="browser" data-i18n="guide.tab_browser">Navegadores</button>
                     </div>
 
@@ -266,6 +267,21 @@ DNS=85.208.114.51#dns.xdp.es 2a0e:97c0:c40::51#dns.xdp.es
 DNSOverTLS=yes
 DNSSEC=allow-downgrade</code></pre>
                         <p data-i18n-html="guide.linux.reload" style="margin-top: 8px;">A continuación, reinicia el servicio con: <code class="code-inline">systemctl restart systemd-resolved</code></p>
+                    </div>
+
+                    <!-- MikroTik Guide -->
+                    <div id="guide-mikrotik" class="guide-panel" role="tabpanel" aria-labelledby="tab-mikrotik" data-platform-guide="mikrotik">
+                        <ol class="steps-list">
+                            <li data-i18n-html="guide.mikrotik.s1">Abre <strong>WinBox</strong> o <strong>WebFig</strong> y ve a <strong>IP</strong> &rarr; <strong>DNS</strong>.</li>
+                            <li data-i18n-html="guide.mikrotik.s2">Activa <em>"Use DoH Server"</em> e introduce: <code class="code-inline">https://dns.xdp.es/dns-query</code>.</li>
+                            <li data-i18n-html="guide.mikrotik.s3">En <em>"Static DNS Entries"</em>, añade <code class="code-inline">dns.xdp.es</code> &rarr; <code class="code-inline">85.208.114.51</code> para que el router pueda arrancar sin depender de otro resolvedor.</li>
+                            <li data-i18n-html="guide.mikrotik.s4">Marca <strong>Allow Remote Requests</strong> para que el router sirva DNS a tu red local.</li>
+                            <li data-i18n-html="guide.mikrotik.s5">Apunta los clientes al router vía DHCP: <strong>IP</strong> &rarr; <strong>DHCP Server</strong> &rarr; <strong>Networks</strong> &rarr; <em>DNS Servers</em> = IP LAN del router.</li>
+                        </ol>
+                        <p data-i18n-html="guide.mikrotik.cli" style="margin-top: 8px;">Equivalente por terminal (<code>/terminal</code>):</p>
+                        <pre class="code-block"><code>/ip dns set use-doh-server=https://dns.xdp.es/dns-query verify-doh-cert=yes
+/ip dns static add name=dns.xdp.es address=85.208.114.51
+/ip dns set allow-remote-requests=yes</code></pre>
                     </div>
 
                     <!-- Browser Guide -->

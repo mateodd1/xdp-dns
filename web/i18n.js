@@ -56,6 +56,15 @@ const translations = {
         "guide.linux.desc": "Para <code>systemd-resolved</code>, edita el archivo <code class=\"code-inline\">/etc/systemd/resolved.conf</code>:",
         "guide.linux.reload": "A continuación, reinicia el servicio con: <code class=\"code-inline\">systemctl restart systemd-resolved</code>",
 
+        // Guide Steps - MikroTik
+        "guide.tab_mikrotik": "MikroTik",
+        "guide.mikrotik.s1": "Abre <strong>WinBox</strong> o <strong>WebFig</strong> y ve a <strong>IP</strong> → <strong>DNS</strong>.",
+        "guide.mikrotik.s2": "Activa <em>\"Use DoH Server\"</em> e introduce: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>.",
+        "guide.mikrotik.s3": "En <em>\"Static DNS Entries\"</em>, añade <code class=\"code-inline\">dns.xdp.es</code> → <code class=\"code-inline\">85.208.114.51</code> para que el router pueda arrancar sin depender de otro resolvedor.",
+        "guide.mikrotik.s4": "Marca <strong>Allow Remote Requests</strong> para que el router sirva DNS a tu red local.",
+        "guide.mikrotik.s5": "Apunta los clientes al router vía DHCP: <strong>IP</strong> → <strong>DHCP Server</strong> → <strong>Networks</strong> → <em>DNS Servers</em> = IP LAN del router.",
+        "guide.mikrotik.cli": "Equivalente por terminal (<code>/terminal</code>):",
+
         // Guide Steps - Browsers
         "guide.browser.ff": "<strong>Firefox:</strong> Ajustes → Privacidad y Seguridad → DNS sobre HTTPS → Protección máxima → Proveedor personalizado: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
         "guide.browser.chrome": "<strong>Chrome / Brave / Edge:</strong> Configuración → Privacidad y Seguridad → Usar DNS seguro → Con: Personalizado → <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
@@ -190,6 +199,15 @@ const translations = {
         // Guide Steps - Linux
         "guide.linux.desc": "For <code>systemd-resolved</code>, edit the file <code class=\"code-inline\">/etc/systemd/resolved.conf</code>:",
         "guide.linux.reload": "Then restart the service with: <code class=\"code-inline\">systemctl restart systemd-resolved</code>",
+
+        // Guide Steps - MikroTik
+        "guide.tab_mikrotik": "MikroTik",
+        "guide.mikrotik.s1": "Open <strong>WinBox</strong> or <strong>WebFig</strong> and go to <strong>IP</strong> → <strong>DNS</strong>.",
+        "guide.mikrotik.s2": "Enable <em>\"Use DoH Server\"</em> and enter: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>.",
+        "guide.mikrotik.s3": "Under <em>\"Static DNS Entries\"</em>, add <code class=\"code-inline\">dns.xdp.es</code> → <code class=\"code-inline\">85.208.114.51</code> so the router can bootstrap without relying on another resolver.",
+        "guide.mikrotik.s4": "Check <strong>Allow Remote Requests</strong> so the router serves DNS to your LAN.",
+        "guide.mikrotik.s5": "Point LAN clients to the router via DHCP: <strong>IP</strong> → <strong>DHCP Server</strong> → <strong>Networks</strong> → <em>DNS Servers</em> = router's LAN IP.",
+        "guide.mikrotik.cli": "Terminal equivalent (<code>/terminal</code>):",
 
         // Guide Steps - Browsers
         "guide.browser.ff": "<strong>Firefox:</strong> Settings → Privacy & Security → DNS over HTTPS → Max Protection → Custom provider: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
