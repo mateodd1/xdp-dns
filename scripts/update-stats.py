@@ -53,7 +53,23 @@ def save_json(filepath, data):
     except Exception as e:
         print(f"Error saving {filepath}: {e}")
 
+CUSTOM_ASN_NAMES = {
+    '12479': 'Orange Espagne SA',
+    '14593': 'SpaceX Starlink',
+    '27277': 'SpaceX Starlink',
+    '397446': 'SpaceX Starlink',
+}
+
+def normalize_cached_asns(cache_dict):
+    for ip, data in list(cache_dict.items()):
+        c_asn = str(data.get("asn", "")).strip().upper().replace('AS', '')
+        if c_asn in CUSTOM_ASN_NAMES:
+            data["name"] = f"AS{c_asn} ({CUSTOM_ASN_NAMES[c_asn]})"
+        elif data.get("name", ""):
+            data["name"] = re.sub(r'\((AS\s*[-–]\s*|[-–]\s*)', '(', data["name"], flags=re.IGNORECASE)
+
 asn_cache = load_json(ASN_CACHE_FILE, {})
+normalize_cached_asns(asn_cache)
 
 def is_local_ip(ip_str):
     if not ip_str or ip_str in ["127.0.0.1", "::1", "localhost"]:
@@ -72,6 +88,9 @@ def resolve_asn(ip_str):
     
     if ip_str in asn_cache:
         cached = asn_cache[ip_str]
+        c_asn = str(cached.get("asn", "0")).strip().upper().replace('AS', '')
+        if c_asn in CUSTOM_ASN_NAMES:
+            cached["name"] = f"AS{c_asn} ({CUSTOM_ASN_NAMES[c_asn]})"
         return cached.get("name"), cached.get("asn", "0"), cached.get("country", "")
 
     try:
@@ -105,12 +124,19 @@ def resolve_asn(ip_str):
         parts = asn_name_raw.split("|")
         country = parts[1].strip() if len(parts) >= 2 else ""
         raw_name = parts[-1].strip() if len(parts) >= 5 else f"AS{asn}"
-        if "-" in raw_name:
-            org = raw_name.split("-", 1)[1].strip()
+        
+        asn_clean_key = str(asn).strip().upper().replace('AS', '')
+        if asn_clean_key in CUSTOM_ASN_NAMES:
+            clean_name = CUSTOM_ASN_NAMES[asn_clean_key]
         else:
-            org = raw_name.strip()
-        org = re.sub(r",\s*[A-Z]{2}$", "", org).strip()
-        clean_name = re.sub(r'[,_]+', ' ', org).strip()
+            if "-" in raw_name:
+                org = raw_name.split("-", 1)[1].strip()
+            else:
+                org = raw_name.strip()
+            org = re.sub(r",\s*[A-Z]{2}$", "", org).strip()
+            org = re.sub(r'^(AS\s*[-–]\s*|[-–]\s*|AS\s+)', '', org, flags=re.IGNORECASE).strip()
+            clean_name = re.sub(r'[,_]+', ' ', org).strip()
+            
         formatted_name = f"AS{asn} ({clean_name})"
 
         asn_cache[ip_str] = {"name": formatted_name, "asn": asn, "country": country}
