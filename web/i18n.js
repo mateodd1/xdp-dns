@@ -11,6 +11,10 @@ const translations = {
         "copy.copied": "¡Copiado!",
         "nav.back_home": "← Volver al inicio",
         "nav.home": "← Inicio",
+        "nav.stats": "Estadísticas",
+        "nav.about": "Acerca de",
+        "nav.ota": "Bloqueo OTA",
+        "nav.github": "GitHub",
 
         // Protocols
         "doh.desc": "Cifrado de extremo a extremo a través de HTTPS.",
@@ -156,6 +160,10 @@ const translations = {
         "copy.copied": "Copied!",
         "nav.back_home": "← Back to home",
         "nav.home": "← Home",
+        "nav.stats": "Statistics",
+        "nav.about": "About",
+        "nav.ota": "OTA Block",
+        "nav.github": "GitHub",
 
         // Protocols
         "doh.desc": "End-to-end encryption over HTTPS.",
