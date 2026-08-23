@@ -50,17 +50,17 @@
         .back-link {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            font-size: 0.88rem;
-            font-weight: 500;
-            color: var(--text-secondary);
+            color: var(--accent);
             text-decoration: none;
-            transition: color 0.2s ease, transform 0.2s ease;
+            font-size: 0.85rem;
+            font-weight: 500;
+            gap: 6px;
+            transition: opacity 0.2s ease;
         }
 
         .back-link:hover {
-            color: var(--accent);
-            transform: translateX(-2px);
+            opacity: 0.8;
+            text-decoration: underline;
         }
 
         .hero-section {
@@ -505,7 +505,7 @@
         <!-- Site Header -->
         <header>
             <div class="header-top">
-                <a href="/" class="back-link" aria-label="Volver al inicio" data-i18n="nav.back_home">
+                <a href="/" class="back-link" aria-label="Volver al inicio" data-agent-action="navigate-home" data-i18n="nav.back_home">
                     &larr; Volver al inicio
                 </a>
                 <div class="theme-switcher" role="group" aria-label="Seleccionar tema">
