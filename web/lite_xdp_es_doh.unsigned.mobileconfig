@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PayloadDisplayName</key><string>xdp.es Standard DoH DNS</string>
+    <key>PayloadDescription</key><string>Configura DNS cifrado mediante HTTPS (DoH) en lite.xdp.es sin filtrado de publicidad.</string>
+    <key>PayloadOrganization</key><string>xdp.es</string>
+    <key>PayloadIdentifier</key><string>es.xdp.dns.lite.doh.root</string>
+    <key>PayloadScope</key><string>System</string>
+    <key>PayloadType</key><string>Configuration</string>
+    <key>PayloadUUID</key><string>f30c8711-3d32-4e13-92eb-4754742550c4</string>
+    <key>PayloadVersion</key><integer>1</integer>
+    <key>PayloadContent</key>
+    <array><dict>
+        <key>PayloadType</key><string>com.apple.dnsSettings.managed</string>
+        <key>PayloadVersion</key><integer>1</integer>
+        <key>PayloadIdentifier</key><string>es.xdp.dns.lite.doh</string>
+        <key>PayloadUUID</key><string>7149e5d8-6028-43d4-b95a-e753801dccf9</string>
+        <key>PayloadDisplayName</key><string>xdp.es Standard DoH DNS</string>
+        <key>PayloadOrganization</key><string>xdp.es</string>
+        <key>PayloadDescription</key><string>DNS cifrado HTTPS (DoH), DNSSEC y evasión de bloqueos, sin adblock.</string>
+        <key>DNSSettings</key>
+        <dict>
+            <key>DNSProtocol</key><string>HTTPS</string>
+            <key>ServerURL</key><string>https://lite.xdp.es/dns-query</string>
+            <key>ServerAddresses</key><array><string>85.208.114.52</string><string>2a0e:97c0:c40::52</string></array>
+        </dict>
+    </dict></array>
+</dict>
+</plist>

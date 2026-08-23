@@ -1,5 +1,85 @@
 // /root/xpd-dns/web/index.js
 
+const DNS_MODES = {
+    adblock: {
+        doh: 'https://dns.xdp.es/dns-query',
+        dot: 'dns.xdp.es',
+        ipv4: '85.208.114.51',
+        ipv6: '2a0e:97c0:c40::51',
+        dohProfile: 'dns_xdp_es_doh.mobileconfig',
+        dotProfile: 'dns_xdp_es_dot.mobileconfig'
+    },
+    standard: {
+        doh: 'https://lite.xdp.es/dns-query',
+        dot: 'lite.xdp.es',
+        ipv4: '85.208.114.52',
+        ipv6: '2a0e:97c0:c40::52',
+        dohProfile: 'lite_xdp_es_doh.mobileconfig',
+        dotProfile: 'lite_xdp_es_dot.mobileconfig'
+    }
+};
+
+let currentDnsMode = 'adblock';
+
+function copyCurrentEndpoint(key, wrapper) {
+    copyEndpoint(DNS_MODES[currentDnsMode][key], wrapper);
+}
+
+function refreshGuideEndpoints() {
+    const selected = DNS_MODES[currentDnsMode];
+    document.querySelectorAll('[data-platform-guide]').forEach(panel => {
+        if (!panel.dataset.adblockTemplate) panel.dataset.adblockTemplate = panel.innerHTML;
+        panel.innerHTML = panel.dataset.adblockTemplate
+            .replaceAll('https://dns.xdp.es/dns-query', selected.doh)
+            .replaceAll('dns.xdp.es', selected.dot)
+            .replaceAll('85.208.114.51', selected.ipv4)
+            .replaceAll('2a0e:97c0:c40::51', selected.ipv6)
+            .replaceAll('dns_xdp_es_doh.mobileconfig', selected.dohProfile)
+            .replaceAll('dns_xdp_es_dot.mobileconfig', selected.dotProfile);
+    });
+}
+
+function setDnsMode(mode) {
+    if (!DNS_MODES[mode]) return;
+    currentDnsMode = mode;
+    document.body.dataset.dnsMode = mode;
+    try { localStorage.setItem('xdp_dns_mode', mode); } catch (e) {}
+
+    document.querySelectorAll('.dns-mode-btn').forEach(btn => {
+        const active = btn.dataset.dnsMode === mode;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', String(active));
+    });
+
+    const selected = DNS_MODES[mode];
+    document.getElementById('doh-endpoint-value').textContent = selected.doh;
+    document.getElementById('dot-hostname-value').textContent = selected.dot;
+    document.getElementById('ipv4-value').textContent = selected.ipv4;
+    document.getElementById('ipv6-value').textContent = selected.ipv6;
+
+    const dohProfileLink = document.getElementById('profile-doh-link');
+    const dotProfileLink = document.getElementById('profile-dot-link');
+    const dohProfileLabel = document.getElementById('profile-doh-label');
+    const dotProfileLabel = document.getElementById('profile-dot-label');
+    if (dohProfileLink) dohProfileLink.href = selected.dohProfile;
+    if (dotProfileLink) dotProfileLink.href = selected.dotProfile;
+    if (dohProfileLabel) dohProfileLabel.textContent = mode === 'standard' ? 'xdp.es Standard DoH DNS' : 'xdp.es AdBlock DoH DNS';
+    if (dotProfileLabel) dotProfileLabel.textContent = mode === 'standard' ? 'xdp.es Standard DoT DNS' : 'xdp.es AdBlock DoT DNS';
+
+    const dohCard = document.querySelector('[data-agent-protocol="doh"]');
+    const dotCard = document.querySelector('[data-agent-protocol="dot"]');
+    if (dohCard) dohCard.dataset.endpointUrl = selected.doh;
+    if (dotCard) dotCard.dataset.endpointHostname = selected.dot;
+
+    refreshGuideEndpoints();
+
+}
+
+window.addEventListener('langchange', () => {
+    document.querySelectorAll('[data-platform-guide]').forEach(panel => delete panel.dataset.adblockTemplate);
+    setDnsMode(currentDnsMode);
+});
+
 function copyEndpoint(text, wrapper) {
     navigator.clipboard.writeText(text).then(() => {
         const tooltip = wrapper.querySelector('.tooltip');
@@ -123,6 +203,9 @@ function loadStats() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    let savedMode = 'adblock';
+    try { savedMode = localStorage.getItem('xdp_dns_mode') || 'adblock'; } catch (e) {}
+    setDnsMode(savedMode);
     autoSelectPlatformTab();
     loadStats();
     // Auto refresh stats every 30s

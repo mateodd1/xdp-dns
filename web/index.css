@@ -34,6 +34,8 @@
     --theme-toggle-border: #252832;
     --theme-toggle-btn-active-bg: #252832;
     --theme-toggle-btn-active-color: #00d2ff;
+    --adblock-active-bg: rgba(248, 180, 180, 0.22);
+    --adblock-active-color: #f5b7b7;
     color-scheme: dark;
 }
 
@@ -70,6 +72,8 @@
     --theme-toggle-border: #e2e8f0;
     --theme-toggle-btn-active-bg: #ffffff;
     --theme-toggle-btn-active-color: #0284c7;
+    --adblock-active-bg: #fee2e2;
+    --adblock-active-color: #a83b3b;
     color-scheme: light;
 }
 
@@ -88,6 +92,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
     transition: background-color 0.2s ease, color 0.2s ease;
+    touch-action: manipulation;
 }
 
 .container {
@@ -100,11 +105,70 @@ header {
     margin-bottom: 24px;
 }
 
+.dns-mode-selector {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--theme-toggle-border);
+    border-radius: 20px;
+    background: var(--theme-toggle-bg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    flex-shrink: 0;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.dns-mode-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 36px;
+    padding: 6px 12px;
+    border: 0;
+    border-radius: 16px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: .8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color .2s ease, color .2s ease;
+    user-select: none;
+}
+
+.dns-mode-btn:hover {
+    color: var(--text-heading);
+}
+
+.dns-mode-btn.active {
+    background: var(--theme-toggle-btn-active-bg);
+    color: var(--theme-toggle-btn-active-color);
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.dns-mode-btn[data-dns-mode="adblock"].active {
+    background-color: var(--adblock-active-bg);
+    color: var(--adblock-active-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+body[data-dns-mode="standard"] [data-adblock-only] {
+    display: none !important;
+}
+
 .header-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
+}
+
+.header-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 header h1 {
@@ -508,6 +572,14 @@ main {
 
 /* Mobile Responsiveness & Touch Target Optimization */
 @media (max-width: 768px) {
+    button,
+    a,
+    [role="button"],
+    .guide-tab,
+    .copyable-wrapper {
+        touch-action: manipulation;
+    }
+
     .container {
         margin: 20px auto 32px;
         padding: 0 14px;
@@ -524,6 +596,20 @@ main {
     .theme-btn {
         padding: 6px 10px;
         min-height: 38px;
+    }
+
+    .dns-mode-btn {
+        padding: 6px 9px;
+        min-height: 38px;
+        font-size: .76rem;
+    }
+
+    .header-top {
+        align-items: flex-start;
+    }
+
+    .header-controls {
+        gap: 6px;
     }
 
     .theme-btn .theme-text {
@@ -586,6 +672,18 @@ main {
     
     .stat-num {
         font-size: 1.65rem;
+    }
+}
+
+@media (max-width: 520px) {
+    .header-top {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .header-controls {
+        align-self: stretch;
+        justify-content: space-between;
     }
 }
 

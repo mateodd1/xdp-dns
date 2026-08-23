@@ -16,7 +16,7 @@ fi
 
 echo "Firmando perfiles Apple (.mobileconfig) con certificado Let's Encrypt..."
 
-for profile in "dns_xdp_es_doh" "dns_xdp_es_dot" "dns_xdp_es_block_ota_doh"; do
+for profile in "dns_xdp_es_doh" "dns_xdp_es_dot" "dns_xdp_es_block_ota_doh" "lite_xdp_es_doh" "lite_xdp_es_dot"; do
     raw_file="${SRC_DIR}/${profile}.unsigned.mobileconfig"
     target_file="${SRC_DIR}/${profile}.mobileconfig"
     

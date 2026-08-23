@@ -15,6 +15,11 @@ const translations = {
         "nav.about": "Acerca de",
         "nav.github": "GitHub",
 
+        "mode.adblock": "Adblock",
+        "mode.adblock_desc": "Con filtrado",
+        "mode.standard": "Standard",
+        "mode.standard_desc": "Sin filtrado",
+
         // Protocols
         "doh.desc": "Cifrado de extremo a extremo a través de HTTPS.",
         "dot.desc": "Protocolo estándar de DNS sobre TLS.",
@@ -24,8 +29,8 @@ const translations = {
         // Apple Profiles
         "profiles.title": "Perfiles Apple",
         "profiles.desc": "Perfiles de configuración móvil para dispositivos Apple.",
-        "profiles.doh_title": "xdp.es DoH DNS",
-        "profiles.dot_title": "xdp.es DoT DNS",
+        "profiles.doh_title": "xdp.es AdBlock DoH DNS",
+        "profiles.dot_title": "xdp.es AdBlock DoT DNS",
 
         // Setup Guides
         "guide.title": "Guía de Configuración",
@@ -159,6 +164,11 @@ const translations = {
         "nav.about": "About",
         "nav.github": "GitHub",
 
+        "mode.adblock": "Adblock",
+        "mode.adblock_desc": "Filtered",
+        "mode.standard": "Standard",
+        "mode.standard_desc": "Unfiltered",
+
         // Protocols
         "doh.desc": "End-to-end encryption over HTTPS.",
         "dot.desc": "Standard protocol for DNS over TLS.",
@@ -168,8 +178,8 @@ const translations = {
         // Apple Profiles
         "profiles.title": "Apple Profiles",
         "profiles.desc": "Mobile configuration profiles for Apple devices.",
-        "profiles.doh_title": "xdp.es DoH DNS",
-        "profiles.dot_title": "xdp.es DoT DNS",
+        "profiles.doh_title": "xdp.es AdBlock DoH DNS",
+        "profiles.dot_title": "xdp.es AdBlock DoT DNS",
 
         // Setup Guides
         "guide.title": "Setup Guide",

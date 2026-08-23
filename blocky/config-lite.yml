@@ -1,0 +1,45 @@
+ports:
+  dns:
+    - 85.208.114.52:5353
+    - "[2a0e:97c0:c40::52]:5353"
+  tls:
+    - 85.208.114.52:8853
+    - "[2a0e:97c0:c40::52]:8853"
+  http: 127.0.0.1:4002
+
+certFile: /etc/letsencrypt/live/xdp.es/fullchain.pem
+keyFile: /etc/letsencrypt/live/xdp.es/privkey.pem
+
+upstreams:
+  groups:
+    default:
+      - tcp+udp:127.0.0.1:5335
+  strategy: strict
+  timeout: 4s
+
+bootstrapDns:
+  - 127.0.0.1:5335
+
+caching:
+  minTime: 10m
+  maxTime: 24h
+  prefetching: true
+  prefetchExpires: 4h
+  prefetchThreshold: 1
+  cacheTimeNegative: 15m
+
+# Deliberately no blocking section: Lite only provides recursive DNS,
+# DNSSEC validation (via Unbound), and the existing IP-evasion layer.
+prometheus:
+  enable: true
+  path: /metrics
+
+ecs:
+  useAsClient: true
+  forward: false
+
+log:
+  # Keep individual queried names out of the journal.
+  level: warn
+  format: text
+  timestamp: true

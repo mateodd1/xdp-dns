@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>PayloadDisplayName</key>
-    <string>xdp.es DoT DNS</string>
+    <string>xdp.es AdBlock DoT DNS</string>
     <key>PayloadDescription</key>
     <string>Configura DNS cifrado mediante TLS (DoT) en dns.xdp.es con protección contra anuncios y rastreo.</string>
     <key>PayloadOrganization</key>
@@ -30,7 +30,7 @@
             <key>PayloadUUID</key>
             <string>8f12a394-18c7-4921-9876-432190fedcba</string>
             <key>PayloadDisplayName</key>
-            <string>xdp.es DoT DNS</string>
+            <string>xdp.es AdBlock DoT DNS</string>
             <key>PayloadOrganization</key>
             <string>xdp.es</string>
             <key>PayloadDescription</key>

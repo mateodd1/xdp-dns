@@ -15,7 +15,10 @@ import subprocess
 import time
 import re
 
-METRICS_URL = "http://127.0.0.1:4000/metrics"
+METRICS_URLS = (
+    "http://127.0.0.1:4000/metrics",  # Adblock
+    "http://127.0.0.1:4002/metrics",  # Standard / Lite
+)
 STATS_FILES = [
     "/root/xpd-dns/web/stats.json",
     "/root/xpd-dns/web/stats/stats.json",
@@ -233,13 +236,32 @@ def classify_asn(name, asn_num='', country=''):
     return 'datacenter'
 
 def fetch_metrics():
-    try:
-        req = urllib.request.Request(METRICS_URL, headers={"User-Agent": "StatsUpdater/2.1"})
-        with urllib.request.urlopen(req, timeout=5) as response:
-            return response.read().decode("utf-8")
-    except Exception as e:
-        print(f"Error fetching metrics: {e}")
-        return None
+    payloads = []
+    for url in METRICS_URLS:
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "StatsUpdater/2.2"})
+            with urllib.request.urlopen(req, timeout=5) as response:
+                payloads.append(response.read().decode("utf-8"))
+        except Exception as e:
+            # Do not publish a partial snapshot: a missing counter would look
+            # like a service restart and could duplicate historical deltas.
+            print(f"Error fetching metrics from {url}: {e}")
+            return None
+    return payloads
+
+def merge_raw_metrics(parsed_metrics):
+    merged = {
+        "total": 0.0, "blocked": 0.0, "cached": 0.0,
+        "duration_sum": 0.0, "duration_count": 0.0,
+        "query_types": {}, "client_ips": {}
+    }
+    for metrics in parsed_metrics:
+        for key in ("total", "blocked", "cached", "duration_sum", "duration_count"):
+            merged[key] += metrics[key]
+        for key in ("query_types", "client_ips"):
+            for name, count in metrics[key].items():
+                merged[key][name] = merged[key].get(name, 0.0) + count
+    return merged
 
 def parse_raw_metrics(raw_text):
     if not raw_text:
@@ -662,15 +684,16 @@ def build_window_stats(history, window_seconds):
     }
 
 def main():
-    raw_text = fetch_metrics()
-    if not raw_text:
-        print("Warning: unable to scrape Blocky metrics")
+    raw_payloads = fetch_metrics()
+    if not raw_payloads:
+        print("Warning: unable to scrape all Blocky metrics")
         return
 
-    raw_now = parse_raw_metrics(raw_text)
-    if not raw_now:
+    parsed = [parse_raw_metrics(raw_text) for raw_text in raw_payloads]
+    if not all(parsed):
         print("Warning: failed to parse metrics")
         return
+    raw_now = merge_raw_metrics(parsed)
 
     history = update_persistent_history(raw_now)
 
