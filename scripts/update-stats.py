@@ -59,7 +59,8 @@ CUSTOM_ASN_NAMES = {
     '27277': 'SpaceX Starlink',
     '397446': 'SpaceX Starlink',
     '57269': 'DIGI Spain Telecom S.L.U.',
-    '29119': 'Parlem Telecom',
+    '29119': 'AireNetworks',
+    '43590': 'AireNetworks',
     '200845': 'Avatel Telecom S.A.',
 }
 
