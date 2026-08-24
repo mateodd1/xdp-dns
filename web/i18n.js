@@ -145,7 +145,7 @@ const translations = {
         "about.card_encrypted_title": "Cifrado Moderno con DoH3 y DoT",
         "about.card_encrypted_desc": "Soporte completo para DNS sobre HTTP/3 (DoH3 con QUIC) con 0-RTT y sin bloqueo de cabeza de línea, junto con DNS sobre TLS (DoT RFC 7858) para cifrado seguro integrado a nivel de sistema operativo.",
         "about.card_filtering_title": "Filtrado de Publicidad y Rastreo",
-        "about.card_filtering_desc": "Bloqueo preventivo en tiempo real de anuncios invasivos, rastreadores de telemetría y dominios maliciosos, mejorando la velocidad de navegación y el ahorro de datos.",
+        "about.card_filtering_desc": "Bloqueo preventivo en tiempo real de anuncios invasivos, rastreadores de telemetría y dominios maliciosos mediante la lista <a href=\"https://github.com/hagezi/dns-blocklists\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-link\">HaGeZi Multi PRO</a>, mejorando la velocidad de navegación y el ahorro de datos.",
 
         // Section 3: Addresses
         "about.sec_addresses_title": "Direcciones del Servicio",
@@ -333,7 +333,7 @@ const translations = {
         "about.card_encrypted_title": "Modern Encryption with DoH3 & DoT",
         "about.card_encrypted_desc": "Full support for DNS over HTTP/3 (DoH3 with QUIC) offering 0-RTT handshakes and zero head-of-line blocking, alongside standard DNS over TLS (DoT RFC 7858) for native OS-level encryption.",
         "about.card_filtering_title": "Ad & Tracker Filtering",
-        "about.card_filtering_desc": "Real-time proactive filtering of intrusive ads, tracking telemetry, and malicious domains, improving browsing speed and reducing bandwidth usage.",
+        "about.card_filtering_desc": "Real-time proactive filtering of intrusive ads, tracking telemetry, and malicious domains using the <a href=\"https://github.com/hagezi/dns-blocklists\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-link\">HaGeZi Multi PRO</a> list, improving browsing speed and reducing bandwidth usage.",
 
         // Section 3: Addresses
         "about.sec_addresses_title": "Service Addresses",
