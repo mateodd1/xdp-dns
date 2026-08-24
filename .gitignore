@@ -22,3 +22,6 @@ venv/
 .DS_Store
 .vscode/
 .idea/
+
+# Generated dashboard snapshot (written every minute by update-blocked-ips.timer)
+web/blocked/data.json
