@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """dnsleak-gate — observador autoritativo efímero para _check.xdp.es (proyecto xpd-dns).
 Escucha DNS (UDP+TCP) en GATE_IP:53 y expone API HTTP en 127.0.0.1:8088.
-Las observaciones (token, ip_origen) viven <=120 s EN MEMORIA. Sin disco, sin logs."""
-import socket, struct, threading, time, re, json
-import sys
+Las observaciones (token, ip_origen) viven <=120 s EN MEMORIA. Sin disco, sin logs.
+Enriquecimiento opcional: ASN/organización del resolver vía Team Cymru (con caché)."""
+import socket, struct, threading, time, re, json, subprocess
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 GATE_IP   = "85.208.114.54"        # gate dns-leak (IPv4 pública dedicada)
@@ -26,6 +26,47 @@ def record(token, src_ip):
         cutoff = now - OBS_TTL                          # purga perezosa por expiración
         for k in [k for k, v in obs.items() if v and v[-1]["ts"] < cutoff]:
             del obs[k]
+
+# ---------- Enriquecimiento ASN (Team Cymru, igual que generate-blocked-json) ----------
+_asn_cache = {}                     # ip -> {"asn": int|None, "org": str|None}
+ASN_CACHE_TTL = 7 * 24 * 3600       # 7 días
+
+def _dig_txt(query):
+    try:
+        r = subprocess.run(["/usr/bin/dig", "+short", "+time=2", "+tries=1", "TXT", query],
+                           capture_output=True, text=True, timeout=4)
+        lines = [l.strip().strip('"') for l in r.stdout.splitlines() if l.strip()]
+        return lines[0] if lines else None
+    except Exception:
+        return None
+
+def lookup_asn(ip_str):
+    """Devuelve {'asn': int|None, 'org': str|None} para una IP (con caché)."""
+    cached = _asn_cache.get(ip_str)
+    if cached and time.time() - cached[0] < ASN_CACHE_TTL:
+        return cached[1]
+    info = {"asn": None, "org": None}
+    try:
+        import ipaddress
+        ip = ipaddress.ip_address(ip_str)
+        zone = "origin.asn.cymru.com" if ip.version == 4 else "origin6.asn.cymru.com"
+        base = ip.reverse_pointer.rsplit(".", 2)[0]
+        raw = _dig_txt(f"{base}.{zone}")
+        if raw and "|" in raw:
+            fields = [f.strip() for f in raw.split("|")]
+            if fields and fields[0].isdigit():
+                info["asn"] = int(fields[0])
+                org_raw = _dig_txt(f"AS{info['asn']}.asn.cymru.com")
+                if org_raw and "|" in org_raw:
+                    ofields = [f.strip() for f in org_raw.split("|")]
+                    if len(ofields) >= 5 and ofields[4]:
+                        info["org"] = ofields[4].rstrip(",").strip()
+    except Exception:
+        pass
+    _asn_cache[ip_str] = (time.time(), info)
+    if len(_asn_cache) > 10000:
+        _asn_cache.clear()          # salvaguarda anti-crecimiento
+    return info
 
 # ---------- DNS wire ----------
 def read_name(data, off):
@@ -79,23 +120,20 @@ def handle_dns(data, src_ip):
         token = q[: -(len(ZONE) + 1)]
         if TOKEN_RE.match(token):
             record(token, src_ip)
-    return nxdomain(data, qend + 4)   # eco de question COMPLETO: nombre + qtype + qclass
+    return nxdomain(data, qend + 4)
 
 # ---------- listeners DNS ----------
 def udp_loop():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind((GATE_IP, 53))
-    print(f"[udp] escuchando en {GATE_IP}:53", file=sys.stderr, flush=True)
     while True:
         data, addr = s.recvfrom(4096)
-        print(f"[udp] query de {addr[0]} ({len(data)}B)", file=sys.stderr, flush=True)
         try:
             resp = handle_dns(data, addr[0])
             if resp:
                 s.sendto(resp, addr)
-                print(f"[udp] respuesta {len(resp)}B → {addr[0]}", file=sys.stderr, flush=True)
-        except Exception as e:
-            print(f"[udp] ERROR: {e!r}", file=sys.stderr, flush=True)
+        except Exception:
+            pass
 
 def tcp_loop():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -142,10 +180,18 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(404, {"error": "not found"})
         tok = m.group(1).lower()
         now = time.time()
+        seen_ips = []
         with lock:
-            items = [{"src_ip": o["src_ip"], "age": round(now - o["ts"], 1)}
-                     for o in obs.get(tok, []) if now - o["ts"] < OBS_TTL]
-        self._json(200, {"seen": bool(items), "resolvers": items})
+            for o in obs.get(tok, []):
+                if o["src_ip"] not in seen_ips and now - o["ts"] < OBS_TTL:
+                    seen_ips.append(o["src_ip"])
+        resolvers = []
+        for ip in seen_ips:
+            entry = {"src_ip": ip}
+            if ip not in ("85.208.114.51", "85.208.114.52"):
+                entry.update(lookup_asn(ip))          # ASN/org solo para resolutores externos
+            resolvers.append(entry)
+        self._json(200, {"seen": bool(seen_ips), "resolvers": resolvers})
     def _json(self, code, obj):
         body = json.dumps(obj).encode()
         self.send_response(code)

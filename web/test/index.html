@@ -36,96 +36,57 @@
     <link rel="stylesheet" href="/index.css?v=4.1">
     <style>
         .container {
-            max-width: 860px;
+            max-width: 640px;
             margin: 44px auto;
             padding: 0 20px;
         }
 
-        .test-card {
+        .result-card {
             background-color: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 28px;
+            padding: 34px 28px;
             text-align: center;
             box-shadow: var(--shadow-card);
         }
 
-        .check-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--accent-dim);
-            color: var(--accent);
-            border: 1px solid var(--badge-border);
-            padding: 12px 28px;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-        }
+        .verdict { font-size: 1.35rem; font-weight: 700; margin-bottom: 8px; }
+        .verdict.yes  { color: #10b981; }
+        .verdict.no   { color: #ef4444; }
+        .verdict.warn { color: #f59e0b; }
 
-        .check-btn:hover { background-color: rgba(0, 210, 255, 0.2); }
-        .check-btn:active { transform: scale(0.98); }
-        .check-btn:disabled { opacity: 0.5; cursor: wait; }
+        .sub { color: var(--text-secondary); font-size: 0.92rem; margin-top: 4px; }
+
+        .asn-list {
+            list-style: none;
+            padding: 0; margin: 14px 0 0;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+        .asn-list li { padding: 3px 0; font-variant-numeric: tabular-nums; }
 
         .spinner {
-            width: 16px; height: 16px;
-            border: 2px solid var(--accent);
+            display: inline-block;
+            width: 22px; height: 22px;
+            border: 3px solid var(--accent);
             border-top-color: transparent;
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
-            display: none;
         }
-        .testing .spinner { display: inline-block; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .result-box {
-            margin-top: 22px;
-            padding: 18px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            background: var(--bg-code);
-            display: none;
-            text-align: left;
-            font-size: 0.92rem;
-            line-height: 1.6;
-        }
-        .result-box.visible { display: block; }
-
-        .verdict { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; }
-        .verdict.yes { color: #10b981; }
-        .verdict.no  { color: #ef4444; }
-        .verdict.warn{ color: #f59e0b; }
-
-        .resolver-list {
-            list-style: none;
-            padding: 0; margin: 10px 0 0;
-            font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-            font-size: 0.82rem;
-            color: var(--text-secondary);
-        }
-        .resolver-list li { padding: 2px 0; }
-
-        .caveats {
-            margin-top: 24px;
-            padding: 16px 20px;
-            border-radius: 10px;
-            border: 1px dashed var(--border);
+        .retry {
+            display: inline-block;
+            margin-top: 18px;
             color: var(--text-muted);
             font-size: 0.85rem;
-            line-height: 1.6;
-            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-decoration: underline;
         }
-        .caveats strong { color: var(--text-secondary); }
-
-        .privacy-note {
-            margin-top: 14px;
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            opacity: 0.85;
-        }
+        .retry:hover { color: var(--text-primary); }
 
         @media (prefers-reduced-motion: reduce) {
             .spinner { animation: none; }
@@ -156,33 +117,15 @@
         </header>
 
         <main>
-            <h1 style="font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px;">
-                ¿Navegas a través de XDP?
+            <h1 style="font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 22px;">
+                ¿Navegas por XDP?
             </h1>
-            <p style="color: var(--text-secondary); max-width: 620px; margin: 0 auto 26px; font-size: 0.95rem; line-height: 1.55;">
-                Comprueba si tu dispositivo está utilizando los servidores DNS de XDP para resolver dominios.
-            </p>
 
-            <div class="test-card">
-                <button type="button" class="check-btn" id="check-btn">
-                    <span class="spinner" aria-hidden="true"></span>
-                    <span id="btn-label">Comprobar ahora</span>
-                </button>
-
-                <div class="result-box" id="result" aria-live="polite"></div>
-
-                <div class="caveats">
-                    <strong>Limitaciones conocidas:</strong><br>
-                    • Si tu navegador usa su propio DNS seguro (DoH) o activaste iCloud Private Relay,
-                    el test puede dar negativo aunque tengas XDP configurado.<br>
-                    • VPNs con DNS propio también producen falso negativo.<br>
-                    • El resultado refleja únicamente este dispositivo y esta red.
+            <div class="result-card">
+                <div id="status" aria-live="polite">
+                    <span class="spinner" role="status"></span>
                 </div>
-
-                <div class="privacy-note">
-                    🔒 Privacidad: el test genera un token aleatorio único que solo existe durante
-                    segundos en memoria del servidor. No se guardan IPs de navegación ni historiales.
-                </div>
+                <button type="button" class="retry" id="retry" hidden>Repetir test</button>
             </div>
         </main>
 
@@ -200,17 +143,14 @@
     <script src="/theme.js?v=4.0"></script>
     <script>
         (function() {
-            const btn = document.getElementById('check-btn');
-            const label = document.getElementById('btn-label');
-            const box = document.getElementById('result');
-            let running = false;
+            const statusEl = document.getElementById('status');
+            const retryBtn = document.getElementById('retry');
 
             function makeToken() {
                 return [...crypto.getRandomValues(new Uint8Array(4))]
                     .map(b => b.toString(16).padStart(2, '0')).join('');
             }
 
-            // IP → servicio (egreso de cada cadena Unbound)
             function serviceName(ip) {
                 if (ip === '85.208.114.51') return 'XDP AdBlock';
                 if (ip === '85.208.114.52') return 'XDP Standard';
@@ -218,73 +158,66 @@
             }
 
             function fireBeacons(token) {
-                const fire = () => {
-                    const url = 'https://' + token + '._check.xdp.es/pixel.gif?t=' + Date.now();
-                    new Image().src = url;                                   // vía <img>
-                    fetch(url, { mode: 'no-cors', cache: 'no-store' }).catch(() => {}); // vía fetch
-                };
-                fire();
-                setTimeout(fire, 2500); // refuerzo a mitad de la ventana de polling
+                const url = 'https://' + token + '._check.xdp.es/pixel.gif?t=' + Date.now();
+                new Image().src = url;
+                fetch(url, { mode: 'no-cors', cache: 'no-store' }).catch(() => {});
             }
 
-            async function pollWatch(token, attempts) {
-                for (let i = 0; i < attempts; i++) {
+            async function pollWatch(token) {
+                for (let i = 0; i < 10; i++) {
                     await new Promise(r => setTimeout(r, 1000));
                     try {
                         const r = await fetch('/test/api/watch/' + token, { cache: 'no-store' });
                         const d = await r.json();
-                        if (d.seen && d.resolvers.length) return d.resolvers.map(x => x.src_ip);
+                        if (d.seen && d.resolvers.length) return d.resolvers;
                     } catch (e) { /* reintento */ }
                 }
                 return [];
             }
 
-            function render(resolverIps) {
-                const services = [...new Set(resolverIps.map(serviceName).filter(Boolean))];
-                let html;
-
-                if (services.length > 0) {
-                    html = '<div class="verdict yes">✅ Sí — estás usando ' +
-                           services.join(' + ') + '</div>' +
-                           '<p>Tu conexión resuelve los dominios a través de los DNS de XDP.</p>';
-                } else if (resolverIps.length > 0) {
-                    html = '<div class="verdict no">❌ No estás usando XDP</div>' +
-                           '<p>Tu tráfico DNS sale por estos resolutores:</p>' +
-                           '<ul class="resolver-list">' +
-                           resolverIps.map(ip => '<li>' + ip.replace(/[^0-9a-fA-F.:]/g, '') +
-                           ' · <a href="https://rdap.org/ip/' + ip.replace(/[^0-9a-fA-F.:]/g, '') +
-                           '" target="_blank" rel="noopener noreferrer">ver propietario</a></li>').join('') +
-                           '</ul>' +
-                           '<p style="margin-top:8px;">Configura XDP siguiendo las guías de la portada.</p>';
-                } else {
-                    html = '<div class="verdict warn">⚠️ No se pudo determinar</div>' +
-                           '<p>Posibles causas: DNS-over-HTTPS del navegador, iCloud Private Relay o una VPN.</p>';
-                }
-
-                box.innerHTML = html;
-                box.classList.add('visible');
-                btn.disabled = false;
-                btn.classList.remove('testing');
-                label.textContent = 'Repetir test';
-                running = false;
+            function show(html, retryable) {
+                statusEl.innerHTML = html;
+                retryBtn.hidden = !retryable;
             }
 
             async function runTest() {
-                if (running) return;
-                running = true;
-                btn.disabled = true;
-                label.textContent = 'Comprobando…';
-                btn.classList.add('testing');
-                box.classList.remove('visible');
+                retryBtn.hidden = true;
+                statusEl.innerHTML = '<span class="spinner" role="status"></span>';
 
                 const token = makeToken();
                 fireBeacons(token);
 
-                const ips = await pollWatch(token, 8);
-                render(ips);
+                // Refuerzo a mitad de ventana por si algún resolver es lento
+                setTimeout(() => fireBeacons(token), 2500);
+
+                const resolvers = await pollWatch(token);
+
+                if (resolvers.length === 0) {
+                    show('<div class="verdict warn">⚠️ No se pudo determinar</div>' +
+                         '<p class="sub">¿Usas DoH en el navegador, Private Relay o una VPN?</p>', true);
+                    return;
+                }
+
+                const services = [...new Set(resolvers.map(r => serviceName(r.src_ip)).filter(Boolean))];
+
+                if (services.length > 0) {
+                    show('<div class="verdict yes">✅ Sí — ' + services.join(' + ') + '</div>' +
+                         '<p class="sub">Tu conexión resuelve a través de XDP.</p>', true);
+                } else {
+                    const lines = resolvers.map(r => {
+                        if (!/^[0-9a-fA-F.:]+$/.test(r.src_ip)) return '';
+                        const asn = r.asn ? 'AS' + r.asn : 'ASN desconocido';
+                        const org = r.org ? ' · ' + r.org : '';
+                        return '<li>' + asn + org + ' — ' + r.src_ip + '</li>';
+                    }).join('');
+                    show('<div class="verdict no">❌ No usas XDP</div>' +
+                         '<p class="sub">Tus resolutores DNS:</p>' +
+                         '<ul class="asn-list">' + lines + '</ul>', true);
+                }
             }
 
-            btn.addEventListener('click', runTest);
+            retryBtn.addEventListener('click', runTest);
+            runTest();          // automático al cargar
         })();
     </script>
 </body>
