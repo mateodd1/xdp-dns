@@ -2,8 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="blocked.page_title">Monitor de Evasión de Bloqueos | xdp.es DNS</title>
+    <meta name="description" content="Monitor interno de IPs bloqueadas y rutas de evasión dinámicas del DNS de xdp.es.">
     <meta name="robots" content="noindex, nofollow, noarchive">
 
     <!-- Anti-FOIT Instant Theme Loader -->
@@ -20,15 +21,20 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+    </noscript>
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
 
-    <link rel="stylesheet" href="/index.css?v=3.9">
+    <link rel="stylesheet" href="/index.css?v=4.0">
     <style>
         .container {
             max-width: 1040px;
@@ -476,6 +482,18 @@
             font-size: 0.92rem;
         }
 
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
         /* Mobile Switch Breakpoint */
         @media (max-width: 767px) {
             .desktop-view {
@@ -510,7 +528,7 @@
                 </a>
                 <div class="theme-switcher" role="group" aria-label="Seleccionar tema">
                     <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="5"></circle>
                             <line x1="12" y1="1" x2="12" y2="3"></line>
                             <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -524,13 +542,13 @@
                         <span class="theme-text" data-i18n="theme.light">Claro</span>
                     </button>
                     <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                         <span class="theme-text" data-i18n="theme.dark">Oscuro</span>
                     </button>
                     <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático" aria-label="Automático">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                             <line x1="8" y1="21" x2="16" y2="21"></line>
                             <line x1="12" y1="17" x2="12" y2="21"></line>
@@ -546,7 +564,7 @@
             <div class="hero-section">
                 <div class="hero-badge-container">
                     <div class="status-badge-live" id="live-badge">
-                        <span class="pulse-dot"></span>
+                        <span class="pulse-dot" aria-hidden="true"></span>
                         <span id="live-text" data-i18n="blocked.live_checking">Comprobando estado...</span>
                     </div>
                 </div>
@@ -577,13 +595,14 @@
             <!-- Controls: Search & Filters -->
             <div class="controls-card">
                 <div class="search-wrapper">
+                    <label class="visually-hidden" for="search-input">Buscar IP o prefijo</label>
                     <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <input type="text" class="search-input" id="search-input" placeholder="Buscar IP o prefijo..." data-i18n-placeholder="blocked.search_placeholder">
                 </div>
                 <div class="filter-buttons">
-                    <button class="filter-btn active" data-filter="all" data-i18n="blocked.filter_all">Todas</button>
-                    <button class="filter-btn" data-filter="cf" data-i18n="blocked.filter_cf">Cloudflare</button>
-                    <button class="filter-btn" data-filter="other" data-i18n="blocked.filter_other">Otras CDN</button>
+                    <button class="filter-btn active" data-filter="all" aria-pressed="true" data-i18n="blocked.filter_all">Todas</button>
+                    <button class="filter-btn" data-filter="cf" aria-pressed="false" data-i18n="blocked.filter_cf">Cloudflare</button>
+                    <button class="filter-btn" data-filter="other" aria-pressed="false" data-i18n="blocked.filter_other">Otras CDN</button>
                 </div>
                 <button class="refresh-btn" id="refresh-btn">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
@@ -595,13 +614,14 @@
             <div class="desktop-view">
                 <div class="table-container">
                     <table class="blocked-table">
+                        <caption class="visually-hidden">Listado de IPs bloqueadas, su red de origen y rutas de evasión activas</caption>
                         <thead>
                             <tr>
-                                <th data-i18n="blocked.th_ip">IP Bloqueada</th>
-                                <th data-i18n="blocked.th_network">Red / Proveedor</th>
-                                <th data-i18n="blocked.th_prefix">Prefijo BGP</th>
-                                <th data-i18n="blocked.th_alternative">IP Alternativa (Evasión)</th>
-                                <th data-i18n="blocked.th_status">Estado</th>
+                                <th scope="col" data-i18n="blocked.th_ip">IP Bloqueada</th>
+                                <th scope="col" data-i18n="blocked.th_network">Red / Proveedor</th>
+                                <th scope="col" data-i18n="blocked.th_prefix">Prefijo BGP</th>
+                                <th scope="col" data-i18n="blocked.th_alternative">IP Alternativa (Evasión)</th>
+                                <th scope="col" data-i18n="blocked.th_status">Estado</th>
                             </tr>
                         </thead>
                         <tbody id="desktop-table-body">
@@ -629,11 +649,18 @@
                 </div>
             </div>
         </main>
+
+        <footer class="site-footer">
+            <div>xdp.es DNS</div>
+            <div class="site-footer-links">
+                <a href="/about" class="site-footer-link" data-i18n="nav.about">Acerca de</a>
+            </div>
+        </footer>
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=3.9"></script>
-    <script src="/theme.js?v=3.9"></script>
+    <script src="/i18n.js?v=4.0"></script>
+    <script src="/theme.js?v=4.0"></script>
     <script>
         let allEntries = [];
         let filteredEntries = [];
@@ -646,16 +673,53 @@
             return (window.i18n && window.i18n.t(key)) || fallback;
         }
 
-        function copyToClipboard(text, btn) {
-            navigator.clipboard.writeText(text).then(() => {
-                const originalHtml = btn.innerHTML;
-                const copiedLabel = t('blocked.copied', '✓ Copiado');
-                btn.innerHTML = `<span style="color: #10b981; font-weight: 700;">${copiedLabel}</span>`;
-                setTimeout(() => { btn.innerHTML = originalHtml; }, 1400);
-            });
+        function markCopy(btn, ok) {
+            const originalHtml = btn.innerHTML;
+            const copiedLabel = t('blocked.copied', '✓ Copiado');
+            const failedLabel = t('blocked.copy_failed', '✗ Error');
+            btn.innerHTML = ok
+                ? `<span style="color: #10b981; font-weight: 700;">${copiedLabel}</span>`
+                : `<span style="color: #ef4444; font-weight: 700;">${failedLabel}</span>`;
+            setTimeout(() => { btn.innerHTML = originalHtml; }, 1400);
         }
 
-        function filterAndRender() {
+        function fallbackCopy(text, btn) {
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.setAttribute('readonly', '');
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                const ok = document.execCommand('copy');
+                document.body.removeChild(ta);
+                markCopy(btn, ok);
+            } catch (e) {
+                markCopy(btn, false);
+            }
+        }
+
+        function copyToClipboard(text, btn) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text)
+                    .then(() => markCopy(btn, true))
+                    .catch(() => fallbackCopy(text, btn));
+            } else {
+                fallbackCopy(text, btn);
+            }
+        }
+
+        function esc(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function filterAndRender(keepPage) {
             filteredEntries = allEntries.filter(item => {
                 if (currentFilter === 'cf' && !item.is_cloudflare) return false;
                 if (currentFilter === 'other' && item.is_cloudflare) return false;
@@ -672,7 +736,7 @@
                 return true;
             });
 
-            currentPage = 1;
+            if (!keepPage) currentPage = 1;
             renderViews();
         }
 
@@ -688,7 +752,7 @@
                 const emptyMsg = allEntries.length === 0 ? noBlocksMsg : notFoundMsg;
                 desktopBody.innerHTML = `<tr><td colspan="5" class="empty-state">${emptyMsg}</td></tr>`;
                 mobileBody.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
-                document.getElementById('pagination-info').innerText = `0 / ${allEntries.length}`;
+                document.getElementById('pagination-info').textContent = `0 / ${allEntries.length}`;
                 document.getElementById('prev-page').disabled = true;
                 document.getElementById('next-page').disabled = true;
                 return;
@@ -723,17 +787,17 @@
                     <tr>
                         <td>
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span class="ip-banned mono">${item.blocked_ip}</span>
-                                <button class="copy-btn-touch" onclick="copyToClipboard('${item.blocked_ip}', this)" title="${copyLabel}">📋</button>
+                                <span class="ip-banned mono">${esc(item.blocked_ip)}</span>
+                                <button type="button" class="copy-btn-touch" data-copy="${esc(item.blocked_ip)}" title="${copyLabel}" aria-label="${copyLabel} ${esc(item.blocked_ip)}">📋</button>
                             </div>
                         </td>
                         <td>${cfBadge}</td>
-                        <td><span class="mono" style="font-size: 0.78rem; color: var(--text-muted);">${item.prefix}</span></td>
+                        <td><span class="mono" style="font-size: 0.78rem; color: var(--text-muted);">${esc(item.prefix)}</span></td>
                         <td>
                             ${isEvaded ? `
                                 <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span class="ip-alt mono">${item.alternative_ip}</span>
-                                    <button class="copy-btn-touch" onclick="copyToClipboard('${item.alternative_ip}', this)" title="${copyLabel}">📋</button>
+                                    <span class="ip-alt mono">${esc(item.alternative_ip)}</span>
+                                    <button type="button" class="copy-btn-touch" data-copy="${esc(item.alternative_ip)}" title="${copyLabel}" aria-label="${copyLabel} ${esc(item.alternative_ip)}">📋</button>
                                 </div>
                             ` : `<span style="color: var(--text-muted); font-style: italic;">${statusIntactLabel}</span>`}
                         </td>
@@ -756,12 +820,12 @@
                         </div>
 
                         <div class="card-ip-block">
-                            <span class="ip-banned mono">${item.blocked_ip}</span>
-                            <button class="copy-btn-touch" onclick="copyToClipboard('${item.blocked_ip}', this)">📋 ${copyLabel}</button>
+                            <span class="ip-banned mono">${esc(item.blocked_ip)}</span>
+                            <button type="button" class="copy-btn-touch" data-copy="${esc(item.blocked_ip)}" aria-label="${copyLabel} ${esc(item.blocked_ip)}">📋 ${copyLabel}</button>
                         </div>
 
                         <div class="card-meta-row">
-                            <span>${cardPrefixLabel} <strong class="mono" style="color: var(--text-primary);">${item.prefix}</strong></span>
+                            <span>${cardPrefixLabel} <strong class="mono" style="color: var(--text-primary);">${esc(item.prefix)}</strong></span>
                             ${isEvaded 
                                 ? `<span style="color: #10b981; font-weight: 700;">● ${statusEvadedLabel}</span>`
                                 : `<span style="color: var(--text-muted);">● ${statusIntactLabel}</span>`}
@@ -773,9 +837,9 @@
                                     <div style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: #10b981; margin-bottom: 2px;">
                                         ${cardCleanLabel}
                                     </div>
-                                    <span class="ip-alt mono">${item.alternative_ip}</span>
+                                    <span class="ip-alt mono">${esc(item.alternative_ip)}</span>
                                 </div>
-                                <button class="copy-btn-touch" style="border-color: rgba(16, 185, 129, 0.3); color: #10b981;" onclick="copyToClipboard('${item.alternative_ip}', this)">📋 ${copyLabel}</button>
+                                <button type="button" class="copy-btn-touch" style="border-color: rgba(16, 185, 129, 0.3); color: #10b981;" data-copy="${esc(item.alternative_ip)}" aria-label="${copyLabel} ${esc(item.alternative_ip)}">📋 ${copyLabel}</button>
                             </div>
                         ` : ''}
                     </div>
@@ -786,7 +850,7 @@
             mobileBody.innerHTML = mobileHtml;
 
             const endIdx = Math.min(startIdx + pageSize, total);
-            document.getElementById('pagination-info').innerText = `${startIdx + 1}-${endIdx} / ${total} (${allEntries.length})`;
+            document.getElementById('pagination-info').textContent = `${startIdx + 1}-${endIdx} / ${total} (${allEntries.length})`;
             document.getElementById('prev-page').disabled = currentPage <= 1;
             document.getElementById('next-page').disabled = currentPage >= totalPages;
         }
@@ -799,42 +863,56 @@
             if (data && data.evasion_active && data.total_blocked > 0) {
                 liveBadge.className = 'status-badge-live';
                 const tpl = t('blocked.live_active', 'Evasión Activa ({count} IPs)');
-                liveText.innerText = tpl.replace('{count}', data.total_blocked);
+                liveText.textContent = tpl.replace('{count}', data.total_blocked);
             } else {
                 liveBadge.className = 'status-badge-live inactive';
-                liveText.innerText = t('blocked.live_inactive', 'Sin bloqueos activos (Directo)');
+                liveText.textContent = t('blocked.live_inactive', 'Sin bloqueos activos (Directo)');
             }
         }
 
         let cachedData = null;
+        let loadController = null;
 
-        function loadBlockedData() {
+        function renderLoadError() {
+            if (allEntries.length > 0) return; // keep last known good data on screen
+            const errorMsg = t('blocked.load_error', '⚠️ No se pudieron cargar los datos. Pulsa «Actualizar» para reintentar.');
+            document.getElementById('desktop-table-body').innerHTML = `<tr><td colspan="5" class="empty-state">${errorMsg}</td></tr>`;
+            document.getElementById('mobile-cards-body').innerHTML = `<div class="empty-state">${errorMsg}</div>`;
+        }
+
+        async function loadBlockedData() {
             const refreshBtn = document.getElementById('refresh-btn');
             if (refreshBtn) refreshBtn.classList.add('spinning');
 
-            fetch('/blocked/data.json?t=' + Date.now())
-                .then(r => {
-                    if (!r.ok) throw new Error('Network error');
-                    return r.json();
-                })
-                .then(data => {
-                    cachedData = data;
-                    allEntries = data.entries || [];
-                    
-                    updateLiveBadge(data);
+            if (loadController) loadController.abort();
+            loadController = new AbortController();
+            const controller = loadController;
 
-                    document.getElementById('stat-total').innerText = (data.total_blocked || 0).toLocaleString();
-                    document.getElementById('stat-cf').innerText = (data.cf_blocked_count || 0).toLocaleString();
-                    document.getElementById('stat-evaded').innerText = (data.evaded_count || 0).toLocaleString();
+            try {
+                const response = await fetch('/blocked/data.json?t=' + Date.now(), { signal: controller.signal });
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                const data = await response.json();
 
-                    filterAndRender();
-                })
-                .catch(err => {
+                cachedData = data;
+                allEntries = data.entries || [];
+
+                updateLiveBadge(data);
+
+                document.getElementById('stat-total').textContent = (data.total_blocked || 0).toLocaleString();
+                document.getElementById('stat-cf').textContent = (data.cf_blocked_count || 0).toLocaleString();
+                document.getElementById('stat-evaded').textContent = (data.evaded_count || 0).toLocaleString();
+
+                filterAndRender(true);
+            } catch (err) {
+                if (!controller.signal.aborted) {
                     console.error('Error loading data:', err);
-                })
-                .finally(() => {
-                    if (refreshBtn) refreshBtn.classList.remove('spinning');
-                });
+                    renderLoadError();
+                }
+            } finally {
+                if (!controller.signal.aborted && refreshBtn) {
+                    refreshBtn.classList.remove('spinning');
+                }
+            }
         }
 
         window.addEventListener('langchange', () => {
@@ -847,16 +925,25 @@
 
             const searchInput = document.getElementById('search-input');
             if (searchInput) {
+                let searchTimer = null;
                 searchInput.addEventListener('input', (e) => {
-                    currentSearch = e.target.value.trim();
-                    filterAndRender();
+                    clearTimeout(searchTimer);
+                    const value = e.target.value.trim();
+                    searchTimer = setTimeout(() => {
+                        currentSearch = value;
+                        filterAndRender();
+                    }, 200);
                 });
             }
 
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('active');
+                        b.setAttribute('aria-pressed', 'false');
+                    });
                     btn.classList.add('active');
+                    btn.setAttribute('aria-pressed', 'true');
                     currentFilter = btn.dataset.filter;
                     filterAndRender();
                 });
@@ -875,10 +962,34 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
+            // Copy buttons (event delegation, works for desktop table and mobile cards)
+            const handleCopyClick = (e) => {
+                const btn = e.target.closest('button[data-copy]');
+                if (btn) copyToClipboard(btn.dataset.copy, btn);
+            };
+            document.getElementById('desktop-table-body').addEventListener('click', handleCopyClick);
+            document.getElementById('mobile-cards-body').addEventListener('click', handleCopyClick);
+
             document.getElementById('refresh-btn').addEventListener('click', loadBlockedData);
 
-            // Auto-refresh every 30 seconds
-            setInterval(loadBlockedData, 30000);
+            // Auto-refresh every 30s while the tab is visible
+            let refreshTimer = null;
+            const stopAutoRefresh = () => {
+                if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; }
+            };
+            const startAutoRefresh = () => {
+                stopAutoRefresh();
+                refreshTimer = setInterval(loadBlockedData, 30000);
+            };
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    stopAutoRefresh();
+                } else {
+                    loadBlockedData();
+                    startAutoRefresh();
+                }
+            });
+            startAutoRefresh();
         });
     </script>
 </body>

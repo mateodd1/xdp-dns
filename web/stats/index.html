@@ -37,6 +37,11 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    </noscript>
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -215,16 +220,17 @@
         .theme-btn {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             background: none;
             border: none;
-            padding: 5px 10px;
+            padding: 6px 12px;
+            min-height: 36px;
             border-radius: 16px;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             font-weight: 500;
             color: var(--text-secondary);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background-color 0.2s ease, color 0.2s ease;
             user-select: none;
         }
 
@@ -829,7 +835,7 @@
                 </a>
                 <div class="theme-switcher" role="group" aria-label="Seleccionar tema">
                         <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro" data-agent-action="set-light-theme">
-                            <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="5"></circle>
                                 <line x1="12" y1="1" x2="12" y2="3"></line>
                                 <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -843,13 +849,13 @@
                             <span class="theme-text" data-i18n="theme.light">Claro</span>
                         </button>
                         <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro" data-agent-action="set-dark-theme">
-                            <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                             </svg>
                             <span class="theme-text" data-i18n="theme.dark">Oscuro</span>
                         </button>
                         <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático según el sistema" aria-label="Automático" data-agent-action="set-auto-theme">
-                            <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                                 <line x1="8" y1="21" x2="16" y2="21"></line>
                                 <line x1="12" y1="17" x2="12" y2="21"></line>
@@ -882,7 +888,7 @@
                         <span class="metric-sub" id="sub-blocked-24h">-</span>
                     </div>
                     <div class="metric-card" data-agent-metric="evaded-queries">
-                        <span class="metric-title" data-i18n="stats.card_evaded">IPs Reemplazadas</span>
+                        <span class="metric-title" data-i18n="stats.card_evaded">Consultas Reemplazadas</span>
                         <span class="metric-value green" id="val-evaded-24h">...</span>
                         <span class="metric-sub" id="sub-evaded-24h">-</span>
                     </div>
@@ -940,7 +946,7 @@
                         <span class="metric-sub" id="sub-blocked-30d">-</span>
                     </div>
                     <div class="metric-card" data-agent-metric="evaded-queries-30d">
-                        <span class="metric-title" data-i18n="stats.card_evaded">IPs Reemplazadas</span>
+                        <span class="metric-title" data-i18n="stats.card_evaded">Consultas Reemplazadas</span>
                         <span class="metric-value green" id="val-evaded-30d">...</span>
                         <span class="metric-sub" id="sub-evaded-30d">-</span>
                     </div>
@@ -1012,8 +1018,8 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=3.2"></script>
-    <script src="/theme.js?v=3.2" defer></script>
+    <script src="/i18n.js?v=4.0"></script>
+    <script src="/theme.js?v=4.0" defer></script>
     <script>
         // Tab Switching
         function switchTab(interval) {

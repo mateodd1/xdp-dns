@@ -88,7 +88,7 @@ const translations = {
         "stats.tab_30d": "30 Días",
         "stats.card_total": "Total Consultas",
         "stats.card_blocked": "Consultas Bloqueadas",
-        "stats.card_evaded": "IPs Reemplazadas",
+        "stats.card_evaded": "Consultas Reemplazadas",
         "stats.card_cached": "Caché Hit",
         "stats.card_latency": "Latencia Media",
         "stats.table_asn": "Top ASNs",
@@ -147,7 +147,9 @@ const translations = {
         "about.card_filtering_desc": "Bloqueo preventivo en tiempo real de anuncios invasivos, rastreadores de telemetría y dominios maliciosos, mejorando la velocidad de navegación y el ahorro de datos.",
 
         // Section 3: Addresses
-        "about.sec_addresses_title": "Direcciones de Conexión",
+        "about.sec_addresses_title": "Direcciones del Servicio",
+        "about.svc_adblock_desc": "Bloqueo de publicidad, rastreadores y malware",
+        "about.svc_standard_desc": "Resolución DNS limpia, sin bloqueo de publicidad",
         "about.addr_ipv4": "Dirección IPv4:",
         "about.addr_ipv6": "Dirección IPv6:",
         "about.addr_doh": "Endpoint DoH / DoH3:",
@@ -273,7 +275,7 @@ const translations = {
         "stats.tab_30d": "30 Days",
         "stats.card_total": "Total Queries",
         "stats.card_blocked": "Blocked Queries",
-        "stats.card_evaded": "Replaced IPs",
+        "stats.card_evaded": "Replaced Queries",
         "stats.card_cached": "Cache Hit",
         "stats.card_latency": "Avg Latency",
         "stats.table_asn": "Top ASNs",
@@ -332,7 +334,9 @@ const translations = {
         "about.card_filtering_desc": "Real-time proactive filtering of intrusive ads, tracking telemetry, and malicious domains, improving browsing speed and reducing bandwidth usage.",
 
         // Section 3: Addresses
-        "about.sec_addresses_title": "Connection Addresses",
+        "about.sec_addresses_title": "Service Addresses",
+        "about.svc_adblock_desc": "Blocks ads, trackers and malware",
+        "about.svc_standard_desc": "Clean DNS resolution, no ad blocking",
         "about.addr_ipv4": "IPv4 Address:",
         "about.addr_ipv6": "IPv6 Address:",
         "about.addr_doh": "DoH / DoH3 Endpoint:",

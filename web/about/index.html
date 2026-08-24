@@ -56,7 +56,7 @@
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="manifest" href="/site.webmanifest">
 
-    <link rel="stylesheet" href="/index.css">
+    <link rel="stylesheet" href="/index.css?v=4.0">
     <style>
         .hero-section {
             text-align: center;
@@ -253,7 +253,7 @@
                 </a>
                 <div class="theme-switcher" role="group" aria-label="Seleccionar tema">
                     <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="5"></circle>
                             <line x1="12" y1="1" x2="12" y2="3"></line>
                             <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -267,13 +267,13 @@
                         <span class="theme-text" data-i18n="theme.light">Claro</span>
                     </button>
                     <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                         <span class="theme-text" data-i18n="theme.dark">Oscuro</span>
                     </button>
                     <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático" aria-label="Automático">
-                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                             <line x1="8" y1="21" x2="16" y2="21"></line>
                             <line x1="12" y1="17" x2="12" y2="21"></line>
@@ -350,12 +350,17 @@
                 </div>
             </div>
 
-            <!-- Section 3: Connection Addresses Table -->
+            <!-- Section 3: Service Addresses -->
             <div class="section-header">
-                <h2 class="section-title">📋 <span data-i18n="about.sec_addresses_title">Direcciones de Conexión</span></h2>
+                <h2 class="section-title">📋 <span data-i18n="about.sec_addresses_title">Direcciones del Servicio</span></h2>
             </div>
 
-            <div class="card" style="margin-bottom: 24px; padding: 6px 16px;">
+            <!-- AdBlock Service -->
+            <div class="card" style="margin-bottom: 12px; padding: 6px 16px;">
+                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 12px 4px 4px;">
+                    <span class="pill-badge">🛡️ AdBlock</span>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;" data-i18n="about.svc_adblock_desc">Bloqueo de publicidad, rastreadores y malware</span>
+                </div>
                 <table class="specs-table">
                     <tbody>
                         <tr>
@@ -397,6 +402,54 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Standard Service -->
+            <div class="card" style="margin-bottom: 24px; padding: 6px 16px;">
+                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 12px 4px 4px;">
+                    <span class="pill-badge">🌐 Standard</span>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;" data-i18n="about.svc_standard_desc">Resolución DNS limpia, sin bloqueo de publicidad</span>
+                </div>
+                <table class="specs-table">
+                    <tbody>
+                        <tr>
+                            <th scope="row" data-i18n="about.addr_ipv4">Dirección IPv4:</th>
+                            <td>
+                                <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyValue('85.208.114.52', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyValue('85.208.114.52', this)" aria-label="Copiar dirección IPv4">
+                                    <span class="code-val">85.208.114.52</span>
+                                    <span class="tooltip" data-i18n="copy.tooltip">Click para copiar</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" data-i18n="about.addr_ipv6">Dirección IPv6:</th>
+                            <td>
+                                <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyValue('2a0e:97c0:c40::52', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyValue('2a0e:97c0:c40::52', this)" aria-label="Copiar dirección IPv6">
+                                    <span class="code-val">2a0e:97c0:c40::52</span>
+                                    <span class="tooltip" data-i18n="copy.tooltip">Click para copiar</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" data-i18n="about.addr_doh">Endpoint DoH / DoH3:</th>
+                            <td>
+                                <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyValue('https://lite.xdp.es/dns-query', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyValue('https://lite.xdp.es/dns-query', this)" aria-label="Copiar endpoint DoH">
+                                    <span class="code-val">https://lite.xdp.es/dns-query</span>
+                                    <span class="tooltip" data-i18n="copy.tooltip">Click para copiar</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" data-i18n="about.addr_dot">Endpoint DoT:</th>
+                            <td>
+                                <div class="copyable-wrapper" role="button" tabindex="0" onclick="copyValue('lite.xdp.es', this)" onkeydown="if(event.key==='Enter'||event.key===' ')copyValue('lite.xdp.es', this)" aria-label="Copiar endpoint DoT">
+                                    <span class="code-val">lite.xdp.es</span>
+                                    <span class="tooltip" data-i18n="copy.tooltip">Click para copiar</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </main>
 
         <!-- Site Footer -->
@@ -406,8 +459,8 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=3.2"></script>
-    <script src="/theme.js?v=3.2" defer></script>
+    <script src="/i18n.js?v=4.0"></script>
+    <script src="/theme.js?v=4.0" defer></script>
     <script>
         // Copy-to-clipboard for the addresses table
         function copyValue(text, wrapper) {
