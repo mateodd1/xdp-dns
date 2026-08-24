@@ -13,7 +13,7 @@
    - [4.1 Caddy (Terminador Web, TLS, HTTP/2 y HTTP/3 DoH)](#41-caddy-servidor-web-tls-y-doh3)
    - [4.2 Blocky (Motor Principal de Filtrado, DNS53, DoT y Métricas)](#42-blocky-instancia-principal)
    - [4.3 Blocky OTA (Instancia Aislada para Bloqueo de Actualizaciones Apple)](#43-blocky-ota-instancia-apple-ota)
-   - [4.4 Proxy de Evasión de Bloqueos (evade_proxy.py)](#44-proxy-de-evasión-de-bloqueos-evade_proxypy)
+   - [4.4 Proxy de Evasión de Bloqueos (Rust)](#44-proxy-de-evasión-de-bloqueos-rust)
    - [4.5 Unbound (Resolver Recursivo Raíz y DNSSEC)](#45-unbound-resolver-recursivo-puro)
    - [4.6 dnsproxy (DNS over QUIC / DoQ)](#46-dnsproxy-dns-over-quic--doq)
 5. [Automatizaciones y Temporizadores Systemd](#5-automatizaciones-y-temporizadores-systemd)
@@ -45,38 +45,32 @@
 
 ```text
                                 CLIENTES DNS (Internet)
-      ┌─────────────────────┬──────────────────────┬──────────────────────┐
-      │   DNS Estándar 53   │   DNS over TLS 853   │   DoH / DoH3 (443)   │
-      │     (UDP / TCP)     │      (DoT RFC 7858)  │   (HTTP/2 & HTTP/3)  │
-      └──────────┬──────────┴──────────┬───────────┴──────────┬───────────┘
-                 │                     │                      │
-                 ▼                     ▼                      ▼
-    ┌──────────────────────────────────────────────┐   ┌───────────────────────────┐
-    │          Blocky Principal (53 / 853)         │   │       Caddy (Puerto 443)  │
-    │  - Filtrado Adblock (Hagezi, OISD, etc.)     │   │ - HTTP/3 QUIC 0-RTT       │
-    │  - Termina DoT nativo con ECDSA              │   │ - Certificado *.xdp.es    │
-    │  - Exportador Prometheus en RAM (Port 4000)  │   │ - Termina /dns-query      │
-    └──────────────────────┬───────────────────────┘   └─────────────┬─────────────┘
-                           │                                         │
-                           └─────────────────┬───────────────────────┘
-                                             ▼
-                               ┌───────────────────────────┐
-                               │  Proxy Evasión (Port 5335)│
-                               │  - evade_proxy.py         │
-                               │  - Valida Cloudflare (BGP)│
-                               │  - Reemplazo por IP limpia│
-                               └─────────────┬─────────────┘
-                                             ▼
-                               ┌───────────────────────────┐
-                               │  Unbound (Port 5336)      │
-                               │  - Recursión 100% pura    │
-                               │  - Validación DNSSEC      │
-                               │  - QNAME Minimisation     │
-                               └─────────────┬─────────────┘
-                                             ▼
-                                  SERVIDORES RAÍZ DNS
-                             (a.root-servers.net .. m.root)
+      DNS 53 UDP/TCP ──────────────────────────────┐
+      DoT TCP/853 ─────────────────────────────────┤
+      DoH/DoH3 443 ──→ Caddy ──────────────────────┤→ Blocky (entrada + filtro)
+      DoQ UDP/853 ────→ dnsproxy ──────────────────┘              │
+                                                                  ▼
+                                                        evade-proxy (Rust)
+                                                        5335→5336 principal
+                                                        5337→5338 Lite
+                                                                  │
+                                                                  ▼
+                                                                Unbound
+                                                           recursión + DNSSEC
+                                                                  │
+                                                                  ▼
+                                                       SERVIDORES AUTORITATIVOS
 ```
+
+El perfil principal (`.51`) utiliza Blocky con listas de bloqueo y el recorrido
+Rust `5335 → 5336`. El perfil Lite (`.52`) utiliza su propia instancia de Blocky,
+sin listas publicitarias, y el recorrido `5337 → 5338`; así conserva además una
+IP de salida recursiva diferente.
+
+Caddy nunca consulta directamente al proxy Rust ni a Unbound. Para DoH reenvía
+el mensaje DNS a la interfaz HTTP de la instancia Blocky correspondiente:
+`4000` para el perfil principal, `4001` para OTA y `4002` para Lite. Blocky aplica
+el perfil de bloqueo y solo entonces entrega la consulta al proxy Rust.
 
 ---
 
@@ -88,7 +82,8 @@
 | **DNS over TLS (DoT)** | `dns.xdp.es` | `853` TCP | Cifrado TLS 1.3 nativo, ideal para Android / iOS |
 | **DNS over HTTPS (DoH)** | `https://dns.xdp.es/dns-query` | `443` TCP/UDP | HTTP/2 y HTTP/3 (QUIC) con 0-RTT |
 | **DoH (Bloqueo Apple OTA)**| `https://dns.xdp.es/block-ota/dns-query` | `443` TCP/UDP | Adblock + Bloqueo de actualizaciones iOS/macOS |
-| **DNS over QUIC (DoQ)** | `quic://dns.xdp.es:853` | `853` UDP | RFC 9250 experimental con `dnsproxy` |
+| **DNS over QUIC (DoQ)** | `quic://dns.xdp.es:853` | `853` UDP | RFC 9250; Adblock + evasión + DNSSEC |
+| **DNS over QUIC Lite** | `quic://lite.xdp.es:853` | `853` UDP | RFC 9250; evasión + DNSSEC, sin Adblock |
 
 ---
 
@@ -124,16 +119,44 @@
 * **Puertos**: `127.0.0.1:5354` (DNS) y `127.0.0.1:4001` (HTTP DoH).
 * **Bloqueo añadido**: Lista `/root/xpd-dns/blocky/apple-ota.txt` con dominios como `mesu.apple.com`, `appldnld.apple.com`, `gdmf.apple.com`, `updates-http.apple.com` para evitar actualizaciones forzadas de iOS/macOS.
 
-### 4.4 Proxy de Evasión de Bloqueos (`evade_proxy.py`)
-* **Ruta del script**: `/root/xpd-dns/scripts/evade_proxy.py`
+### 4.4 Proxy de Evasión de Bloqueos (Rust)
+* **Código fuente**: `/root/xpd-dns/evade-proxy/`
+* **Binario de producción**: `/usr/local/bin/evade-proxy`
 * **Servicio Systemd**: `xdp-evade-proxy.service`
-* **Puerto de escucha**: `127.0.0.1:5335` (UDP/TCP) -> Upstream hacia Unbound en `127.0.0.1:5336`.
+* **Listeners**:
+  * `127.0.0.1:5335` UDP/TCP → Unbound principal en `127.0.0.1:5336`.
+  * `127.0.0.1:5337` UDP/TCP → Unbound Lite en `127.0.0.1:5338`.
+  * `127.0.0.1:5339` HTTP → métricas Prometheus y estado JSON.
 * **Algoritmo de Evasión Cloudflare**:
   1. Carga la lista de IPs bloqueadas (`/etc/unbound/blocked_ips.txt` y `blocked_ipv6.txt`).
-  2. Carga los **348 prefijos IPv4 y 68 prefijos IPv6** oficiales de Cloudflare AS13335 (`/etc/unbound/cloudflare_prefixes_v4.txt` y `_v6.txt`).
-  3. Comprueba por búsqueda binaria de intervalos `O(log N)` en 0.001 µs si la IP del registro `A` o `AAAA` está en la lista de bloqueo **Y** pertenece a Cloudflare.
+  2. Carga los prefijos IPv4 e IPv6 de Cloudflare AS13335 (`/etc/unbound/cloudflare_prefixes_v4.txt` y `_v6.txt`).
+  3. Comprueba por búsqueda binaria `O(log N)` si la IP del registro `A` o `AAAA` está bloqueada **Y** pertenece a Cloudflare.
   4. Si cumple ambas condiciones, busca en el mismo prefijo una IP contigua que **NO esté en la lista de bloqueos**.
   5. Si la IP pertenece a otro proveedor (Google, AWS, etc.), **NO se modifica**.
+* **Implementación**: Tokio multihilo, contadores atómicos y modificación directa
+  del RDATA sobre el paquete DNS, sin reconstruir el mensaje completo.
+* **Persistencia compatible**: conserva los contadores históricos en
+  `/root/xpd-dns/scripts/evade_stats.json`.
+
+El script `/root/xpd-dns/scripts/evade_proxy.py` se conserva únicamente como
+respaldo de reversión; no es el proceso activo en producción.
+
+#### Modo aislado de prueba
+
+Puede ejecutarse junto a producción porque utiliza los puertos alternativos
+`15335`, `15337` y `15339`, además de estadísticas separadas en `/tmp`:
+
+```bash
+cd /root/xpd-dns/evade-proxy
+./target/release/evade-proxy --test \
+  --redirect example.com=203.0.113.7 \
+  --redirect example.com=2001:db8::7
+
+dig @127.0.0.1 -p 15335 example.com A +short
+dig @127.0.0.1 -p 15335 example.com AAAA +short
+dig @127.0.0.1 -p 15337 example.com A +tcp +short
+curl http://127.0.0.1:15339/metrics
+```
 
 ### 4.5 Unbound (Resolver Recursivo Puro)
 * **Archivo de configuración**: `/etc/unbound/unbound.conf` (respaldado en `/root/xpd-dns/unbound/unbound.conf`)
@@ -148,8 +171,41 @@
 
 ### 4.6 dnsproxy (DNS over QUIC / DoQ)
 * **Binario**: `/root/xpd-dns/bin/dnsproxy`
-* **Servicio Systemd**: `xdp-doq-dot.service`
-* **Puertos**: Escucha en UDP `853` (DoQ) con certificado TLS y reenvía hacia Blocky en `127.0.0.1:53`.
+* **Versión desplegada**: `v0.84.1`.
+* **Servicios Systemd**: `xdp-doq-dot.service` y `xdp-lite-doq.service`.
+* **Transporte**: RFC 9250 sobre QUIC y TLS 1.3 en UDP `853`.
+
+DoQ transporta mensajes DNS directamente sobre QUIC. No debe confundirse con
+DoH3: DoH3 encapsula DNS dentro de HTTP/3 y entra por Caddy en UDP `443`, mientras
+que DoQ no usa HTTP ni pasa por Caddy.
+
+Frente a DNS tradicional, DoQ cifra tanto la consulta como la respuesta. QUIC
+integra TLS 1.3, evita depender de una conexión TCP y permite reutilizar una
+conexión para múltiples consultas sin que la pérdida de un paquete detenga todas
+las demás. Al no incluir la capa HTTP de DoH3, el protocolo tiene además menos
+encapsulación. La primera conexión todavía necesita un handshake; la mejora es
+más visible en conexiones reutilizadas o reanudadas y en redes con pérdida.
+
+Los dos recorridos en producción son:
+
+```text
+quic://dns.xdp.es:853 (UDP)
+  → dnsproxy principal
+  → Blocky principal 127.0.0.1:53
+  → evade-proxy 5335
+  → Unbound 5336 (.51 egress)
+
+quic://lite.xdp.es:853 (UDP)
+  → dnsproxy Lite
+  → Blocky Lite 85.208.114.52:53
+  → evade-proxy 5337
+  → Unbound Lite 5338 (.52 egress)
+```
+
+Cada `dnsproxy` se inicia con DNS tradicional, DoT y DoH desactivados
+(`-p 0 -t 0 -s 0`) y solamente DoQ habilitado (`-q 853`). Esto permite que
+Blocky use simultáneamente el mismo número de puerto para DoT en **TCP/853** sin
+colisión: DoQ escucha en UDP y DoT en TCP.
 
 ---
 
@@ -214,7 +270,8 @@
 ### Estado de los Servicios
 ```bash
 # Comprobar estado de todos los servicios DNS
-systemctl status caddy blocky blocky-ota xdp-evade-proxy unbound xdp-doq-dot
+systemctl status caddy blocky blocky-lite blocky-ota \
+  xdp-evade-proxy unbound unbound-lite xdp-doq-dot xdp-lite-doq
 
 # Ver temporizadores activos (actualización de bloqueos y estadísticas)
 systemctl list-timers | grep -E 'blocked|stats'
@@ -223,7 +280,8 @@ systemctl list-timers | grep -E 'blocked|stats'
 ### Reiniciar Servicios
 ```bash
 # Reiniciar el stack completo
-systemctl restart caddy blocky blocky-ota xdp-evade-proxy unbound xdp-doq-dot
+systemctl restart caddy blocky blocky-lite blocky-ota \
+  xdp-evade-proxy unbound unbound-lite xdp-doq-dot xdp-lite-doq
 
 # Forzar sincronización de bloqueos de fútbol
 /root/xpd-dns/scripts/update-blocked-ips.sh
@@ -263,6 +321,18 @@ ss.close()
 
 # 3. Probar DoH
 curl -s -H "accept: application/dns-message" "https://dns.xdp.es/dns-query?dns=AAABAAABAAAAAAAAA3d3dwZnb29nbGUDY29tAAABAAE" -o /dev/null -w "%{http_code}\n"
+
+# 4. Probar DoQ principal (UDP/853, RFC 9250)
+kdig @85.208.114.51 -p 853 +quic \
+  +tls-hostname=dns.xdp.es example.com A +short
+
+# 5. Probar DoQ Lite
+kdig @85.208.114.52 -p 853 +quic \
+  +tls-hostname=lite.xdp.es example.com A +short
+
+# 6. Comparar DoT: mismo puerto, pero TCP/TLS en lugar de QUIC/UDP
+kdig @85.208.114.51 -p 853 +tls \
+  +tls-hostname=dns.xdp.es example.com A +short
 ```
 
 ---
@@ -284,8 +354,15 @@ curl -s -H "accept: application/dns-message" "https://dns.xdp.es/dns-query?dns=A
 │   ├── cloudflare_prefixes_v4.txt      # Prefijos BGP IPv4 de Cloudflare AS13335
 │   ├── cloudflare_prefixes_v6.txt      # Prefijos BGP IPv6 de Cloudflare AS13335
 │   └── evade_blackhole.py              # Módulo Unbound Python alternativo
+├── evade-proxy/
+│   ├── Cargo.toml                       # Proyecto del proxy Rust/Tokio
+│   ├── Cargo.lock                       # Dependencias reproducibles
+│   ├── README.md                        # Compilación y modo aislado de prueba
+│   └── src/main.rs                      # Proxy UDP/TCP, evasión y métricas
+├── bin/
+│   └── dnsproxy                         # Servidor DoQ principal y Lite (UDP/853)
 ├── scripts/
-│   ├── evade_proxy.py                  # Proxy de evasión DNS principal (Port 5335)
+│   ├── evade_proxy.py                  # Implementación Python de respaldo
 │   ├── update-blocked-ips.sh           # Script de sincronización de bloqueos cada 1 min
 │   ├── update-cloudflare-prefixes.py   # Script de actualización de prefijos Cloudflare
 │   ├── update-stats.py                 # Scraper y agregador de estadísticas de Prometheus
@@ -293,6 +370,8 @@ curl -s -H "accept: application/dns-message" "https://dns.xdp.es/dns-query?dns=A
 │   ├── history.json                    # Historial persistente horario de métricas
 │   └── asn_cache.json                  # Caché local de resoluciones de ASN
 ├── systemd/
+│   ├── xdp-evade-proxy.service         # Proxy Rust de evasión principal y Lite
+│   ├── xdp-lite-doq.service            # DoQ Lite sobre UDP/853
 │   ├── update-blocked-ips.service      # Servicio oneshot para sincronización de bloqueos
 │   ├── update-blocked-ips.timer        # Timer cada 1 minuto para update-blocked-ips
 │   ├── update-stats.service            # Servicio oneshot para estadísticas
