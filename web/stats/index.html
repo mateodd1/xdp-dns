@@ -294,10 +294,10 @@
             gap: 20px;
         }
 
-        /* 4-Column Metrics Grid */
+        /* 5-Column Metrics Grid */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 14px;
             margin-bottom: 20px;
         }
@@ -337,6 +337,10 @@
 
         .metric-value.cyan {
             color: var(--accent);
+        }
+
+        .metric-value.green {
+            color: #10b981;
         }
 
         .metric-sub {
@@ -744,7 +748,13 @@
         }
 
         /* Responsive */
-        @media (max-width: 900px) {
+        @media (max-width: 1040px) {
+            .metrics-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
             .metrics-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -871,6 +881,11 @@
                         <span class="metric-value cyan" id="val-blocked-24h">...</span>
                         <span class="metric-sub" id="sub-blocked-24h">-</span>
                     </div>
+                    <div class="metric-card" data-agent-metric="evaded-queries">
+                        <span class="metric-title" data-i18n="stats.card_evaded">IPs Reemplazadas</span>
+                        <span class="metric-value green" id="val-evaded-24h">...</span>
+                        <span class="metric-sub" id="sub-evaded-24h">-</span>
+                    </div>
                     <div class="metric-card" data-agent-metric="cached-queries">
                         <span class="metric-title" data-i18n="stats.card_cached">Caché Hit</span>
                         <span class="metric-value" id="val-cached-24h">...</span>
@@ -923,6 +938,11 @@
                         <span class="metric-title" data-i18n="stats.card_blocked">Consultas Bloqueadas</span>
                         <span class="metric-value cyan" id="val-blocked-30d">...</span>
                         <span class="metric-sub" id="sub-blocked-30d">-</span>
+                    </div>
+                    <div class="metric-card" data-agent-metric="evaded-queries-30d">
+                        <span class="metric-title" data-i18n="stats.card_evaded">IPs Reemplazadas</span>
+                        <span class="metric-value green" id="val-evaded-30d">...</span>
+                        <span class="metric-sub" id="sub-evaded-30d">-</span>
                     </div>
                     <div class="metric-card" data-agent-metric="cached-queries-30d">
                         <span class="metric-title" data-i18n="stats.card_cached">Caché Hit</span>

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # /root/xpd-dns/scripts/evade_proxy.py
-# High-Performance Asynchronous DNS Evasion Proxy
-# Intercepts DNS queries on 127.0.0.1:5335, forwards to Unbound (127.0.0.1:5336),
-# and dynamically rewrites blocked Anycast IPs ONLY IF they belong to Cloudflare (AS13335)
-# to unblocked contiguous Cloudflare Anycast IPs.
+# High-Performance Asynchronous DNS Evasion Proxy with Replaced Resolutions Tracking
+# Intercepts DNS queries on:
+#   - 127.0.0.1:5335 -> forwards to Unbound Adblock (127.0.0.1:5336) [.51 egress]
+#   - 127.0.0.1:5337 -> forwards to Unbound Lite (127.0.0.1:5338) [.52 egress]
+# Dynamically rewrites blocked Anycast IPs ONLY IF they belong to Cloudflare (AS13335)
+# to unblocked contiguous Cloudflare Anycast IPs, and tracks resolution statistics.
 
 import asyncio
 import os
@@ -12,6 +14,7 @@ import socket
 import struct
 import ipaddress
 import bisect
+import json
 import dns.message
 import dns.rdatatype
 import dns.rdataclass
@@ -19,6 +22,7 @@ import dns.rdata
 
 LISTEN_HOST = "127.0.0.1"
 UPSTREAM_HOST = "127.0.0.1"
+METRICS_PORT = 5339
 
 PORT_PAIRS = [
     (5335, 5336),  # Adblock (.51 egress)
@@ -29,6 +33,7 @@ BLOCKED_IPV4_FILE = "/etc/unbound/blocked_ips.txt"
 BLOCKED_IPV6_FILE = "/etc/unbound/blocked_ipv6.txt"
 CF_IPV4_FILE = "/etc/unbound/cloudflare_prefixes_v4.txt"
 CF_IPV6_FILE = "/etc/unbound/cloudflare_prefixes_v6.txt"
+EVADE_STATS_FILE = "/root/xpd-dns/scripts/evade_stats.json"
 
 BLOCKED_IPS_V4 = set()
 BLOCKED_IPS_V6 = set()
@@ -44,6 +49,47 @@ _last_v6_mtime = 0
 _last_cf_v4_mtime = 0
 _last_cf_v6_mtime = 0
 _last_check_time = 0
+
+EVADED_QUERIES_COUNT = 0
+EVADED_RECORDS_COUNT = 0
+TOTAL_QUERIES_COUNT = 0
+LAST_EVADED_TIME = 0
+_last_save_time = 0
+
+def load_evade_stats():
+    global EVADED_QUERIES_COUNT, EVADED_RECORDS_COUNT, TOTAL_QUERIES_COUNT, LAST_EVADED_TIME
+    if os.path.exists(EVADE_STATS_FILE):
+        try:
+            with open(EVADE_STATS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                EVADED_QUERIES_COUNT = int(data.get("evaded_queries_total", 0))
+                EVADED_RECORDS_COUNT = int(data.get("evaded_records_total", 0))
+                TOTAL_QUERIES_COUNT = int(data.get("total_queries_processed", 0))
+                LAST_EVADED_TIME = float(data.get("last_evasion_timestamp", 0))
+                print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Loaded evasion stats: {EVADED_QUERIES_COUNT} queries evaded ({EVADED_RECORDS_COUNT} records replaced)", flush=True)
+        except Exception as e:
+            print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Warning loading {EVADE_STATS_FILE}: {e}", flush=True)
+
+def save_evade_stats(force=False):
+    global _last_save_time
+    now = time.time()
+    if not force and (now - _last_save_time < 2):
+        return
+    _last_save_time = now
+    try:
+        data = {
+            "evaded_queries_total": EVADED_QUERIES_COUNT,
+            "evaded_records_total": EVADED_RECORDS_COUNT,
+            "total_queries_processed": TOTAL_QUERIES_COUNT,
+            "last_evasion_timestamp": LAST_EVADED_TIME,
+            "last_updated": now
+        }
+        temp_file = f"{EVADE_STATS_FILE}.tmp"
+        with open(temp_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+        os.replace(temp_file, EVADE_STATS_FILE)
+    except Exception:
+        pass
 
 def load_data(force=False):
     global _last_v4_mtime, _last_v6_mtime, _last_cf_v4_mtime, _last_cf_v6_mtime, _last_check_time
@@ -62,9 +108,9 @@ def load_data(force=False):
                 new_v4 = set()
                 with open(BLOCKED_IPV4_FILE, "r", encoding="utf-8") as f:
                     for line in f:
-                        ip = line.strip()
-                        if ip and not ip.startswith("#"):
-                            new_v4.add(ip)
+                        line = line.strip()
+                        if line and not line.startswith("#"):
+                            new_v4.add(line)
                 BLOCKED_IPS_V4 = new_v4
                 _last_v4_mtime = mtime
                 print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Loaded {len(BLOCKED_IPS_V4)} blocked IPv4s from {BLOCKED_IPV4_FILE}", flush=True)
@@ -81,13 +127,14 @@ def load_data(force=False):
                 new_v6 = set()
                 with open(BLOCKED_IPV6_FILE, "r", encoding="utf-8") as f:
                     for line in f:
-                        ip_str = line.strip()
-                        if ip_str and not ip_str.startswith("#"):
+                        line = line.strip()
+                        if line and not line.startswith("#"):
                             try:
-                                parsed = ipaddress.IPv6Address(ip_str)
-                                new_v6.add(parsed.compressed)
+                                ip_obj = ipaddress.IPv6Address(line)
+                                new_v6.add(ip_obj.compressed)
+                                new_v6.add(str(ip_obj))
                             except Exception:
-                                new_v6.add(ip_str.lower())
+                                new_v6.add(line.lower())
                 BLOCKED_IPS_V6 = new_v6
                 _last_v6_mtime = mtime
                 print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Loaded {len(BLOCKED_IPS_V6)} blocked IPv6s from {BLOCKED_IPV6_FILE}", flush=True)
@@ -96,7 +143,7 @@ def load_data(force=False):
     else:
         BLOCKED_IPS_V6 = set()
 
-    # 3. Load Cloudflare IPv4 Prefixes
+    # 3. Load Cloudflare AS13335 IPv4 Prefixes
     if os.path.exists(CF_IPV4_FILE):
         try:
             mtime = os.path.getmtime(CF_IPV4_FILE)
@@ -107,34 +154,48 @@ def load_data(force=False):
                         line = line.strip()
                         if line and not line.startswith("#"):
                             try:
-                                nets.append(ipaddress.ip_network(line, strict=False))
+                                net = ipaddress.ip_network(line, strict=False)
+                                nets.append((int(net.network_address), int(net.broadcast_address)))
                             except Exception:
                                 pass
-                ivs = sorted([(int(n.network_address), int(n.broadcast_address)) for n in nets])
-                CF_V4_INTERVALS = ivs
-                CF_V4_STARTS = [iv[0] for iv in ivs]
+                nets.sort()
+                merged = []
+                for s, e in nets:
+                    if merged and s <= merged[-1][1] + 1:
+                        merged[-1] = (merged[-1][0], max(merged[-1][1], e))
+                    else:
+                        merged.append((s, e))
+                CF_V4_INTERVALS = merged
+                CF_V4_STARTS = [x[0] for x in merged]
                 _last_cf_v4_mtime = mtime
                 print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Loaded {len(CF_V4_INTERVALS)} Cloudflare IPv4 prefix intervals", flush=True)
         except Exception as e:
             print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Error reading {CF_IPV4_FILE}: {e}", flush=True)
 
-    # 4. Load Cloudflare IPv6 Prefixes
+    # 4. Load Cloudflare AS13335 IPv6 Prefixes
     if os.path.exists(CF_IPV6_FILE):
         try:
             mtime = os.path.getmtime(CF_IPV6_FILE)
             if mtime != _last_cf_v6_mtime or force:
-                nets = []
+                nets_v6 = []
                 with open(CF_IPV6_FILE, "r", encoding="utf-8") as f:
                     for line in f:
                         line = line.strip()
                         if line and not line.startswith("#"):
                             try:
-                                nets.append(ipaddress.ip_network(line, strict=False))
+                                net = ipaddress.ip_network(line, strict=False)
+                                nets_v6.append((int(net.network_address), int(net.broadcast_address)))
                             except Exception:
                                 pass
-                ivs = sorted([(int(n.network_address), int(n.broadcast_address)) for n in nets])
-                CF_V6_INTERVALS = ivs
-                CF_V6_STARTS = [iv[0] for iv in ivs]
+                nets_v6.sort()
+                merged_v6 = []
+                for s, e in nets_v6:
+                    if merged_v6 and s <= merged_v6[-1][1] + 1:
+                        merged_v6[-1] = (merged_v6[-1][0], max(merged_v6[-1][1], e))
+                    else:
+                        merged_v6.append((s, e))
+                CF_V6_INTERVALS = merged_v6
+                CF_V6_STARTS = [x[0] for x in merged_v6]
                 _last_cf_v6_mtime = mtime
                 print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Loaded {len(CF_V6_INTERVALS)} Cloudflare IPv6 prefix intervals", flush=True)
         except Exception as e:
@@ -149,10 +210,10 @@ def find_cf_v4(ip_str):
         if idx >= 0:
             s, e = CF_V4_INTERVALS[idx]
             if s <= ip_int <= e:
-                return s, e
-        return None
+                return (s, e)
     except Exception:
-        return None
+        pass
+    return None
 
 def find_cf_v6(ip_str):
     if not CF_V6_STARTS:
@@ -163,13 +224,12 @@ def find_cf_v6(ip_str):
         if idx >= 0:
             s, e = CF_V6_INTERVALS[idx]
             if s <= ip_int <= e:
-                return s, e
-        return None
+                return (s, e)
     except Exception:
-        return None
+        pass
+    return None
 
 def get_evasive_ipv4(ip_str):
-    # Only rewrite if IP belongs to Cloudflare AS13335
     cf_range = find_cf_v4(ip_str)
     if not cf_range:
         return ip_str
@@ -208,7 +268,6 @@ def get_evasive_ipv4(ip_str):
         return ip_str
 
 def get_evasive_ipv6(ip_str):
-    # Only rewrite if IPv6 belongs to Cloudflare AS13335
     cf_range = find_cf_v6(ip_str)
     if not cf_range:
         return ip_str
@@ -231,6 +290,8 @@ def get_evasive_ipv6(ip_str):
         return ip_str
 
 def rewrite_dns_payload(wire_data):
+    global EVADED_QUERIES_COUNT, EVADED_RECORDS_COUNT, TOTAL_QUERIES_COUNT, LAST_EVADED_TIME
+    TOTAL_QUERIES_COUNT += 1
     load_data()
 
     # Evasion is active only when BLOCKED_IPS_V4 is NOT empty
@@ -240,6 +301,7 @@ def rewrite_dns_payload(wire_data):
     try:
         msg = dns.message.from_wire(wire_data)
         modified = False
+        records_replaced = 0
 
         for section in [msg.answer, msg.authority, msg.additional]:
             for rrset in section:
@@ -252,6 +314,7 @@ def rewrite_dns_payload(wire_data):
                             if cont_ip != rdata.address:
                                 new_rdatas.append(dns.rdata.from_text(rrset.rdclass, rrset.rdtype, cont_ip))
                                 modified = True
+                                records_replaced += 1
                             else:
                                 new_rdatas.append(rdata)
                         else:
@@ -275,6 +338,7 @@ def rewrite_dns_payload(wire_data):
                             if alt_ip != rdata.address and alt_ip != norm_ip:
                                 new_rdatas.append(dns.rdata.from_text(rrset.rdclass, rrset.rdtype, alt_ip))
                                 modified = True
+                                records_replaced += 1
                             else:
                                 new_rdatas.append(rdata)
                         else:
@@ -285,6 +349,10 @@ def rewrite_dns_payload(wire_data):
                             rrset.add(rdata)
 
         if modified:
+            EVADED_QUERIES_COUNT += 1
+            EVADED_RECORDS_COUNT += records_replaced
+            LAST_EVADED_TIME = time.time()
+            save_evade_stats()
             return msg.to_wire()
     except Exception:
         pass
@@ -362,7 +430,67 @@ def make_tcp_handler(upstream_port):
                 pass
     return handle_tcp_client
 
+async def handle_http_metrics(reader, writer):
+    try:
+        line = await asyncio.wait_for(reader.readline(), timeout=2.0)
+        req_line = line.decode('utf-8', errors='ignore').strip()
+        parts = req_line.split()
+        path = parts[1] if len(parts) > 1 else "/"
+
+        # Consume remaining headers
+        while True:
+            h_line = await asyncio.wait_for(reader.readline(), timeout=1.0)
+            if not h_line or h_line == b"\r\n" or h_line == b"\n":
+                break
+
+        if path.startswith("/metrics"):
+            body = (
+                f"# HELP xdp_evade_queries_total Total DNS queries rewritten for block evasion\n"
+                f"# TYPE xdp_evade_queries_total counter\n"
+                f"xdp_evade_queries_total {EVADED_QUERIES_COUNT}\n"
+                f"# HELP xdp_evade_records_total Total DNS records replaced for block evasion\n"
+                f"# TYPE xdp_evade_records_total counter\n"
+                f"xdp_evade_records_total {EVADED_RECORDS_COUNT}\n"
+                f"# HELP xdp_evade_queries_processed Total queries processed by evasion proxy\n"
+                f"# TYPE xdp_evade_queries_processed counter\n"
+                f"xdp_evade_queries_processed {TOTAL_QUERIES_COUNT}\n"
+            ).encode('utf-8')
+            content_type = "text/plain; version=0.0.4"
+        else:
+            payload = {
+                "evaded_queries_total": EVADED_QUERIES_COUNT,
+                "evaded_records_total": EVADED_RECORDS_COUNT,
+                "total_queries_processed": TOTAL_QUERIES_COUNT,
+                "last_evasion_timestamp": LAST_EVADED_TIME
+            }
+            body = json.dumps(payload, indent=2).encode('utf-8')
+            content_type = "application/json"
+
+        header = (
+            f"HTTP/1.1 200 OK\r\n"
+            f"Content-Type: {content_type}\r\n"
+            f"Content-Length: {len(body)}\r\n"
+            f"Connection: close\r\n\r\n"
+        ).encode('utf-8')
+
+        writer.write(header + body)
+        await writer.drain()
+    except Exception:
+        pass
+    finally:
+        try:
+            writer.close()
+            await writer.wait_closed()
+        except Exception:
+            pass
+
+async def stats_persister_task():
+    while True:
+        await asyncio.sleep(5)
+        save_evade_stats(force=True)
+
 async def main():
+    load_evade_stats()
     load_data(force=True)
     loop = asyncio.get_running_loop()
 
@@ -385,6 +513,18 @@ async def main():
         )
         print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] DNS Evasion Proxy TCP listening on {LISTEN_HOST}:{listen_p} -> upstream {UPSTREAM_HOST}:{upstream_p}", flush=True)
         servers.append(tcp_server)
+
+    # HTTP Metrics Server
+    http_metrics_server = await asyncio.start_server(
+        handle_http_metrics,
+        LISTEN_HOST,
+        METRICS_PORT,
+        reuse_port=True
+    )
+    print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] DNS Evasion Proxy Metrics HTTP listening on {LISTEN_HOST}:{METRICS_PORT}", flush=True)
+    servers.append(http_metrics_server)
+
+    asyncio.create_task(stats_persister_task())
 
     await asyncio.gather(
         *(s.serve_forever() for s in servers),

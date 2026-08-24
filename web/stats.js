@@ -203,13 +203,20 @@ function loadStatsData() {
             const elTotal24 = document.getElementById('val-total-24h');
             const elBlocked24 = document.getElementById('val-blocked-24h');
             const elSubBlocked24 = document.getElementById('sub-blocked-24h');
+            const elEvaded24 = document.getElementById('val-evaded-24h');
+            const elSubEvaded24 = document.getElementById('sub-evaded-24h');
             const elCached24 = document.getElementById('val-cached-24h');
             const elSubCached24 = document.getElementById('sub-cached-24h');
             const elLatency24 = document.getElementById('val-latency-24h');
 
+            const evadedSuffix = (window.i18n && window.i18n.t('stats.evaded_suffix')) || 'reemplazadas';
+            const blockedSuffix = (window.i18n && window.i18n.t('stats.rate_suffix')) || 'bloqueadas';
+
             if (elTotal24) elTotal24.innerText = Number(s24.total || 0).toLocaleString();
             if (elBlocked24) elBlocked24.innerText = Number(s24.blocked || 0).toLocaleString();
-            if (elSubBlocked24) elSubBlocked24.innerText = `${s24.blocked_pct || 0}% tasa de bloqueo`;
+            if (elSubBlocked24) elSubBlocked24.innerText = `${s24.blocked_pct || 0}% ${blockedSuffix}`;
+            if (elEvaded24) elEvaded24.innerText = Number(s24.evaded || 0).toLocaleString();
+            if (elSubEvaded24) elSubEvaded24.innerText = `${s24.evaded_pct || 0}% ${evadedSuffix}`;
             if (elCached24) elCached24.innerText = `${s24.cached_pct || 0}%`;
             if (elSubCached24) elSubCached24.innerText = `${Number(s24.cached || 0).toLocaleString()} en caché`;
             if (elLatency24) elLatency24.innerText = `${s24.avg_duration || 0} ms`;
@@ -221,13 +228,17 @@ function loadStatsData() {
             const elTotal30 = document.getElementById('val-total-30d');
             const elBlocked30 = document.getElementById('val-blocked-30d');
             const elSubBlocked30 = document.getElementById('sub-blocked-30d');
+            const elEvaded30 = document.getElementById('val-evaded-30d');
+            const elSubEvaded30 = document.getElementById('sub-evaded-30d');
             const elCached30 = document.getElementById('val-cached-30d');
             const elSubCached30 = document.getElementById('sub-cached-30d');
             const elLatency30 = document.getElementById('val-latency-30d');
 
             if (elTotal30) elTotal30.innerText = Number(s30.total || 0).toLocaleString();
             if (elBlocked30) elBlocked30.innerText = Number(s30.blocked || 0).toLocaleString();
-            if (elSubBlocked30) elSubBlocked30.innerText = `${s30.blocked_pct || 0}% tasa de bloqueo`;
+            if (elSubBlocked30) elSubBlocked30.innerText = `${s30.blocked_pct || 0}% ${blockedSuffix}`;
+            if (elEvaded30) elEvaded30.innerText = Number(s30.evaded || 0).toLocaleString();
+            if (elSubEvaded30) elSubEvaded30.innerText = `${s30.evaded_pct || 0}% ${evadedSuffix}`;
             if (elCached30) elCached30.innerText = `${s30.cached_pct || 0}%`;
             if (elSubCached30) elSubCached30.innerText = `${Number(s30.cached || 0).toLocaleString()} en caché`;
             if (elLatency30) elLatency30.innerText = `${s30.avg_duration || 0} ms`;

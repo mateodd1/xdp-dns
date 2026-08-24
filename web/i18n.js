@@ -88,6 +88,7 @@ const translations = {
         "stats.tab_30d": "30 Días",
         "stats.card_total": "Total Consultas",
         "stats.card_blocked": "Consultas Bloqueadas",
+        "stats.card_evaded": "IPs Reemplazadas",
         "stats.card_cached": "Caché Hit",
         "stats.card_latency": "Latencia Media",
         "stats.table_asn": "Top ASNs",
@@ -100,6 +101,7 @@ const translations = {
         "stats.loading": "Cargando datos...",
         "stats.no_data": "Sin consultas.",
         "stats.rate_suffix": "bloqueadas",
+        "stats.evaded_suffix": "reemplazadas",
 
         // Connection Card
         "conn.title": "Tu Conexión",
@@ -271,6 +273,7 @@ const translations = {
         "stats.tab_30d": "30 Days",
         "stats.card_total": "Total Queries",
         "stats.card_blocked": "Blocked Queries",
+        "stats.card_evaded": "Replaced IPs",
         "stats.card_cached": "Cache Hit",
         "stats.card_latency": "Avg Latency",
         "stats.table_asn": "Top ASNs",
@@ -283,6 +286,7 @@ const translations = {
         "stats.loading": "Loading data...",
         "stats.no_data": "No queries.",
         "stats.rate_suffix": "blocked",
+        "stats.evaded_suffix": "replaced",
 
         // Connection Card
         "conn.title": "Your Connection",

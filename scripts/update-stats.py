@@ -30,6 +30,24 @@ STATS_FILES = [
 
 ASN_CACHE_FILE = "/root/xpd-dns/scripts/asn_cache.json"
 HISTORY_FILE = "/root/xpd-dns/scripts/history.json"
+EVADE_STATS_FILE = "/root/xpd-dns/scripts/evade_stats.json"
+EVADE_METRICS_URL = "http://127.0.0.1:5339/stats"
+
+def fetch_evade_metrics():
+    try:
+        req = urllib.request.Request(EVADE_METRICS_URL, headers={"User-Agent": "StatsUpdater/2.2"})
+        with urllib.request.urlopen(req, timeout=2) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            return int(data.get("evaded_queries_total", 0))
+    except Exception:
+        if os.path.exists(EVADE_STATS_FILE):
+            try:
+                with open(EVADE_STATS_FILE, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    return int(data.get("evaded_queries_total", 0))
+            except Exception:
+                pass
+    return 0
 
 def load_json(filepath, default=None):
     if default is None:
@@ -253,7 +271,8 @@ def merge_raw_metrics(parsed_metrics):
     merged = {
         "total": 0.0, "blocked": 0.0, "cached": 0.0,
         "duration_sum": 0.0, "duration_count": 0.0,
-        "query_types": {}, "client_ips": {}
+        "query_types": {}, "client_ips": {},
+        "evaded": float(fetch_evade_metrics())
     }
     for metrics in parsed_metrics:
         for key in ("total", "blocked", "cached", "duration_sum", "duration_count"):
@@ -358,6 +377,7 @@ def update_persistent_history(raw_now):
     last_total = float(raw_last.get("total", 0.0))
     last_blocked = float(raw_last.get("blocked", 0.0))
     last_cached = float(raw_last.get("cached", 0.0))
+    last_evaded = float(raw_last.get("evaded", 0.0))
     last_d_sum = float(raw_last.get("duration_sum", 0.0))
     last_d_cnt = float(raw_last.get("duration_count", 0.0))
     last_qtypes = raw_last.get("query_types", {})
@@ -367,6 +387,7 @@ def update_persistent_history(raw_now):
     cur_total = raw_now["total"]
     cur_blocked = raw_now["blocked"]
     cur_cached = raw_now["cached"]
+    cur_evaded = raw_now.get("evaded", 0.0)
     cur_d_sum = raw_now["duration_sum"]
     cur_d_cnt = raw_now["duration_count"]
 
@@ -384,6 +405,11 @@ def update_persistent_history(raw_now):
         d_cached = cur_cached - last_cached
     else:
         d_cached = cur_cached
+
+    if cur_evaded >= last_evaded and last_evaded > 0:
+        d_evaded = cur_evaded - last_evaded
+    else:
+        d_evaded = cur_evaded
 
     if cur_d_sum >= last_d_sum and last_d_sum > 0:
         d_d_sum = cur_d_sum - last_d_sum
@@ -424,6 +450,7 @@ def update_persistent_history(raw_now):
             "total": base_total,
             "blocked": base_blocked,
             "cached": base_cached,
+            "evaded": int(cur_evaded),
             "duration_sum": base_total * 0.002,
             "duration_count": base_total,
             "query_types": {"DS": int(base_total * 0.45), "A": int(base_total * 0.25), "AAAA": int(base_total * 0.15), "HTTPS": int(base_total * 0.10), "PTR": int(base_total * 0.05)},
@@ -436,6 +463,7 @@ def update_persistent_history(raw_now):
             "total": 0,
             "blocked": 0,
             "cached": 0,
+            "evaded": 0,
             "duration_sum": 0.0,
             "duration_count": 0,
             "query_types": {},
@@ -446,6 +474,7 @@ def update_persistent_history(raw_now):
     bucket["total"] += int(d_total)
     bucket["blocked"] += int(d_blocked)
     bucket["cached"] += int(d_cached)
+    bucket["evaded"] = bucket.get("evaded", 0) + int(d_evaded)
     bucket["duration_sum"] += d_d_sum
     bucket["duration_count"] += int(d_d_cnt)
 
@@ -477,6 +506,7 @@ def build_window_stats(history, window_seconds):
     total_queries = 0
     blocked_queries = 0
     cached_queries = 0
+    evaded_queries = 0
     duration_sum = 0.0
     duration_count = 0
 
@@ -492,6 +522,7 @@ def build_window_stats(history, window_seconds):
             total_queries += b.get("total", 0)
             blocked_queries += b.get("blocked", 0)
             cached_queries += b.get("cached", 0)
+            evaded_queries += b.get("evaded", 0)
             duration_sum += b.get("duration_sum", 0.0)
             duration_count += b.get("duration_count", 0)
 
@@ -504,6 +535,7 @@ def build_window_stats(history, window_seconds):
 
     blocked_pct = round((blocked_queries / total_queries * 100), 1) if total_queries > 0 else 0.0
     cached_pct = round((cached_queries / total_queries * 100), 1) if total_queries > 0 else 0.0
+    evaded_pct = round((evaded_queries / total_queries * 100), 2) if total_queries > 0 else 0.0
     avg_latency = round((duration_sum / duration_count * 1000), 1) if duration_count > 0 else 2.1
 
     # Process ASNs
@@ -540,53 +572,37 @@ def build_window_stats(history, window_seconds):
 
     top_asns_isp = []
     top_asns_datacenter = []
-    top_asns_all = []
 
-    total_isp_queries = sum(item["count"] for item in asn_data.values() if item.get("type") == "isp")
-    total_dc_queries = sum(item["count"] for item in asn_data.values() if item.get("type") == "datacenter")
-
-    # Build ISP list
-    for item in sorted([i for i in asn_data.values() if i.get("type") == "isp"], key=lambda x: x["count"], reverse=True):
+    # Sort ASNs by query volume
+    for name, item in sorted(asn_data.items(), key=lambda x: x[1]["count"], reverse=True):
         c = item["count"]
-        pct = round((c / total_isp_queries * 100), 1) if total_isp_queries > 0 else 0.0
+        pct = round((c / total_asn_queries * 100), 1) if total_asn_queries > 0 else 0.0
         v4_c = item["ipv4_count"]
         v6_c = item["ipv6_count"]
         v4_pct = round((v4_c / c * 100), 1) if c > 0 else 0.0
         v6_pct = round((v6_c / c * 100), 1) if c > 0 else 0.0
-        top_asns_isp.append({
-            "name": item["name"],
+
+        entry = {
+            "name": name,
             "count": c,
             "percent": pct,
             "ipv4_count": v4_c,
             "ipv6_count": v6_c,
             "ipv4_percent": v4_pct,
             "ipv6_percent": v6_pct,
-            "type": "isp"
-        })
+            "type": item["type"]
+        }
+
+        if item["type"] == "isp":
+            top_asns_isp.append(entry)
+        else:
+            top_asns_datacenter.append(entry)
+
     top_asns_isp = top_asns_isp[:8]
-
-    # Build Datacenter list
-    for item in sorted([i for i in asn_data.values() if i.get("type") == "datacenter"], key=lambda x: x["count"], reverse=True):
-        c = item["count"]
-        pct = round((c / total_dc_queries * 100), 1) if total_dc_queries > 0 else 0.0
-        v4_c = item["ipv4_count"]
-        v6_c = item["ipv6_count"]
-        v4_pct = round((v4_c / c * 100), 1) if c > 0 else 0.0
-        v6_pct = round((v6_c / c * 100), 1) if c > 0 else 0.0
-        top_asns_datacenter.append({
-            "name": item["name"],
-            "count": c,
-            "percent": pct,
-            "ipv4_count": v4_c,
-            "ipv6_count": v6_c,
-            "ipv4_percent": v4_pct,
-            "ipv6_percent": v6_pct,
-            "type": "datacenter"
-        })
     top_asns_datacenter = top_asns_datacenter[:8]
 
-    # Build Overall list
-    for item in sorted(asn_data.values(), key=lambda x: x["count"], reverse=True):
+    top_asns_all = []
+    for name, item in sorted(asn_data.items(), key=lambda x: x[1]["count"], reverse=True):
         c = item["count"]
         pct = round((c / total_asn_queries * 100), 1) if total_asn_queries > 0 else 0.0
         v4_c = item["ipv4_count"]
@@ -594,7 +610,7 @@ def build_window_stats(history, window_seconds):
         v4_pct = round((v4_c / c * 100), 1) if c > 0 else 0.0
         v6_pct = round((v6_c / c * 100), 1) if c > 0 else 0.0
         top_asns_all.append({
-            "name": item["name"],
+            "name": name,
             "count": c,
             "percent": pct,
             "ipv4_count": v4_c,
@@ -674,6 +690,8 @@ def build_window_stats(history, window_seconds):
         "total": total_queries,
         "blocked": blocked_queries,
         "blocked_pct": blocked_pct,
+        "evaded": evaded_queries,
+        "evaded_pct": evaded_pct,
         "cached": cached_queries,
         "cached_pct": cached_pct,
         "avg_duration": avg_latency,
@@ -710,7 +728,7 @@ def main():
 
     save_json(ASN_CACHE_FILE, asn_cache)
 
-    print(f"Stats updated: 24h={stats_24h['total']} queries (blocked {stats_24h['blocked']}), 30d={stats_30d['total']} queries")
+    print(f"Stats updated: 24h={stats_24h['total']} queries (blocked {stats_24h['blocked']}, evaded {stats_24h['evaded']}), 30d={stats_30d['total']} queries (evaded {stats_30d['evaded']})")
 
 if __name__ == "__main__":
     main()
