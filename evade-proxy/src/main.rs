@@ -25,10 +25,11 @@ const PRODUCTION_METRICS_PORT: u16 = 5339;
 const TEST_METRICS_PORT: u16 = 15339;
 const UDP_LIMIT: usize = 65_535;
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, PartialEq)]
 struct TestRedirect {
     v4: Option<u32>,
     v6: Option<u128>,
+    expires_at: Option<f64>,
 }
 
 struct RuntimeConfig {
@@ -122,6 +123,7 @@ struct Paths {
     cf_v4: PathBuf,
     cf_v6: PathBuf,
     stats: PathBuf,
+    redirects: PathBuf,
 }
 
 impl Paths {
@@ -150,6 +152,7 @@ impl Paths {
                     "/root/xpd-dns/scripts/evade_stats.json"
                 },
             ),
+            redirects: value("EVADE_REDIRECTS_FILE", "/run/evade-proxy/redirects.txt"),
         }
     }
 }
@@ -293,25 +296,40 @@ struct App {
     counters: Counters,
     paths: Paths,
     test_redirects: HashMap<String, TestRedirect>,
+    temporary_redirects: RwLock<Arc<HashMap<String, TestRedirect>>>,
 }
 
 impl App {
     async fn new(paths: Paths, test_redirects: HashMap<String, TestRedirect>) -> Arc<Self> {
         let data = Data::load(&paths, true).await;
         let counters = Counters::load(&paths.stats).await;
+        let temporary_redirects = load_temporary_redirects(&paths.redirects).await;
         Arc::new(Self {
             data: RwLock::new(Arc::new(data)),
             counters,
             paths,
             test_redirects,
+            temporary_redirects: RwLock::new(Arc::new(temporary_redirects)),
         })
     }
 
     fn rewrite(&self, packet: &mut [u8]) -> usize {
         self.counters.total_queries.fetch_add(1, Relaxed);
         let data = self.data.read().expect("data lock poisoned").clone();
-        let test_redirect =
-            question_name(packet).and_then(|domain| self.test_redirects.get(&domain));
+        let temporary_redirects = self
+            .temporary_redirects
+            .read()
+            .expect("redirect lock poisoned")
+            .clone();
+        let domain = question_name(packet);
+        let test_redirect = domain
+            .as_ref()
+            .and_then(|domain| {
+                self.test_redirects
+                    .get(domain)
+                    .or_else(|| temporary_redirects.get(domain))
+            })
+            .filter(|redirect| redirect.expires_at.is_none_or(|expires| expires > epoch()));
         if test_redirect.is_none() && data.blocked_v4.is_empty() && data.blocked_v6.is_empty() {
             return 0;
         }
@@ -606,15 +624,74 @@ async fn handle_http(app: Arc<App>, stream: TcpStream) -> Result<()> {
 }
 
 async fn maintenance(app: Arc<App>) {
-    let mut ticker = tokio::time::interval(Duration::from_secs(5));
+    let mut ticker = tokio::time::interval(Duration::from_secs(1));
+    let mut ticks = 0u8;
     loop {
         ticker.tick().await;
-        let new_data = Data::load(&app.paths, false).await;
-        *app.data.write().expect("data lock poisoned") = Arc::new(new_data);
-        if let Err(err) = save_stats(&app.paths.stats, &app.counters.snapshot()).await {
-            eprintln!("warning: could not persist stats: {err:#}");
+        let redirects = load_temporary_redirects(&app.paths.redirects).await;
+        {
+            let mut current = app
+                .temporary_redirects
+                .write()
+                .expect("redirect lock poisoned");
+            if current.as_ref() != &redirects {
+                eprintln!("loaded {} active temporary redirect(s)", redirects.len());
+                *current = Arc::new(redirects);
+            }
+        }
+
+        ticks = ticks.wrapping_add(1);
+        if ticks % 5 == 0 {
+            let new_data = Data::load(&app.paths, false).await;
+            *app.data.write().expect("data lock poisoned") = Arc::new(new_data);
+            if let Err(err) = save_stats(&app.paths.stats, &app.counters.snapshot()).await {
+                eprintln!("warning: could not persist stats: {err:#}");
+            }
         }
     }
+}
+
+async fn load_temporary_redirects(path: &Path) -> HashMap<String, TestRedirect> {
+    let text = tokio::fs::read_to_string(path).await.unwrap_or_default();
+    parse_temporary_redirects(&text, epoch())
+}
+
+fn parse_temporary_redirects(text: &str, now: f64) -> HashMap<String, TestRedirect> {
+    let mut redirects = HashMap::new();
+    for line in text.lines().map(str::trim) {
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut parts = line.split_whitespace();
+        let Some(rule) = parts.next() else { continue };
+        let Some(expires_text) = parts.next() else {
+            eprintln!("warning: redirect without expiry ignored: {line}");
+            continue;
+        };
+        if parts.next().is_some() {
+            eprintln!("warning: invalid redirect line ignored: {line}");
+            continue;
+        }
+        let Ok(expires_at) = expires_text.parse::<f64>() else {
+            eprintln!("warning: invalid redirect expiry ignored: {line}");
+            continue;
+        };
+        if expires_at <= now {
+            continue;
+        }
+        if let Err(error) = add_redirect(&mut redirects, rule) {
+            eprintln!("warning: invalid temporary redirect ignored: {error:#}");
+            continue;
+        }
+        if let Some((domain, _)) = rule.split_once('=') {
+            if let Ok(domain) = normalize_domain(domain) {
+                if let Some(redirect) = redirects.get_mut(&domain) {
+                    redirect.expires_at = Some(expires_at);
+                }
+            }
+        }
+    }
+    redirects
 }
 
 async fn save_stats(path: &Path, stats: &StatsFile) -> Result<()> {
@@ -791,6 +868,7 @@ mod tests {
             counters: Counters::default(),
             paths: Paths::from_env(true),
             test_redirects: HashMap::new(),
+            temporary_redirects: RwLock::new(Arc::new(HashMap::new())),
         };
         assert_eq!(app.rewrite(&mut packet), 1);
         assert_eq!(&packet[packet.len() - 4..], &[104, 16, 1, 2]);
@@ -848,6 +926,7 @@ mod tests {
             counters: Counters::default(),
             paths: Paths::from_env(true),
             test_redirects: rules,
+            temporary_redirects: RwLock::new(Arc::new(HashMap::new())),
         };
         assert_eq!(app.rewrite(&mut packet), 1);
         assert_eq!(&packet[packet.len() - 4..], &[203, 0, 113, 7]);
@@ -863,5 +942,19 @@ mod tests {
             merge_v4([(1, 3), (4, 7), (10, 11)].into_iter()),
             vec![(1, 7), (10, 11)]
         );
+    }
+
+    #[test]
+    fn temporary_redirects_require_a_future_expiry() {
+        let rules = parse_temporary_redirects(
+            "expired.example=192.0.2.1 999\nactive.example=192.0.2.2 1001\n",
+            1000.0,
+        );
+        assert!(!rules.contains_key("expired.example"));
+        assert_eq!(
+            rules["active.example"].v4,
+            Some(u32::from(Ipv4Addr::new(192, 0, 2, 2)))
+        );
+        assert_eq!(rules["active.example"].expires_at, Some(1001.0));
     }
 }

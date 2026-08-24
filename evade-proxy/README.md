@@ -64,3 +64,18 @@ curl http://127.0.0.1:15339/metrics
 
 Finaliza la prueba con `Ctrl-C`. `--redirect` se rechaza fuera de `--test` para
 evitar activar una regla accidentalmente en los listeners de producción.
+
+## Redirecciones temporales en producción
+
+El servicio recarga cada segundo `/run/evade-proxy/redirects.txt`. Cada línea
+contiene una regla y su instante de caducidad Unix; las reglas sin caducidad o ya
+caducadas se ignoran:
+
+```text
+ohz.es=104.18.13.102 1787609000
+```
+
+La expiración se comprueba también en cada consulta, por lo que una IP deja de
+reemplazarse al alcanzar el timestamp aunque la siguiente recarga aún no se haya
+ejecutado. `RuntimeDirectory=evade-proxy` hace que systemd cree el directorio de
+forma segura al iniciar el servicio.
