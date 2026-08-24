@@ -1,4 +1,4 @@
-// /root/xpd-dns/web/stats.js
+// stats.js
 // Anonymous DNS Metrics & Connection Status Loader
 
 function switchTab(interval) {

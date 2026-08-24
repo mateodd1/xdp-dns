@@ -1,4 +1,4 @@
-// /root/xpd-dns/web/i18n.js
+// i18n.js
 // Automatic language detection based on browser and OS locale
 
 const translations = {

@@ -1,4 +1,4 @@
-// /root/xpd-dns/web/theme.js
+// theme.js
 // Theme Manager: Dark, Light, and Auto (prefers-color-scheme)
 
 (function() {

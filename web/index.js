@@ -1,4 +1,4 @@
-// /root/xpd-dns/web/index.js
+// index.js
 
 const DNS_MODES = {
     adblock: {
