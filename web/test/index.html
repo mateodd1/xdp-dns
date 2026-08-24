@@ -157,6 +157,27 @@
                 return null;
             }
 
+            // Logos de ISPs disponibles en /stats/img (mismos ASN que usa /stats)
+            const ISP_LOGOS = [
+                { file: '/stats/img/movistar.svg', alt: 'Movistar', asn: [3352, 6739], kw: ['telefonica', 'movistar'] },
+                { file: '/stats/img/vodafone.svg', alt: 'Vodafone', asn: [12430], kw: ['vodafone'] },
+                { file: '/stats/img/orange.svg', alt: 'Orange', asn: [12479], kw: ['orange'] },
+                { file: '/stats/img/digi.png', alt: 'Digi', asn: [57269, 206238], kw: ['digi'] },
+                { file: '/stats/img/masmovil.svg', alt: 'MásMóvil / Yoigo', asn: [15704, 210344, 15954, 56645], kw: ['yoigo', 'masmovil', 'másmóvil', 'xfera', 'pepephone', 'euskaltel'] }
+            ];
+
+            function ispLogoFor(ipStr, asn, org) {
+                const lower = String(org || '').toLowerCase();
+                return ISP_LOGOS.find(l =>
+                    (asn != null && l.asn.includes(Number(asn))) ||
+                    l.kw.some(k => lower.includes(k))
+                ) || null;
+            }
+
+            function logoImg(logo) {
+                return '<img src="' + logo.file + '" alt="' + logo.alt + '" style="width:20px;height:20px;vertical-align:-4px;margin-right:6px;">';
+            }
+
             function fireBeacons(token) {
                 const url = 'https://' + token + '._check.xdp.es/pixel.gif?t=' + Date.now();
                 new Image().src = url;
@@ -206,9 +227,11 @@
                 } else {
                     const lines = resolvers.map(r => {
                         if (!/^[0-9a-fA-F.:]+$/.test(r.src_ip)) return '';
+                        const logo = ispLogoFor(r.src_ip, r.asn, r.org);
+                        const logoHtml = logo ? logoImg(logo) : '';
                         const asn = r.asn ? 'AS' + r.asn : 'ASN desconocido';
                         const org = r.org ? ' · ' + r.org : '';
-                        return '<li>' + asn + org + ' — ' + r.src_ip + '</li>';
+                        return '<li>' + logoHtml + '<strong>' + asn + '</strong>' + org + ' — ' + r.src_ip + '</li>';
                     }).join('');
                     show('<div class="verdict no">❌ No usas XDP</div>' +
                          '<p class="sub">Tus resolutores DNS:</p>' +
