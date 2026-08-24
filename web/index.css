@@ -83,6 +83,11 @@
     padding: 0;
 }
 
+/* Disable double-tap zoom on touch devices while keeping pinch zoom (WCAG-safe) */
+html {
+    touch-action: manipulation;
+}
+
 body {
     background-color: var(--bg-main);
     color: var(--text-primary);
