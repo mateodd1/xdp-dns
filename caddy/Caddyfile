@@ -164,6 +164,18 @@ xdp.es {
 		file_server
 	}
 
+	@test_page path /test /test/ /test/index.html
+	handle @test_page {
+		header Content-Type "text/html; charset=utf-8"
+		header Cache-Control "public, max-age=60, must-revalidate"
+		rewrite * /test/index.html
+		file_server
+	}
+
+	handle_path /test/api/* {
+		reverse_proxy 127.0.0.1:8088
+	}
+
 	@known_assets path /index.css /index.js /theme.js /i18n.js /stats.js /llms.txt /llms-full.txt /openapi.json /robots.txt /sitemap.xml /favicon.ico /site.webmanifest *.mobileconfig *.svg *.png *.ico *.webmanifest
 	handle @known_assets {
 		@css path *.css

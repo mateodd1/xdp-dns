@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Navegas por XDP? | xdp.es DNS</title>
+    <meta name="description" content="Comprueba si tu conexión resuelve las DNS a través de los servidores de xdp.es.">
+    <link rel="canonical" href="https://xdp.es/test">
+
+    <!-- Anti-FOIT Instant Theme Loader -->
+    <script>
+        (function() {
+            try {
+                const theme = localStorage.getItem('xdp_theme') || 'auto';
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+            } catch (e) {}
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    </noscript>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <link rel="stylesheet" href="/index.css?v=4.1">
+    <style>
+        .container {
+            max-width: 860px;
+            margin: 44px auto;
+            padding: 0 20px;
+        }
+
+        .test-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 28px;
+            text-align: center;
+            box-shadow: var(--shadow-card);
+        }
+
+        .check-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid var(--badge-border);
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .check-btn:hover { background-color: rgba(0, 210, 255, 0.2); }
+        .check-btn:active { transform: scale(0.98); }
+        .check-btn:disabled { opacity: 0.5; cursor: wait; }
+
+        .spinner {
+            width: 16px; height: 16px;
+            border: 2px solid var(--accent);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+        .testing .spinner { display: inline-block; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .result-box {
+            margin-top: 22px;
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-code);
+            display: none;
+            text-align: left;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+        .result-box.visible { display: block; }
+
+        .verdict { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; }
+        .verdict.yes { color: #10b981; }
+        .verdict.no  { color: #ef4444; }
+        .verdict.warn{ color: #f59e0b; }
+
+        .resolver-list {
+            list-style: none;
+            padding: 0; margin: 10px 0 0;
+            font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+        .resolver-list li { padding: 2px 0; }
+
+        .caveats {
+            margin-top: 24px;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px dashed var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            text-align: left;
+        }
+        .caveats strong { color: var(--text-secondary); }
+
+        .privacy-note {
+            margin-top: 14px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            opacity: 0.85;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .spinner { animation: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Site Header -->
+        <header>
+            <div class="header-top">
+                <a href="/" class="back-link" aria-label="Volver al inicio">&larr; Volver al inicio</a>
+                <div class="theme-switcher" role="group" aria-label="Seleccionar tema">
+                    <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <span class="theme-text">Claro</span>
+                    </button>
+                    <button type="button" class="theme-btn" data-theme-val="dark" onclick="setTheme('dark')" title="Modo Oscuro" aria-label="Modo Oscuro">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                        <span class="theme-text">Oscuro</span>
+                    </button>
+                    <button type="button" class="theme-btn" data-theme-val="auto" onclick="setTheme('auto')" title="Automático" aria-label="Automático">
+                        <svg class="theme-icon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        <span class="theme-text">Auto</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <h1 style="font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px;">
+                ¿Navegas a través de XDP?
+            </h1>
+            <p style="color: var(--text-secondary); max-width: 620px; margin: 0 auto 26px; font-size: 0.95rem; line-height: 1.55;">
+                Comprueba si tu dispositivo está utilizando los servidores DNS de XDP para resolver dominios.
+            </p>
+
+            <div class="test-card">
+                <button type="button" class="check-btn" id="check-btn">
+                    <span class="spinner" aria-hidden="true"></span>
+                    <span id="btn-label">Comprobar ahora</span>
+                </button>
+
+                <div class="result-box" id="result" aria-live="polite"></div>
+
+                <div class="caveats">
+                    <strong>Limitaciones conocidas:</strong><br>
+                    • Si tu navegador usa su propio DNS seguro (DoH) o activaste iCloud Private Relay,
+                    el test puede dar negativo aunque tengas XDP configurado.<br>
+                    • VPNs con DNS propio también producen falso negativo.<br>
+                    • El resultado refleja únicamente este dispositivo y esta red.
+                </div>
+
+                <div class="privacy-note">
+                    🔒 Privacidad: el test genera un token aleatorio único que solo existe durante
+                    segundos en memoria del servidor. No se guardan IPs de navegación ni historiales.
+                </div>
+            </div>
+        </main>
+
+        <!-- Site Footer -->
+        <footer class="site-footer">
+            <div>xdp.es DNS</div>
+            <div class="site-footer-links">
+                <a href="/about" class="site-footer-link">Acerca de</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/i18n.js?v=4.0"></script>
+    <script src="/theme.js?v=4.0"></script>
+    <script>
+        (function() {
+            const btn = document.getElementById('check-btn');
+            const label = document.getElementById('btn-label');
+            const box = document.getElementById('result');
+            let running = false;
+
+            function makeToken() {
+                return [...crypto.getRandomValues(new Uint8Array(4))]
+                    .map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+
+            // IP → servicio (egreso de cada cadena Unbound)
+            function serviceName(ip) {
+                if (ip === '85.208.114.51') return 'XDP AdBlock';
+                if (ip === '85.208.114.52') return 'XDP Standard';
+                return null;
+            }
+
+            function fireBeacons(token) {
+                const fire = () => {
+                    const url = 'https://' + token + '._check.xdp.es/pixel.gif?t=' + Date.now();
+                    new Image().src = url;                                   // vía <img>
+                    fetch(url, { mode: 'no-cors', cache: 'no-store' }).catch(() => {}); // vía fetch
+                };
+                fire();
+                setTimeout(fire, 2500); // refuerzo a mitad de la ventana de polling
+            }
+
+            async function pollWatch(token, attempts) {
+                for (let i = 0; i < attempts; i++) {
+                    await new Promise(r => setTimeout(r, 1000));
+                    try {
+                        const r = await fetch('/test/api/watch/' + token, { cache: 'no-store' });
+                        const d = await r.json();
+                        if (d.seen && d.resolvers.length) return d.resolvers.map(x => x.src_ip);
+                    } catch (e) { /* reintento */ }
+                }
+                return [];
+            }
+
+            function render(resolverIps) {
+                const services = [...new Set(resolverIps.map(serviceName).filter(Boolean))];
+                let html;
+
+                if (services.length > 0) {
+                    html = '<div class="verdict yes">✅ Sí — estás usando ' +
+                           services.join(' + ') + '</div>' +
+                           '<p>Tu conexión resuelve los dominios a través de los DNS de XDP.</p>';
+                } else if (resolverIps.length > 0) {
+                    html = '<div class="verdict no">❌ No estás usando XDP</div>' +
+                           '<p>Tu tráfico DNS sale por estos resolutores:</p>' +
+                           '<ul class="resolver-list">' +
+                           resolverIps.map(ip => '<li>' + ip.replace(/[^0-9a-fA-F.:]/g, '') +
+                           ' · <a href="https://rdap.org/ip/' + ip.replace(/[^0-9a-fA-F.:]/g, '') +
+                           '" target="_blank" rel="noopener noreferrer">ver propietario</a></li>').join('') +
+                           '</ul>' +
+                           '<p style="margin-top:8px;">Configura XDP siguiendo las guías de la portada.</p>';
+                } else {
+                    html = '<div class="verdict warn">⚠️ No se pudo determinar</div>' +
+                           '<p>Posibles causas: DNS-over-HTTPS del navegador, iCloud Private Relay o una VPN.</p>';
+                }
+
+                box.innerHTML = html;
+                box.classList.add('visible');
+                btn.disabled = false;
+                label.textContent = 'Repetir test';
+                running = false;
+            }
+
+            async function runTest() {
+                if (running) return;
+                running = true;
+                btn.disabled = true;
+                label.textContent = 'Comprobando…';
+                btn.classList.add('testing');
+                box.classList.remove('visible');
+
+                const token = makeToken();
+                fireBeacons(token);
+
+                const ips = await pollWatch(token, 8);
+                render(ips);
+            }
+
+            btn.addEventListener('click', runTest);
+        })();
+    </script>
+</body>
+</html>
