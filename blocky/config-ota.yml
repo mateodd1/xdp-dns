@@ -17,12 +17,9 @@ bootstrapDns:
   - 1.1.1.1
 
 caching:
-  minTime: 10m
-  maxTime: 24h
-  prefetching: true
-  prefetchExpires: 4h
-  prefetchThreshold: 1
-  cacheTimeNegative: 15m
+  minTime: -1m
+  maxTime: -1m
+  maxItemsCount: 0
 
 blocking:
   denylists:

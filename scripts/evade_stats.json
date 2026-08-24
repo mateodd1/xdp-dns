@@ -1,7 +1,7 @@
 {
-  "evaded_queries_total": 23,
-  "evaded_records_total": 38,
-  "total_queries_processed": 3996,
-  "last_evasion_timestamp": 1787548936.9566674,
-  "last_updated": 1787548940.361347
+  "evaded_queries_total": 47,
+  "evaded_records_total": 82,
+  "total_queries_processed": 7833,
+  "last_evasion_timestamp": 1787549133.1902704,
+  "last_updated": 1787549143.101721
 }

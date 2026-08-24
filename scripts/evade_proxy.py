@@ -349,6 +349,9 @@ def rewrite_dns_payload(wire_data):
                             rrset.add(rdata)
 
         if modified:
+            for section in [msg.answer, msg.authority, msg.additional]:
+                for rrset in section:
+                    rrset.ttl = 0
             EVADED_QUERIES_COUNT += 1
             EVADED_RECORDS_COUNT += records_replaced
             LAST_EVADED_TIME = time.time()

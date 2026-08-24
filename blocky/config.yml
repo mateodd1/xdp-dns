@@ -1,83 +1,70 @@
-ports:
-  dns:
-    - 85.208.114.51:53
-    - 127.0.0.1:53
-    - "[2a0e:97c0:c40::51]:53"
-    - "[::1]:53"
-  tls:
-    - 85.208.114.51:853
-    - 127.0.0.1:853
-    - "[2a0e:97c0:c40::51]:853"
-    - "[::1]:853"
-  http: 127.0.0.1:4000
-
+blocking:
+  blockTTL: 1m
+  blockType: zeroIp
+  clientGroupsBlock:
+    block-ota:
+    - ads
+    - apple_ota
+    default:
+    - ads
+    ota:
+    - ads
+    - apple_ota
+  denylists:
+    ads:
+    - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro.txt
+    - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+    - https://small.oisd.nl
+    - https://urlhaus.abuse.ch/downloads/hostfile/
+    apple_ota:
+    - /root/xpd-dns/blocky/apple-ota.txt
+  loading:
+    downloads:
+      attempts: 3
+      cooldown: 10s
+      timeout: 60s
+    refreshPeriod: 24h
+bootstrapDns:
+- 127.0.0.1:5335
+- 1.1.1.1
+caching:
+  maxItemsCount: 0
+  maxTime: -1m
+  minTime: -1m
+certFile: /etc/letsencrypt/live/xdp.es/fullchain.pem
 customDNS:
   customTTL: 1h
   mapping:
     dns.xdp.es: 85.208.114.51,2a0e:97c0:c40::51
     lite.xdp.es: 85.208.114.52,2a0e:97c0:c40::52
-
-certFile: /etc/letsencrypt/live/xdp.es/fullchain.pem
+ecs:
+  forward: false
+  useAsClient: true
 keyFile: /etc/letsencrypt/live/xdp.es/privkey.pem
-
-upstreams:
-  groups:
-    default:
-      - tcp+udp:127.0.0.1:5335
-  strategy: strict
-  timeout: 4s
-
-bootstrapDns:
-  - 127.0.0.1:5335
-  - 1.1.1.1
-
-caching:
-  minTime: 10m
-  maxTime: 24h
-  prefetching: true
-  prefetchExpires: 4h
-  prefetchThreshold: 1
-  cacheTimeNegative: 15m
-
-blocking:
-  denylists:
-    ads:
-      - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro.txt
-      - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-      - https://small.oisd.nl
-      - https://urlhaus.abuse.ch/downloads/hostfile/
-    apple_ota:
-      - /root/xpd-dns/blocky/apple-ota.txt
-  clientGroupsBlock:
-    default:
-      - ads
-    block-ota:
-      - ads
-      - apple_ota
-    ota:
-      - ads
-      - apple_ota
-  blockType: zeroIp
-  blockTTL: 1m
-  loading:
-    refreshPeriod: 24h
-    downloads:
-      timeout: 60s
-      cooldown: 10s
-      attempts: 3
-
+log:
+  format: text
+  level: warn
+  timestamp: true
+ports:
+  dns:
+  - 85.208.114.51:53
+  - 127.0.0.1:53
+  - '[2a0e:97c0:c40::51]:53'
+  - '[::1]:53'
+  http: 127.0.0.1:4000
+  tls:
+  - 85.208.114.51:853
+  - 127.0.0.1:853
+  - '[2a0e:97c0:c40::51]:853'
+  - '[::1]:853'
 prometheus:
   enable: true
   path: /metrics
-
-ecs:
-  useAsClient: true
-  forward: false
-
 queryLog:
   type: none
-
-log:
-  level: warn
-  format: text
-  timestamp: true
+upstreams:
+  groups:
+    default:
+    - tcp+udp:127.0.0.1:5335
+  strategy: strict
+  timeout: 4s

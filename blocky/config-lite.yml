@@ -1,54 +1,39 @@
-ports:
-  dns:
-    - 85.208.114.52:53
-    - "[2a0e:97c0:c40::52]:53"
-  tls:
-    - 85.208.114.52:853
-    - "[2a0e:97c0:c40::52]:853"
-  http: 127.0.0.1:4002
-
+bootstrapDns:
+- 127.0.0.1:5337
+caching:
+  minTime: -1m
+  maxTime: -1m
+  maxItemsCount: 0
+certFile: /etc/letsencrypt/live/xdp.es/fullchain.pem
 customDNS:
   customTTL: 1h
   mapping:
     dns.xdp.es: 85.208.114.51,2a0e:97c0:c40::51
     lite.xdp.es: 85.208.114.52,2a0e:97c0:c40::52
-
-certFile: /etc/letsencrypt/live/xdp.es/fullchain.pem
+ecs:
+  forward: false
+  useAsClient: true
 keyFile: /etc/letsencrypt/live/xdp.es/privkey.pem
-
-upstreams:
-  groups:
-    default:
-      - tcp+udp:127.0.0.1:5337
-  strategy: strict
-  timeout: 4s
-
-bootstrapDns:
-  - 127.0.0.1:5337
-
-caching:
-  minTime: 10m
-  maxTime: 24h
-  prefetching: true
-  prefetchExpires: 4h
-  prefetchThreshold: 1
-  cacheTimeNegative: 15m
-
-# Deliberately no blocking section: Lite only provides recursive DNS,
-# DNSSEC validation (via Unbound), and the existing IP-evasion layer.
+log:
+  format: text
+  level: warn
+  timestamp: true
+ports:
+  dns:
+  - 85.208.114.52:53
+  - '[2a0e:97c0:c40::52]:53'
+  http: 127.0.0.1:4002
+  tls:
+  - 85.208.114.52:853
+  - '[2a0e:97c0:c40::52]:853'
 prometheus:
   enable: true
   path: /metrics
-
-ecs:
-  useAsClient: true
-  forward: false
-
 queryLog:
   type: none
-
-log:
-  # Keep individual queried names out of the journal.
-  level: warn
-  format: text
-  timestamp: true
+upstreams:
+  groups:
+    default:
+    - tcp+udp:127.0.0.1:5337
+  strategy: strict
+  timeout: 4s
