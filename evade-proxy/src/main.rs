@@ -1,7 +1,7 @@
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashSet,
+    collections::{HashMap, HashSet},
     net::{Ipv4Addr, Ipv6Addr},
     path::{Path, PathBuf},
     str::FromStr,
@@ -19,9 +19,101 @@ use tokio::{
 
 const LISTEN_HOST: &str = "127.0.0.1";
 const UPSTREAM_HOST: &str = "127.0.0.1";
-const PORT_PAIRS: &[(u16, u16)] = &[(5335, 5336), (5337, 5338)];
-const METRICS_PORT: u16 = 5339;
+const PRODUCTION_PORT_PAIRS: &[(u16, u16)] = &[(5335, 5336), (5337, 5338)];
+const TEST_PORT_PAIRS: &[(u16, u16)] = &[(15335, 5336), (15337, 5338)];
+const PRODUCTION_METRICS_PORT: u16 = 5339;
+const TEST_METRICS_PORT: u16 = 15339;
 const UDP_LIMIT: usize = 65_535;
+
+#[derive(Clone, Default)]
+struct TestRedirect {
+    v4: Option<u32>,
+    v6: Option<u128>,
+}
+
+struct RuntimeConfig {
+    test_mode: bool,
+    redirects: HashMap<String, TestRedirect>,
+}
+
+impl RuntimeConfig {
+    fn parse() -> Result<Self> {
+        let mut test_mode = false;
+        let mut redirects: HashMap<String, TestRedirect> = HashMap::new();
+        let mut args = std::env::args().skip(1);
+        while let Some(arg) = args.next() {
+            match arg.as_str() {
+                "--test" => test_mode = true,
+                "--redirect" => {
+                    let rule = args.next().context("--redirect requires DOMAIN=IP")?;
+                    add_redirect(&mut redirects, &rule)?;
+                }
+                "--help" | "-h" => {
+                    println!(
+                        "evade-proxy\n\n  --test                 listen on 15335/15337; metrics on 15339\n  --redirect DOMAIN=IP   override A or AAAA answers in test mode (repeatable)\n  -h, --help             show this help"
+                    );
+                    std::process::exit(0);
+                }
+                _ if arg.starts_with("--redirect=") => {
+                    add_redirect(&mut redirects, &arg[11..])?;
+                }
+                _ => bail!("unknown argument {arg:?}; use --help"),
+            }
+        }
+        if !test_mode && !redirects.is_empty() {
+            bail!("--redirect is only accepted together with --test");
+        }
+        Ok(Self {
+            test_mode,
+            redirects,
+        })
+    }
+
+    fn port_pairs(&self) -> &'static [(u16, u16)] {
+        if self.test_mode {
+            TEST_PORT_PAIRS
+        } else {
+            PRODUCTION_PORT_PAIRS
+        }
+    }
+
+    fn metrics_port(&self) -> u16 {
+        if self.test_mode {
+            TEST_METRICS_PORT
+        } else {
+            PRODUCTION_METRICS_PORT
+        }
+    }
+}
+
+fn add_redirect(rules: &mut HashMap<String, TestRedirect>, rule: &str) -> Result<()> {
+    let (domain, ip) = rule
+        .split_once('=')
+        .with_context(|| format!("invalid redirect {rule:?}; expected DOMAIN=IP"))?;
+    let domain = normalize_domain(domain)?;
+    let target = rules.entry(domain).or_default();
+    if let Ok(ip) = ip.parse::<Ipv4Addr>() {
+        target.v4 = Some(u32::from(ip));
+    } else if let Ok(ip) = ip.parse::<Ipv6Addr>() {
+        target.v6 = Some(u128::from(ip));
+    } else {
+        bail!("invalid redirect address {ip:?}");
+    }
+    Ok(())
+}
+
+fn normalize_domain(domain: &str) -> Result<String> {
+    let normalized = domain.trim().trim_end_matches('.').to_ascii_lowercase();
+    if normalized.is_empty()
+        || normalized.len() > 253
+        || normalized
+            .split('.')
+            .any(|label| label.is_empty() || label.len() > 63)
+    {
+        bail!("invalid domain {domain:?}");
+    }
+    Ok(normalized)
+}
 
 #[derive(Clone, Debug)]
 struct Paths {
@@ -33,7 +125,7 @@ struct Paths {
 }
 
 impl Paths {
-    fn from_env() -> Self {
+    fn from_env(test_mode: bool) -> Self {
         fn value(name: &str, default: &str) -> PathBuf {
             std::env::var_os(name)
                 .map(PathBuf::from)
@@ -50,7 +142,14 @@ impl Paths {
                 "EVADE_CF_IPV6_FILE",
                 "/etc/unbound/cloudflare_prefixes_v6.txt",
             ),
-            stats: value("EVADE_STATS_FILE", "/root/xpd-dns/scripts/evade_stats.json"),
+            stats: value(
+                "EVADE_STATS_FILE",
+                if test_mode {
+                    "/tmp/evade-proxy-test-stats.json"
+                } else {
+                    "/root/xpd-dns/scripts/evade_stats.json"
+                },
+            ),
         }
     }
 }
@@ -193,23 +292,27 @@ struct App {
     data: RwLock<Arc<Data>>,
     counters: Counters,
     paths: Paths,
+    test_redirects: HashMap<String, TestRedirect>,
 }
 
 impl App {
-    async fn new(paths: Paths) -> Arc<Self> {
+    async fn new(paths: Paths, test_redirects: HashMap<String, TestRedirect>) -> Arc<Self> {
         let data = Data::load(&paths, true).await;
         let counters = Counters::load(&paths.stats).await;
         Arc::new(Self {
             data: RwLock::new(Arc::new(data)),
             counters,
             paths,
+            test_redirects,
         })
     }
 
     fn rewrite(&self, packet: &mut [u8]) -> usize {
         self.counters.total_queries.fetch_add(1, Relaxed);
         let data = self.data.read().expect("data lock poisoned").clone();
-        if data.blocked_v4.is_empty() && data.blocked_v6.is_empty() {
+        let test_redirect =
+            question_name(packet).and_then(|domain| self.test_redirects.get(&domain));
+        if test_redirect.is_none() && data.blocked_v4.is_empty() && data.blocked_v6.is_empty() {
             return 0;
         }
         let records = match resource_records(packet) {
@@ -218,6 +321,29 @@ impl App {
         };
         let mut changes: Vec<(usize, Vec<u8>)> = Vec::new();
         for rr in &records {
+            if rr.answer {
+                match (rr.kind, rr.rdlen, test_redirect) {
+                    (1, 4, Some(redirect)) => {
+                        if let Some(ip) = redirect.v4 {
+                            let bytes = ip.to_be_bytes();
+                            if packet[rr.rdata..rr.rdata + 4] != bytes {
+                                changes.push((rr.rdata, bytes.to_vec()));
+                            }
+                            continue;
+                        }
+                    }
+                    (28, 16, Some(redirect)) => {
+                        if let Some(ip) = redirect.v6 {
+                            let bytes = ip.to_be_bytes();
+                            if packet[rr.rdata..rr.rdata + 16] != bytes {
+                                changes.push((rr.rdata, bytes.to_vec()));
+                            }
+                            continue;
+                        }
+                    }
+                    _ => {}
+                }
+            }
             match (rr.kind, rr.rdlen) {
                 (1, 4) => {
                     let ip = u32::from_be_bytes(packet[rr.rdata..rr.rdata + 4].try_into().unwrap());
@@ -266,6 +392,7 @@ struct Record {
     ttl: usize,
     rdlen: usize,
     rdata: usize,
+    answer: bool,
 }
 
 fn resource_records(packet: &[u8]) -> Option<Vec<Record>> {
@@ -273,7 +400,8 @@ fn resource_records(packet: &[u8]) -> Option<Vec<Record>> {
         return None;
     }
     let qd = be16(packet, 4)? as usize;
-    let total = be16(packet, 6)? as usize + be16(packet, 8)? as usize + be16(packet, 10)? as usize;
+    let answers = be16(packet, 6)? as usize;
+    let total = answers + be16(packet, 8)? as usize + be16(packet, 10)? as usize;
     let mut pos = 12;
     for _ in 0..qd {
         pos = skip_name(packet, pos)?;
@@ -283,7 +411,7 @@ fn resource_records(packet: &[u8]) -> Option<Vec<Record>> {
         }
     }
     let mut records = Vec::with_capacity(total);
-    for _ in 0..total {
+    for index in 0..total {
         pos = skip_name(packet, pos)?;
         if pos.checked_add(10)? > packet.len() {
             return None;
@@ -301,9 +429,50 @@ fn resource_records(packet: &[u8]) -> Option<Vec<Record>> {
             ttl,
             rdlen,
             rdata,
+            answer: index < answers,
         });
     }
     Some(records)
+}
+
+fn question_name(packet: &[u8]) -> Option<String> {
+    if be16(packet, 4)? == 0 {
+        return None;
+    }
+    let (name, _) = decode_name(packet, 12)?;
+    Some(name)
+}
+
+fn decode_name(packet: &[u8], start: usize) -> Option<(String, usize)> {
+    let mut labels = Vec::new();
+    let mut pos = start;
+    let mut end = None;
+    let mut jumps = 0usize;
+    loop {
+        let n = *packet.get(pos)?;
+        if n & 0xc0 == 0xc0 {
+            let low = *packet.get(pos + 1)? as usize;
+            let target = (((n & 0x3f) as usize) << 8) | low;
+            end.get_or_insert(pos.checked_add(2)?);
+            pos = target;
+            jumps += 1;
+            if jumps > 128 {
+                return None;
+            }
+            continue;
+        }
+        if n & 0xc0 != 0 || n > 63 {
+            return None;
+        }
+        pos = pos.checked_add(1)?;
+        if n == 0 {
+            let consumed = end.unwrap_or(pos);
+            return Some((labels.join("."), consumed));
+        }
+        let label = packet.get(pos..pos.checked_add(n as usize)?)?;
+        labels.push(std::str::from_utf8(label).ok()?.to_ascii_lowercase());
+        pos += n as usize;
+    }
 }
 
 fn skip_name(packet: &[u8], mut pos: usize) -> Option<usize> {
@@ -393,9 +562,9 @@ async fn handle_tcp(app: Arc<App>, mut client: TcpStream, upstream_port: u16) ->
     Ok(())
 }
 
-async fn metrics_server(app: Arc<App>) -> Result<()> {
-    let listener = TcpListener::bind((LISTEN_HOST, METRICS_PORT)).await?;
-    eprintln!("metrics HTTP {LISTEN_HOST}:{METRICS_PORT}");
+async fn metrics_server(app: Arc<App>, port: u16) -> Result<()> {
+    let listener = TcpListener::bind((LISTEN_HOST, port)).await?;
+    eprintln!("metrics HTTP {LISTEN_HOST}:{port}");
     loop {
         let (stream, _) = listener.accept().await?;
         let app = app.clone();
@@ -566,14 +735,36 @@ fn epoch() -> f64 {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let app = App::new(Paths::from_env()).await;
-    tokio::spawn(maintenance(app.clone()));
-    for &(listen, upstream) in PORT_PAIRS {
-        tokio::spawn(udp_server(app.clone(), listen, upstream));
-        tokio::spawn(tcp_server(app.clone(), listen, upstream));
+    let config = RuntimeConfig::parse()?;
+    let paths = Paths::from_env(config.test_mode);
+    if config.test_mode {
+        eprintln!(
+            "TEST MODE: redirects={}, stats={}",
+            config.redirects.len(),
+            paths.stats.display()
+        );
     }
-    tokio::spawn(metrics_server(app));
-    tokio::signal::ctrl_c().await?;
+    let port_pairs = config.port_pairs();
+    let metrics_port = config.metrics_port();
+    let app = App::new(paths, config.redirects).await;
+    let maintenance_task = tokio::spawn(maintenance(app.clone()));
+    let mut servers = tokio::task::JoinSet::new();
+    for &(listen, upstream) in port_pairs {
+        servers.spawn(udp_server(app.clone(), listen, upstream));
+        servers.spawn(tcp_server(app.clone(), listen, upstream));
+    }
+    servers.spawn(metrics_server(app, metrics_port));
+
+    tokio::select! {
+        signal = tokio::signal::ctrl_c() => signal?,
+        result = servers.join_next() => match result {
+            Some(Ok(Err(error))) => return Err(error),
+            Some(Err(error)) => return Err(error.into()),
+            Some(Ok(Ok(()))) => bail!("a server task stopped unexpectedly"),
+            None => bail!("all server tasks stopped unexpectedly"),
+        }
+    }
+    maintenance_task.abort();
     Ok(())
 }
 
@@ -598,11 +789,68 @@ mod tests {
         let app = App {
             data: RwLock::new(Arc::new(data)),
             counters: Counters::default(),
-            paths: Paths::from_env(),
+            paths: Paths::from_env(true),
+            test_redirects: HashMap::new(),
         };
         assert_eq!(app.rewrite(&mut packet), 1);
         assert_eq!(&packet[packet.len() - 4..], &[104, 16, 1, 2]);
         assert_eq!(&packet[packet.len() - 10..packet.len() - 6], &[0, 0, 0, 0]);
+    }
+
+    #[test]
+    fn test_mode_redirects_only_matching_question() {
+        let original = [104, 16, 1, 1];
+        let mut packet = vec![
+            0x12,
+            0x34,
+            0x81,
+            0x80,
+            0,
+            1,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            b'a',
+            3,
+            b'c',
+            b'o',
+            b'm',
+            0,
+            0,
+            1,
+            0,
+            1,
+            0xc0,
+            0x0c,
+            0,
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0x2c,
+            0,
+            4,
+            original[0],
+            original[1],
+            original[2],
+            original[3],
+        ];
+        let mut rules = HashMap::new();
+        add_redirect(&mut rules, "a.com=203.0.113.7").unwrap();
+        let app = App {
+            data: RwLock::new(Arc::new(Data::default())),
+            counters: Counters::default(),
+            paths: Paths::from_env(true),
+            test_redirects: rules,
+        };
+        assert_eq!(app.rewrite(&mut packet), 1);
+        assert_eq!(&packet[packet.len() - 4..], &[203, 0, 113, 7]);
     }
 
     #[test]
