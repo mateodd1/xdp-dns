@@ -100,9 +100,12 @@
             padding: 0;
         }
 
-        /* Disable double-tap zoom on touch devices while keeping pinch zoom (WCAG-safe) */
+        /* Disable double-tap zoom on touch devices while keeping pinch zoom (WCAG-safe).
+           Reserve scrollbar gutter: stats renders data async and used to shift when
+           the vertical scrollbar appeared mid-scroll. */
         html {
             touch-action: manipulation;
+            scrollbar-gutter: stable;
         }
 
         body {

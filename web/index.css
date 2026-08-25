@@ -84,8 +84,11 @@
 }
 
 /* Disable double-tap zoom on touch devices while keeping pinch zoom (WCAG-safe) */
+/* Disable double-tap zoom on touch devices while keeping pinch zoom (WCAG-safe).
+   Reserve scrollbar gutter so pages don't shift when the scrollbar appears. */
 html {
     touch-action: manipulation;
+    scrollbar-gutter: stable;
 }
 
 body {
