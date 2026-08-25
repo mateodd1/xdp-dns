@@ -1,6 +1,6 @@
 [Unit]
-Description=Update DNS Landing Page Stats from Blocky Metrics
-After=blocky.service blocky-lite.service
+Description=Update DNS Landing Page Stats from Blocky and Unbound Metrics
+After=blocky.service blocky-lite.service unbound.service unbound-lite.service
 
 [Service]
 Type=oneshot

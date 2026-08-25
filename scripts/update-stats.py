@@ -2,8 +2,9 @@
 """
 update-stats.py - High-reliability persistent metrics collector for xdp.es DNS.
 Preserves historical 24-hour and 30-day statistics across service restarts and reboots.
-Scrapes Blocky Prometheus metrics, resolves ASNs anonymously via Team Cymru DNS,
-and publishes clean stats.json for landing page and dashboard.
+Scrapes Blocky Prometheus metrics and Unbound cache counters, resolves ASNs
+anonymously via Team Cymru DNS, and publishes clean stats.json for the landing
+page and dashboard.
 """
 
 import urllib.request
@@ -32,6 +33,20 @@ ASN_CACHE_FILE = "/root/xpd-dns/scripts/asn_cache.json"
 HISTORY_FILE = "/root/xpd-dns/scripts/history.json"
 EVADE_STATS_FILE = "/root/xpd-dns/scripts/evade_stats.json"
 EVADE_METRICS_URL = "http://127.0.0.1:5339/stats"
+CACHE_COUNTER_SOURCE = "unbound-v1"
+UNBOUND_CONTROL_COMMANDS = {
+    "main": [
+        "/usr/sbin/unbound-control",
+        "-c", "/etc/unbound/unbound.conf",
+        "stats_noreset",
+    ],
+    "lite": [
+        "/usr/sbin/unbound-control",
+        "-c", "/etc/unbound/unbound-lite.conf",
+        "-s", "127.0.0.1@8954",
+        "stats_noreset",
+    ],
+}
 
 def fetch_evade_metrics():
     try:
@@ -48,6 +63,27 @@ def fetch_evade_metrics():
             except Exception:
                 pass
     return 0
+
+def fetch_unbound_cache_counters():
+    counters = {}
+    for instance, command in UNBOUND_CONTROL_COMMANDS.items():
+        try:
+            output = subprocess.check_output(
+                command,
+                text=True,
+                stderr=subprocess.STDOUT,
+                timeout=5,
+            )
+            match = re.search(r"^total\.num\.cachehits=(\d+)$", output, re.MULTILINE)
+            if not match:
+                raise ValueError("total.num.cachehits is missing")
+            counters[instance] = int(match.group(1))
+        except Exception as e:
+            # A partial sum could be mistaken for a counter reset and duplicate
+            # cache hits, so skip the complete statistics update on any failure.
+            print(f"Error fetching Unbound cache counter for {instance}: {e}")
+            return None
+    return counters
 
 def load_json(filepath, default=None):
     if default is None:
@@ -373,6 +409,18 @@ def update_persistent_history(raw_now):
     base_blocked = int(history.get("blocked_30d", 68))
     base_cached = int(history.get("cached_30d", 349))
 
+    cache_counter_source = raw_now.get("cache_counter_source", "blocky-v1")
+    previous_cache_source = history.get("cache_counter_source", "blocky-v1")
+    cache_source_changed = cache_counter_source != previous_cache_source
+
+    if cache_source_changed:
+        # Blocky's cache was disabled, so its historical CACHED values are not
+        # comparable to Unbound's real cache hits. Start the new series at zero
+        # and use the current cumulative counters strictly as a baseline.
+        for old_bucket in history["hourly_buckets"].values():
+            old_bucket["cached"] = 0
+        base_cached = 0
+
     raw_last = history.get("raw_last", {})
     last_total = float(raw_last.get("total", 0.0))
     last_blocked = float(raw_last.get("blocked", 0.0))
@@ -401,7 +449,22 @@ def update_persistent_history(raw_now):
     else:
         d_blocked = cur_blocked
 
-    if cur_cached >= last_cached and last_cached > 0:
+    current_cache_counters = raw_now.get("cache_counters", {})
+    previous_cache_counters = raw_last.get("cache_counters", {})
+    if cache_source_changed or not previous_cache_counters:
+        d_cached = 0.0
+    elif cache_counter_source == CACHE_COUNTER_SOURCE and current_cache_counters:
+        d_cached = 0.0
+        for instance, current_value in current_cache_counters.items():
+            current_value = float(current_value)
+            previous_value = float(previous_cache_counters.get(instance, 0.0))
+            if current_value >= previous_value:
+                d_cached += current_value - previous_value
+            else:
+                # This Unbound instance restarted independently. Count only
+                # hits accumulated by the new process.
+                d_cached += current_value
+    elif cur_cached >= last_cached and last_cached > 0:
         d_cached = cur_cached - last_cached
     else:
         d_cached = cur_cached
@@ -486,6 +549,7 @@ def update_persistent_history(raw_now):
 
     # Save raw_last for next iteration
     history["raw_last"] = raw_now
+    history["cache_counter_source"] = cache_counter_source
     history["last_updated"] = now
 
     # Prune buckets older than 35 days
@@ -711,7 +775,16 @@ def main():
     if not all(parsed):
         print("Warning: failed to parse metrics")
         return
+
+    cache_counters = fetch_unbound_cache_counters()
+    if cache_counters is None:
+        print("Warning: unable to collect all Unbound cache counters")
+        return
+
     raw_now = merge_raw_metrics(parsed)
+    raw_now["cached"] = float(sum(cache_counters.values()))
+    raw_now["cache_counters"] = cache_counters
+    raw_now["cache_counter_source"] = CACHE_COUNTER_SOURCE
 
     history = update_persistent_history(raw_now)
 

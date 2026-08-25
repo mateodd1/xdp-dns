@@ -231,11 +231,12 @@ colisión: DoQ escucha en UDP y DoT en TCP.
 * **Script**: `/root/xpd-dns/scripts/update-stats.py`
 * **Servicio & Timer**: `update-stats.service` / `update-stats.timer` (`OnUnitActiveSec=30s`)
 * **Lógica**:
-  1. Scrapea `http://127.0.0.1:4000/metrics` en RAM.
-  2. Suma el 100% de las consultas (DoT + DoH + DNS53).
-  3. Consulta anónimamente a **Team Cymru** (`AS<num>.asn.cymru.com`) para geolocalizar el operador sin almacenar logs de navegación.
-  4. Clasifica entre **Operadores Residenciales (ISP)** (Movistar, Vodafone, Orange, DIGI, MásMóvil, Starlink, Avatel, PTV Telecom, etc.) y **Datacenters** (OVH, Hetzner, AWS, Ginernet, etc.).
-  5. Genera `/var/www/xdp.es/stats.json` con rolling deltas de 24h y 30 días.
+  1. Scrapea en RAM las métricas Prometheus de las dos instancias de Blocky (`:4000` y `:4002`).
+  2. Lee con `unbound-control stats_noreset` los aciertos reales de caché de Unbound principal y Lite. Los contadores se siguen por separado para tolerar reinicios independientes sin duplicar datos.
+  3. Suma el 100% de las consultas (DoT + DoQ + DoH + DNS53).
+  4. Consulta anónimamente a **Team Cymru** (`AS<num>.asn.cymru.com`) para geolocalizar el operador sin almacenar logs de navegación.
+  5. Clasifica entre **Operadores Residenciales (ISP)** (Movistar, Vodafone, Orange, DIGI, MásMóvil, Starlink, Avatel, PTV Telecom, etc.) y **Datacenters** (OVH, Hetzner, AWS, Ginernet, etc.).
+  6. Genera `/var/www/xdp.es/stats.json` con rolling deltas de 24h y 30 días.
 
 ### 5.4 Panel Interno de Bloqueos (`/blocked`)
 * **Página**: `/root/xpd-dns/web/blocked/index.html` -> Desplegada en `/var/www/xdp.es/blocked/index.html`
