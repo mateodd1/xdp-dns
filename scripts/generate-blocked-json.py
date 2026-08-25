@@ -14,6 +14,11 @@ BLOCKED_V4_FILE = "/etc/unbound/blocked_ips.txt"
 CF_V4_FILE = "/etc/unbound/cloudflare_prefixes_v4.txt"
 ASN_CACHE_FILE = "/root/xpd-dns/scripts/asn_cache.json"
 
+# Proxy de evasión en Rust (xdp-evade-proxy.service): consume estos mismos ficheros
+# y expone contadores agregados. Fuente primaria HTTP, fallback al fichero que persiste.
+EVADE_METRICS_URL = "http://127.0.0.1:5339/stats"
+EVADE_STATS_FILE = "/root/xpd-dns/scripts/evade_stats.json"
+
 OUT_WEB = "/root/xpd-dns/web/blocked/data.json"
 OUT_WWW = "/var/www/xdp.es/blocked/data.json"
 
@@ -96,6 +101,9 @@ if os.path.exists(BLOCKED_V4_FILE):
 
 blocked_v4_set = set(blocked_v4)
 
+# NOTA DE PARIDAD: este algoritmo replica 1:1 a `evasive_v4` del proxy Rust
+# (evade-proxy/src/main.rs). Si se cambia aquí, cambiar allí también — y viceversa —
+# o el dashboard mostrará alternativas distintas de las que entrega el proxy en real.
 def get_evasive_v4(ip_str):
     cf = find_cf_v4(ip_str)
     if not cf:
@@ -162,6 +170,23 @@ evaded_count = sum(1 for e in entries if e["status"].startswith("Evadida"))
 
 now_utc = datetime.datetime.now(datetime.timezone.utc)
 
+def evasion_proxy_state():
+    """Contadores en vivo del proxy Rust (:5339). Fallback al fichero que persiste."""
+    import urllib.request
+    try:
+        req = urllib.request.Request(EVADE_METRICS_URL, headers={"User-Agent": "BlockedDashboard/1.0"})
+        with urllib.request.urlopen(req, timeout=2) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except Exception:
+        pass
+    try:
+        with open(EVADE_STATS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+proxy_state = evasion_proxy_state()
+
 data = {
     "last_updated": now_utc.strftime("%Y-%m-%d %H:%M:%S UTC"),
     "timestamp": int(now_utc.timestamp()),
@@ -169,6 +194,13 @@ data = {
     "total_blocked": total_blocked,
     "cf_blocked_count": cf_blocked_count,
     "evaded_count": evaded_count,
+    "evasion_proxy": {
+        "evaded_queries_total": int(proxy_state.get("evaded_queries_total", 0)),
+        "evaded_records_total": int(proxy_state.get("evaded_records_total", 0)),
+        "total_queries_processed": int(proxy_state.get("total_queries_processed", 0)),
+        "last_evasion_timestamp": proxy_state.get("last_evasion_timestamp"),
+        "source": "evade-proxy-rust"
+    },
     "entries": entries
 }
 
