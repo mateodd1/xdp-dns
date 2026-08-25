@@ -238,13 +238,19 @@
                     show('<div class="verdict yes">✅ Sí — ' + services.join(' + ') + '</div>' +
                          '<p class="sub">Tu conexión resuelve a través de XDP.</p>', true);
                 } else {
-                    const lines = resolvers.map(r => {
-                        if (!/^[0-9a-fA-F.:]+$/.test(r.src_ip)) return '';
-                        const logo = logoFor(r.asn, r.name);
+                    // Agrupar por ASN+nombre: un resolver = una línea, sin repetir por IP de egreso
+                    const seen = new Map();
+                    for (const r of resolvers) {
+                        if (!/^[0-9a-fA-F.:]+$/.test(r.src_ip)) continue;
+                        const key = (r.asn != null ? r.asn : 'x') + '|' + (r.name || '');
+                        if (!seen.has(key)) seen.set(key, { asn: r.asn, name: r.name });
+                    }
+                    const lines = [...seen.values()].map(({ asn, name }) => {
+                        const logo = logoFor(asn, name);
                         const logoHtml = logo ? logoImg(logo) : '';
-                        const asn = r.asn ? 'AS' + r.asn : 'ASN desconocido';
-                        const name = r.name ? ' · ' + r.name : '';
-                        return '<li>' + logoHtml + '<strong>' + asn + '</strong>' + name + '</li>';
+                        const asnTxt = asn != null ? 'AS' + asn : 'ASN desconocido';
+                        const nameTxt = name ? ' ' + name : '';
+                        return '<li>' + logoHtml + '<strong>' + asnTxt + '</strong>' + nameTxt + '</li>';
                     }).join('');
                     show('<div class="verdict no">❌ No usas XDP</div>' +
                          '<p class="sub">Tus resolutores DNS:</p>' +
