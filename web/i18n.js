@@ -188,7 +188,20 @@ const translations = {
         "blocked.next": "Siguiente",
         "blocked.empty_no_blocks": "🟢 No hay ninguna IP bloqueada en este momento.",
         "blocked.empty_not_found": "No se encontraron resultados para la búsqueda.",
-        "blocked.loading": "Cargando datos..."
+        "blocked.loading": "Cargando datos...",
+
+        // /test page
+        "test.page_title": "¿Navegas por XDP? | xdp.es DNS",
+        "test.title": "¿Navegas por XDP?",
+        "test.checking": "Comprobando…",
+        "test.retry": "Repetir test",
+        "test.verdict_yes": "✅ Sí — {service}",
+        "test.verdict_yes_sub": "Tu conexión resuelve a través de XDP.",
+        "test.verdict_no": "❌ No usas XDP",
+        "test.resolver_label": "Tu resolutor DNS:",
+        "test.verdict_unknown": "⚠️ No se pudo determinar",
+        "test.unknown_sub": "¿Usas DoH en el navegador, Private Relay o una VPN?",
+        "test.asn_unknown": "ASN desconocido"
     },
     en: {
         "site.title": "xdp.es DNS",
@@ -376,7 +389,20 @@ const translations = {
         "blocked.next": "Next",
         "blocked.empty_no_blocks": "🟢 No IPs are currently blocked at this time.",
         "blocked.empty_not_found": "No results found for your search.",
-        "blocked.loading": "Loading data..."
+        "blocked.loading": "Loading data...",
+
+        // /test page
+        "test.page_title": "Are you browsing via XDP? | xdp.es DNS",
+        "test.title": "Are you browsing via XDP?",
+        "test.checking": "Checking…",
+        "test.retry": "Run again",
+        "test.verdict_yes": "✅ Yes — {service}",
+        "test.verdict_yes_sub": "Your connection resolves through XDP.",
+        "test.verdict_no": "❌ You are not using XDP",
+        "test.resolver_label": "Your DNS resolver:",
+        "test.verdict_unknown": "⚠️ Could not determine",
+        "test.unknown_sub": "Browser DoH, Private Relay or a VPN may be in use.",
+        "test.asn_unknown": "Unknown ASN"
     }
 };
 

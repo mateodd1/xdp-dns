@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¿Navegas por XDP? | xdp.es DNS</title>
+    <title data-i18n="test.page_title">¿Navegas por XDP? | xdp.es DNS</title>
     <meta name="description" content="Comprueba si tu conexión resuelve las DNS a través de los servidores de xdp.es.">
     <link rel="canonical" href="https://xdp.es/test">
 
@@ -14,6 +14,8 @@
                 const theme = localStorage.getItem('xdp_theme') || 'auto';
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+                const navLang = (navigator.language || (navigator.languages && navigator.languages[0]) || 'es').toLowerCase();
+                document.documentElement.setAttribute('lang', navLang.startsWith('es') ? 'es' : 'en');
             } catch (e) {}
         })();
     </script>
@@ -117,7 +119,7 @@
         </header>
 
         <main>
-            <h1 style="font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 22px;">
+            <h1 data-i18n="test.title" style="font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 22px;">
                 ¿Navegas por XDP?
             </h1>
 
@@ -125,7 +127,7 @@
                 <div id="status" aria-live="polite">
                     <span class="spinner" role="status"></span>
                 </div>
-                <button type="button" class="retry" id="retry" hidden>Repetir test</button>
+                <button type="button" class="retry" id="retry" data-i18n="test.retry" hidden>Repetir test</button>
             </div>
         </main>
 
@@ -145,6 +147,8 @@
         (function() {
             const statusEl = document.getElementById('status');
             const retryBtn = document.getElementById('retry');
+            const T = (k, f) => (window.i18n && window.i18n.t(k)) || f;
+            let lastResolvers = null;
 
             function makeToken() {
                 return [...crypto.getRandomValues(new Uint8Array(4))]
@@ -216,7 +220,7 @@
 
             async function runTest() {
                 retryBtn.hidden = true;
-                statusEl.innerHTML = '<span class="spinner" role="status"></span>';
+                statusEl.innerHTML = '<span class="spinner" role="status"></span> ' + T('test.checking', 'Comprobando…');
 
                 const token = makeToken();
                 fireBeacons(token);
@@ -225,18 +229,24 @@
                 setTimeout(() => fireBeacons(token), 2500);
 
                 const resolvers = await pollWatch(token);
+                lastResolvers = resolvers;
+                renderResult(resolvers);
+            }
 
+            function renderResult(resolvers) {
                 if (resolvers.length === 0) {
-                    show('<div class="verdict warn">⚠️ No se pudo determinar</div>' +
-                         '<p class="sub">¿Usas DoH en el navegador, Private Relay o una VPN?</p>', true);
+                    show('<div class="verdict warn">' + T('test.verdict_unknown', '⚠️ No se pudo determinar') + '</div>' +
+                         '<p class="sub">' + T('test.unknown_sub', '¿Usas DoH en el navegador, Private Relay o una VPN?') + '</p>', true);
                     return;
                 }
 
                 const services = [...new Set(resolvers.map(r => serviceName(r.src_ip)).filter(Boolean))];
 
                 if (services.length > 0) {
-                    show('<div class="verdict yes">✅ Sí — ' + services.join(' + ') + '</div>' +
-                         '<p class="sub">Tu conexión resuelve a través de XDP.</p>', true);
+                    show('<div class="verdict yes">' +
+                         T('test.verdict_yes', '✅ Sí — {service}').replace('{service}', services.join(' + ')) +
+                         '</div>' +
+                         '<p class="sub">' + T('test.verdict_yes_sub', 'Tu conexión resuelve a través de XDP.') + '</p>', true);
                 } else {
                     // Agrupar por ASN+nombre: un resolver = una línea, sin repetir por IP de egreso
                     const seen = new Map();
@@ -245,18 +255,23 @@
                         const key = (r.asn != null ? r.asn : 'x') + '|' + (r.name || '');
                         if (!seen.has(key)) seen.set(key, { asn: r.asn, name: r.name });
                     }
+                    const asnUnknown = T('test.asn_unknown', 'ASN desconocido');
                     const lines = [...seen.values()].map(({ asn, name }) => {
                         const logo = logoFor(asn, name);
                         const logoHtml = logo ? logoImg(logo) : '';
-                        const asnTxt = asn != null ? 'AS' + asn : 'ASN desconocido';
-                        const nameTxt = name ? ' ' + name : '';
-                        return '<li>' + logoHtml + '<strong>' + asnTxt + '</strong>' + nameTxt + '</li>';
+                        const asnTxt = asn != null ? '<strong>AS' + asn + '</strong>' : '<strong>' + asnUnknown + '</strong>';
+                        const nameTxt = name ? ' · ' + name : '';
+                        return '<li>' + logoHtml + asnTxt + nameTxt + '</li>';
                     }).join('');
-                    show('<div class="verdict no">❌ No usas XDP</div>' +
-                         '<p class="sub">Tu resolutor DNS:</p>' +
+                    show('<div class="verdict no">' + T('test.verdict_no', '❌ No usas XDP') + '</div>' +
+                         '<p class="sub">' + T('test.resolver_label', 'Tu resolutor DNS:') + '</p>' +
                          '<ul class="asn-list">' + lines + '</ul>', true);
                 }
             }
+
+            window.addEventListener('langchange', () => {
+                if (lastResolvers) renderResult(lastResolvers);
+            });
 
             retryBtn.addEventListener('click', runTest);
             runTest();          // automático al cargar
