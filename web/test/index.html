@@ -157,6 +157,13 @@
                 return null;
             }
 
+            // Logos de resolutores conocidos (assets en /test/img)
+            const RESOLVER_LOGOS = [
+                { file: '/test/img/google.svg', alt: 'Google Public DNS', asn: [15169], kw: ['google'] },
+                { file: '/test/img/cloudflare.svg', alt: 'Cloudflare DNS', asn: [13335], kw: ['cloudflare'] },
+                { file: '/test/img/quad9.svg', alt: 'Quad9', asn: [19281], kw: ['quad9', 'quad9-'] }
+            ];
+
             // Logos de ISPs disponibles en /stats/img (mismos ASN que usa /stats)
             const ISP_LOGOS = [
                 { file: '/stats/img/movistar.svg', alt: 'Movistar', asn: [3352, 6739], kw: ['telefonica', 'movistar'] },
@@ -166,8 +173,14 @@
                 { file: '/stats/img/masmovil.svg', alt: 'MásMóvil / Yoigo', asn: [15704, 210344, 15954, 56645], kw: ['yoigo', 'masmovil', 'másmóvil', 'xfera', 'pepephone', 'euskaltel'] }
             ];
 
-            function ispLogoFor(ipStr, asn, org) {
+            function logoFor(ipStr, asn, org) {
                 const lower = String(org || '').toLowerCase();
+                // Prioridad: logos de resolutores conocidos, luego ISPs de /stats
+                const resolver = RESOLVER_LOGOS.find(l =>
+                    (asn != null && l.asn.includes(Number(asn))) ||
+                    l.kw.some(k => lower.includes(k))
+                );
+                if (resolver) return resolver;
                 return ISP_LOGOS.find(l =>
                     (asn != null && l.asn.includes(Number(asn))) ||
                     l.kw.some(k => lower.includes(k))
@@ -227,7 +240,7 @@
                 } else {
                     const lines = resolvers.map(r => {
                         if (!/^[0-9a-fA-F.:]+$/.test(r.src_ip)) return '';
-                        const logo = ispLogoFor(r.src_ip, r.asn, r.org);
+                        const logo = logoFor(r.src_ip, r.asn, r.org);
                         const logoHtml = logo ? logoImg(logo) : '';
                         const asn = r.asn ? 'AS' + r.asn : 'ASN desconocido';
                         const org = r.org ? ' · ' + r.org : '';
