@@ -443,9 +443,54 @@
             </ul>
         </div>
 
-        <!-- 5. TEMPORIZADORES Y AUTOMATIZACIÓN -->
+        <!-- 5. CÓMO FUNCIONAN LAS ESTADÍSTICAS -->
         <div class="section-card">
-            <h2 class="section-title"><span class="icon">⏰</span> 5. Automatizaciones y Temporizadores Systemd</h2>
+            <h2 class="section-title"><span class="icon">📊</span> 5. Motor de Estadísticas y Métricas (update-stats.py)</h2>
+            
+            <div class="flow-box">
+                <strong>Garantía Zero-Logs + Estadísticas Reales:</strong> El servidor no almacena historiales de navegación ni qué dominios consulta cada usuario. Solo mantiene <em>contadores numéricos agregados en memoria RAM</em> (formato Prometheus) que se consolidan cada 30 segundos.
+            </div>
+
+            <p>El script <code class="inline-code">update-stats.py</code> se ejecuta periódicamente mediante <code class="inline-code">update-stats.timer</code> y sigue este flujo:</p>
+
+            <div class="diagram-ascii">
+[Blocky Adblock :4000]   [Blocky Lite :4002]   [evade-proxy :5339]
+        │                        │                     │
+        └────────────────┬───────┴─────────────────────┘
+                         │
+                         ▼
+        1. RECOLECCIÓN EN MEMORIA RAM
+           (Suma los contadores numéricos de todos los servicios)
+                         │
+                         ▼
+        2. CÁLCULO DE VENTANAS MÓVILES (Rolling Deltas)
+           (Calcula qué ha pasado en las últimas 24h y 30 días usando history.json)
+                         │
+                         ▼
+        3. RESOLUCIÓN ANÓNIMA DE OPERADORES (Team Cymru)
+           (Consulta DNS inversa para identificar el ASN sin guardar la IP)
+                         │
+                         ▼
+        4. CLASIFICACIÓN INTELIGENTE (ISP vs Datacenter)
+           (Separa conexiones de hogares reales de servidores/bots)
+                         │
+                         ▼
+        5. PUBLICACIÓN ATÓMICA DE stats.json
+           (/var/www/xdp.es/stats.json -> Servido a la web en vivo)</div>
+
+            <p><strong>Detalle de cada fase del motor:</strong></p>
+            <ul>
+                <li><strong>1. Recolección en RAM:</strong> Lee las métricas de Prometheus en <code class="inline-code">127.0.0.1:4000/metrics</code> (Adblock), <code class="inline-code">127.0.0.1:4002/metrics</code> (Lite) y <code class="inline-code">127.0.0.1:5339/stats</code> (consultas de fútbol evadidas).</li>
+                <li><strong>2. Ventanas móviles (24h y 30 días):</strong> Como los contadores en RAM vuelven a cero si se reinicia un servicio, el script guarda snapshots en <code class="inline-code">history.json</code>. Si detecta un reinicio, compensa el salto para no perder el histórico ni duplicar conteos.</li>
+                <li><strong>3. Identificación anónima vía Team Cymru:</strong> Para saber qué operadoras usan el DNS sin almacenar IPs de personas, consulta a <code class="inline-code">*.origin.asn.cymru.com</code>. Las respuestas se guardan en <code class="inline-code">asn_cache.json</code> con un TTL de 7 días para evitar saturación de consultas.</li>
+                <li><strong>4. Clasificación (ISP Residencial vs Datacenter):</strong> Discrimina automáticamente entre operadores residenciales (Movistar, Vodafone, Orange, DIGI, MásMóvil, Starlink, Avatel, etc.) y datacenters/hosting (OVH, Hetzner, AWS, Cloudflare, Ginernet). Así, la gráfica pública solo refleja el reparto de usuarios reales.</li>
+                <li><strong>5. Publicación atómica:</strong> Escribe en un fichero temporal y realiza un <code class="inline-code">os.replace</code> hacia <code class="inline-code">/var/www/xdp.es/stats.json</code>, garantizando que el navegador nunca lea un JSON corrupto a medio escribir.</li>
+            </ul>
+        </div>
+
+        <!-- 6. TEMPORIZADORES Y AUTOMATIZACIÓN -->
+        <div class="section-card">
+            <h2 class="section-title"><span class="icon">⏰</span> 6. Automatizaciones y Temporizadores Systemd</h2>
             
             <p>Dos timers del sistema mantienen la infraestructura actualizada de forma 100% desatendida:</p>
 
@@ -456,14 +501,14 @@
                 </li>
                 <li>
                     <strong><code>update-stats.timer</code> (Cada 30 segundos):</strong>
-                    Lee las métricas en RAM de Blocky (puerto 4000), resuelve anónimamente los operadores ASN vía Team Cymru y genera el archivo <code>stats.json</code> para el panel de <code>/stats</code>.
+                    Ejecuta <code>update-stats.py</code> para recolectar métricas en RAM, clasificar ASNs y generar el archivo <code>stats.json</code> que alimenta <code>/stats</code> y la home.
                 </li>
             </ul>
         </div>
 
-        <!-- 6. MATRIZ DE PUERTOS -->
+        <!-- 7. MATRIZ DE PUERTOS -->
         <div class="section-card">
-            <h2 class="section-title"><span class="icon">🔌</span> 6. Matriz de Puertos y Topología Interna</h2>
+            <h2 class="section-title"><span class="icon">🔌</span> 7. Matriz de Puertos y Topología Interna</h2>
             
             <div class="table-responsive">
                 <table>
@@ -538,9 +583,9 @@
             </div>
         </div>
 
-        <!-- 7. COMANDOS ÚTILES -->
+        <!-- 8. COMANDOS ÚTILES -->
         <div class="section-card">
-            <h2 class="section-title"><span class="icon">💻</span> 7. Guía Rápida de Comandos y Mantenimiento</h2>
+            <h2 class="section-title"><span class="icon">💻</span> 8. Guía Rápida de Comandos y Mantenimiento</h2>
             
             <p><strong>Comprobar estado de todos los servicios:</strong></p>
             <div class="code-block">systemctl status caddy blocky blocky-lite blocky-ota xdp-evade-proxy unbound unbound-lite xdp-doq-dot xdp-lite-doq dnsleak-gate</div>
