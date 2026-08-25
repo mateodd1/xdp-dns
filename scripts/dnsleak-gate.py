@@ -40,12 +40,18 @@ def _dig_txt(query):
     except Exception:
         return None
 
+def _short_as_name(raw):
+    """Nombre corto del AS: sin organización ni país ('CLOUDFLARENET - Cloudflare, Inc., US' → 'CLOUDFLARENET')."""
+    name = raw.split(" - ")[0]
+    name = name.split(",")[0].strip()
+    return name or raw.strip()
+
 def lookup_asn(ip_str):
-    """Devuelve {'asn': int|None, 'org': str|None} para una IP (con caché)."""
+    """Devuelve {'asn': int|None, 'name': str|None} para una IP (con caché)."""
     cached = _asn_cache.get(ip_str)
     if cached and time.time() - cached[0] < ASN_CACHE_TTL:
         return cached[1]
-    info = {"asn": None, "org": None}
+    info = {"asn": None, "name": None}
     try:
         import ipaddress
         ip = ipaddress.ip_address(ip_str)
@@ -60,7 +66,7 @@ def lookup_asn(ip_str):
                 if org_raw and "|" in org_raw:
                     ofields = [f.strip() for f in org_raw.split("|")]
                     if len(ofields) >= 5 and ofields[4]:
-                        info["org"] = ofields[4].rstrip(",").strip()
+                        info["name"] = _short_as_name(ofields[4])
     except Exception:
         pass
     _asn_cache[ip_str] = (time.time(), info)
@@ -189,7 +195,7 @@ class Handler(BaseHTTPRequestHandler):
         for ip in seen_ips:
             entry = {"src_ip": ip}
             if ip not in ("85.208.114.51", "85.208.114.52"):
-                entry.update(lookup_asn(ip))          # ASN/org solo para resolutores externos
+                entry.update(lookup_asn(ip))          # ASN/nombre solo para resolutores externos
             resolvers.append(entry)
         self._json(200, {"seen": bool(seen_ips), "resolvers": resolvers})
     def _json(self, code, obj):

@@ -173,8 +173,8 @@
                 { file: '/stats/img/masmovil.svg', alt: 'MásMóvil / Yoigo', asn: [15704, 210344, 15954, 56645], kw: ['yoigo', 'masmovil', 'másmóvil', 'xfera', 'pepephone', 'euskaltel'] }
             ];
 
-            function logoFor(ipStr, asn, org) {
-                const lower = String(org || '').toLowerCase();
+            function logoFor(asn, asName) {
+                const lower = String(asName || '').toLowerCase();
                 // Prioridad: logos de resolutores conocidos, luego ISPs de /stats
                 const resolver = RESOLVER_LOGOS.find(l =>
                     (asn != null && l.asn.includes(Number(asn))) ||
@@ -240,11 +240,11 @@
                 } else {
                     const lines = resolvers.map(r => {
                         if (!/^[0-9a-fA-F.:]+$/.test(r.src_ip)) return '';
-                        const logo = logoFor(r.src_ip, r.asn, r.org);
+                        const logo = logoFor(r.asn, r.name);
                         const logoHtml = logo ? logoImg(logo) : '';
                         const asn = r.asn ? 'AS' + r.asn : 'ASN desconocido';
-                        const org = r.org ? ' · ' + r.org : '';
-                        return '<li>' + logoHtml + '<strong>' + asn + '</strong>' + org + ' — ' + r.src_ip + '</li>';
+                        const name = r.name ? ' · ' + r.name : '';
+                        return '<li>' + logoHtml + '<strong>' + asn + '</strong>' + name + '</li>';
                     }).join('');
                     show('<div class="verdict no">❌ No usas XDP</div>' +
                          '<p class="sub">Tus resolutores DNS:</p>' +
