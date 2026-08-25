@@ -34,17 +34,24 @@ ASN_CACHE_TTL = 7 * 24 * 3600       # 7 días
 def _dig_txt(query):
     try:
         r = subprocess.run(["/usr/bin/dig", "+short", "+time=2", "+tries=1", "TXT", query],
-                           capture_output=True, text=True, timeout=4)
+                           capture_output=True, timeout=4,
+                           encoding="utf-8", errors="replace")
         lines = [l.strip().strip('"') for l in r.stdout.splitlines() if l.strip()]
         return lines[0] if lines else None
     except Exception:
         return None
 
 def _short_as_name(raw):
-    """Nombre corto del AS: sin organización ni país ('CLOUDFLARENET - Cloudflare, Inc., US' → 'CLOUDFLARENET')."""
-    name = raw.split(" - ")[0]
-    name = name.split(",")[0].strip()
-    return name or raw.strip()
+    """Nombre legible del AS. Si el nombre corto trae guiones bajos o rarezas RIPE
+    ('Telefonica_de_EspaNa'), usa la organización formal recortando país."""
+    raw = raw.strip()
+    if " - " in raw:
+        short, org_full = [s.strip() for s in raw.split(" - ", 1)]
+    else:
+        short, org_full = raw, ""
+    if "_" in short:
+        return org_full.split(",")[0].strip() or short.replace("_", " ")
+    return short.split(",")[0].replace("_", " ").strip() or raw
 
 def lookup_asn(ip_str):
     """Devuelve {'asn': int|None, 'name': str|None} para una IP (con caché)."""
