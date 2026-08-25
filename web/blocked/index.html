@@ -591,10 +591,6 @@
                     <span class="stat-card-label" data-i18n="blocked.stat_evaded">Rutas Evasivas</span>
                     <span class="stat-card-value" id="stat-evaded" style="color: #10b981;">-</span>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-card-label">Consultas Reemplazadas</span>
-                    <span class="stat-card-value" id="stat-proxy" style="color: #60a5fa;">-</span>
-                </div>
             </div>
 
             <!-- Controls: Search & Filters -->
@@ -906,9 +902,6 @@
                 document.getElementById('stat-total').textContent = (data.total_blocked || 0).toLocaleString();
                 document.getElementById('stat-cf').textContent = (data.cf_blocked_count || 0).toLocaleString();
                 document.getElementById('stat-evaded').textContent = (data.evaded_count || 0).toLocaleString();
-                const proxyState = data.evasion_proxy || {};
-                document.getElementById('stat-proxy').textContent = (proxyState.evaded_queries_total || 0) > 0
-                    ? (proxyState.evaded_queries_total || 0).toLocaleString() : '-';
 
                 filterAndRender(true);
             } catch (err) {
