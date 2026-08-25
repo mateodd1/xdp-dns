@@ -250,39 +250,49 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
 
-        /* Timeframe Tabs */
+        /* Timeframe Tabs — mismo estilo que el selector Adblock/Standard de la portada */
         .tabs-container {
-            display: flex;
-            gap: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            padding: 3px;
             margin-bottom: 24px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 12px;
+            border: 1px solid var(--theme-toggle-border);
+            border-radius: 20px;
+            background: var(--theme-toggle-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
 
         .tab-btn {
-            background: none;
-            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 36px;
+            padding: 6px 14px;
+            border: 0;
+            border-radius: 16px;
+            background: transparent;
             color: var(--text-secondary);
-            padding: 8px 18px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background-color .2s ease, color .2s ease;
             white-space: nowrap;
+            user-select: none;
         }
 
         .tab-btn:hover {
             color: var(--text-heading);
-            background-color: var(--bg-code);
         }
 
         .tab-btn.active {
-            color: var(--guide-tab-active-text);
-            background-color: var(--accent);
-            border-color: var(--accent);
+            background-color: var(--theme-toggle-btn-active-bg);
+            color: var(--theme-toggle-btn-active-color);
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
 
         .tab-pane {
