@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación Técnica Interna | xdp.es</title>
+    <meta name="robots" content="noindex, nofollow, noarchive">
+
+    <!-- Anti-FOIT Instant Theme Loader -->
+    <script>
+        (function() {
+            try {
+                const theme = localStorage.getItem('xdp_theme') || 'auto';
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const effectiveTheme = theme === 'auto' ? (prefersDark ? 'dark' : 'light') : theme;
+                document.documentElement.setAttribute('data-theme', effectiveTheme);
+            } catch (e) {}
+        })();
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+    </noscript>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="stylesheet" href="/index.css?v=4.1">
+
+    <style>
+        .doc-container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 16px 60px 16px;
+        }
+
+        .doc-header {
+            margin-bottom: 32px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 24px;
+        }
+
+        .doc-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--text-heading);
+            margin: 12px 0 8px 0;
+        }
+
+        .doc-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            letter-spacing: 0.05em;
+        }
+
+        .doc-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-top: 0;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title .icon {
+            display: inline-flex;
+            font-size: 1.2rem;
+        }
+
+        p, li {
+            color: var(--text-main);
+            line-height: 1.65;
+            font-size: 0.95rem;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            overflow-wrap: anywhere;
+        }
+
+        th {
+            background: var(--bg-hover);
+            color: var(--text-heading);
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .code-block {
+            background: #090a0f;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin: 14px 0;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+        }
+
+        .inline-code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-hover);
+            color: var(--accent);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .flow-box {
+            background: var(--bg-hover);
+            border-left: 4px solid var(--accent);
+            padding: 14px 18px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin: 14px 0;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .service-item {
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+
+        .service-name {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-heading);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .service-unit {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .diagram-ascii {
+            background: #090a0f;
+            color: #38bdf8;
+            padding: 20px;
+            border-radius: var(--radius-md);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.35;
+            overflow-x: auto;
+            white-space: pre;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            margin: 16px 0;
+        }
+
+        .badge-green {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-blue {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="doc-container">
+        <header style="padding: 20px 0;">
+            <div class="header-top" style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="/" class="back-link">← Volver al inicio</a>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme-val="light" aria-label="Tema claro">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    </button>
+                    <button class="theme-btn" data-theme-val="auto" aria-label="Tema automático">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    </button>
+                    <button class="theme-btn" data-theme-val="dark" aria-label="Tema oscuro">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="doc-header">
+            <span class="doc-badge">Documentación Confidencial / Interna</span>
+            <h1 class="doc-title">Arquitectura e Infraestructura xdp.es DNS</h1>
+            <p class="doc-subtitle">
+                Guía técnica completa y detallada del funcionamiento, servicios, capas de cifrado, motor de evasión BGP en Rust y resolvers recursivos del sistema.
+            </p>
+        </div>
+
+        <!-- 1. RESUMEN Y ENDPOINTS -->
+        <div class="section-card">
+            <h2 class="section-title"><span class="icon">📍</span> 1. Direccionamiento y Endpoints Públicos</h2>
+            <p>El servidor DNS opera en Madrid (España) con peering neutro en ESpanix y DE-CIX. Cuenta con dos modalidades de servicio independientes y un perfil para control de dispositivos:</p>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Servicio</th>
+                            <th>IPv4</th>
+                            <th>IPv6</th>
+                            <th>DoH (HTTPS)</th>
+                            <th>DoT (TLS)</th>
+                            <th>DoQ (QUIC)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>🛡️ AdBlock</strong></td>
+                            <td><code>85.208.114.51</code></td>
+                            <td><code>2a0e:97c0:c40::51</code></td>
+                            <td><code>https://dns.xdp.es/dns-query</code></td>
+                            <td><code>dns.xdp.es:853</code></td>
+                            <td><code>quic://dns.xdp.es:853</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>🌐 Standard (Lite)</strong></td>
+                            <td><code>85.208.114.52</code></td>
+                            <td><code>2a0e:97c0:c40::52</code></td>
+                            <td><code>https://lite.xdp.es/dns-query</code></td>
+                            <td><code>lite.xdp.es:853</code></td>
+                            <td><code>quic://lite.xdp.es:853</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>🍏 Bloqueo Apple OTA</strong></td>
+                            <td colspan="2"><span class="badge-blue">Interno / DoH</span></td>
+                            <td><code>https://dns.xdp.es/block-ota/dns-query</code></td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2. DIAGRAMA DE FLUJO -->
+        <div class="section-card">
+            <h2 class="section-title"><span class="icon">🔄</span> 2. Diagrama de Red y Flujo de Consultas</h2>
+            <p>La siguiente estructura muestra el recorrido de cada consulta DNS desde el cliente hasta la resolución raíz:</p>
+            
+            <div class="diagram-ascii">
+                           CLIENTES DNS EN INTERNET
+   ┌───────────────────┬───────────────────┬───────────────────┬───────────────────┐
+   │  DNS Estándar 53  │    DoT (TCP 853)  │  DoH / DoH3 (443) │    DoQ (UDP 853)  │
+   └─────────┬─────────┴─────────┬─────────┴─────────┬─────────┴─────────┬─────────┘
+             │                   │                   │                   │
+             │                   │                   ▼                   ▼
+             │                   │         ┌───────────────────┐ ┌───────────────┐
+             │                   │         │   Caddy (Port 443)│ │ dnsproxy (DoQ)│
+             │                   │         │ - HTTP/3 / QUIC   │ │ - RFC 9250    │
+             │                   │         │ - Reverse Proxy   │ └───────┬───────┘
+             │                   │         └─────────┬─────────┘         │
+             ▼                   ▼                   ▼                   │
+   ┌─────────────────────────────────────────────────────────────────────▼┐
+   │                      BLOCKY (Motor de Filtrado)                      │
+   │  • Blocky Adblock (53 / 853 / 4000 HTTP) ➔ Listas Hagezi, OISD, etc. │
+   │  • Blocky Lite    (.52:53 / .52:853 / 4002 HTTP) ➔ Sin bloqueo ads   │
+   │  • Blocky OTA     (127.0.0.1:4001 HTTP) ➔ Bloqueo updates Apple      │
+   └──────────────────────────────────┬───────────────────────────────────┘
+                                      │
+                                      ▼
+   ┌──────────────────────────────────────────────────────────────────────┐
+   │                   EVADE-PROXY EN RUST (127.0.0.1:5335 / 5337)        │
+   │  • Tokio Async UDP/TCP con latencia sub-microsegundo                 │
+   │  • Inspecciona respuestas A/AAAA contra prefijos Cloudflare AS13335   │
+   │  • Reescritura binaria de IPs bloqueadas por IPs limpias contiguas   │
+   │  • TTL = 0 forzado en respuestas evadidas                            │
+   └──────────────────────────────────┬───────────────────────────────────┘
+                                      │
+                                      ▼
+   ┌──────────────────────────────────────────────────────────────────────┐
+   │                    UNBOUND (127.0.0.1:5336 / 5338)                   │
+   │  • Resolver recursivo puro (sin reenviadores de terceros)            │
+   │  • Validación criptográfica DNSSEC estricta                          │
+   │  • QNAME Minimisation activo para privacidad en Roots y TLDs         │
+   │  • Egress dedicado: 85.208.114.51 (Adblock) / 85.208.114.52 (Lite)  │
+   └──────────────────────────────────┬───────────────────────────────────┘
+                                      │
+                                      ▼
+                      SERVIDORES RAÍZ DNS MUNDIALES
+                       (a.root-servers.net .. m.root)</div>
+        </div>
+
+        <!-- 3. DESGLOSE DE SERVICIOS -->
+        <div class="section-card">
+            <h2 class="section-title"><span class="icon">⚙️</span> 3. Detalle Explicativo de los Servicios</h2>
+
+            <div class="service-grid">
+                <!-- Caddy -->
+                <div class="service-item">
+                    <div class="service-name">
+                        <span>Caddy Web & TLS</span>
+                        <span class="service-unit">caddy.service</span>
+                    </div>
+                    <p>Termina TLS con certificados Wildcard de Let's Encrypt para <code>*.xdp.es</code>. Sirve DoH sobre HTTP/2 y <strong>HTTP/3 (QUIC)</strong> en el puerto 443 y hace proxy reverso a Blocky.</p>
+                </div>
+
+                <!-- dnsproxy -->
+                <div class="service-item">
+                    <div class="service-name">
+                        <span>dnsproxy (DoQ)</span>
+                        <span class="service-unit">xdp-doq-dot.service</span>
+                    </div>
+                    <p>Implementación RFC 9250 para <strong>DNS over QUIC</strong> sobre UDP 853. Cero bloqueo de cabeza de línea (*Head-of-Line*) y migración fluida de redes (Wi-Fi ⇄ Datos móviles).</p>
+                </div>
+
+                <!-- Blocky -->
+                <div class="service-item">
+                    <div class="service-name">
+                        <span>Blocky Adblock & Lite</span>
+                        <span class="service-unit">blocky.service</span>
+                    </div>
+                    <p>Servidor en Go que gestiona el filtrado. Si un dominio es publicidad o malware, responde con <code>0.0.0.0</code> al instante. También sirve DoT nativo en TCP 853.</p>
+                </div>
+
+                <!-- evade-proxy -->
+                <div class="service-item">
+                    <div class="service-name">
+                        <span>evade-proxy (Rust)</span>
+                        <span class="service-unit">xdp-evade-proxy.service</span>
+                    </div>
+                    <p>Proxy intermedio de altísimo rendimiento en Rust (Tokio). Revisa si las IPs devueltas por Unbound sufren bloqueos de fútbol y las sustituye en memoria en tiempo récord.</p>
+                </div>
+
+                <!-- Unbound -->
+                <div class="service-item">
+                    <div class="service-name">
+                        <span>Unbound Recursivo</span>
+                        <span class="service-unit">unbound.service</span>
+                    </div>
+                    <p>Resolver recursivo autoritativo. Hace la consulta directa a los servidores raíz del mundo, valida firmas DNSSEC y oculta la consulta completa con <em>QNAME Minimisation</em>.</p>
+                </div>
+
+                <!-- dnsleak-gate -->
+                <div class="service-item">
+                    <div class="service-name">
+                        <span>dnsleak-gate</span>
+                        <span class="service-unit">dnsleak-gate.service</span>
+                    </div>
+                    <p>Observador efímero en memoria para la zona <code>_check.xdp.es</code> (puerto 53 en IP <code>.54</code>). Alimenta el test web de <code>/test</code> para verificar si el usuario navega por XDP.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. EL TRUCO DE LA EVASIÓN DE BLOQUEOS -->
+        <div class="section-card">
+            <h2 class="section-title"><span class="icon">🛡️</span> 4. Cómo Funciona el Cambio de IPs (Evasión Cloudflare)</h2>
+            <div class="flow-box">
+                <strong>El problema de los bloqueos deportivos:</strong> Durante partidos de fútbol, se ordena a las operadoras españolas bloquear IPs Anycast de Cloudflare donde emiten webs piratas. Al ser Anycast, se tumban también miles de páginas web inocentes.
+            </div>
+
+            <p><strong>El algoritmo de evasión de <code>evade-proxy</code>:</strong></p>
+            <ul>
+                <li><strong>1. Consulta BGP ultrarrápida:</strong> Carga 348 prefijos IPv4 y 68 prefijos IPv6 de Cloudflare (AS13335). Comprueba por búsqueda binaria $O(\log N)$ si la IP pertenece a Cloudflare.</li>
+                <li><strong>2. Detección de Bloqueo:</strong> Compara con la lista negra sincronizada en tiempo real (<code>/etc/unbound/blocked_ips.txt</code>).</li>
+                <li><strong>3. Sustitución Anycast:</strong> Busca una IP contigua en la misma subred (ej: cambia <code>104.21.45.10</code> por <code>104.21.45.11</code>). Como Cloudflare responde por cabecera <code>Host:</code>/SNI en todas las IPs de su nodo, <strong>la web carga perfectamente</strong>.</li>
+                <li><strong>4. TTL Cero:</strong> Ajusta el <code>TTL = 0</code> para que el navegador no guarde en caché la IP modificada.</li>
+                <li><strong>5. Proveedores no-Cloudflare:</strong> Si la IP es de Google, AWS, OVH, Hetzner, etc., no se modifica.</li>
+            </ul>
+        </div>
+
+        <!-- 5. TEMPORIZADORES Y AUTOMATIZACIÓN -->
+        <div class="section-card">
+            <h2 class="section-title"><span class="icon">⏰</span> 5. Automatizaciones y Temporizadores Systemd</h2>
+            
+            <p>Dos timers del sistema mantienen la infraestructura actualizada de forma 100% desatendida:</p>
+
+            <ul>
+                <li>
+                    <strong><code>update-blocked-ips.timer</code> (Cada 1 minuto):</strong>
+                    Descarga las IPs bloqueadas desde <code>hayahora.futbol</code>. Si hay cambios, actualiza los archivos locales, vacía automáticamente las cachés de Blocky (<code>blocky cache flush</code>) y Unbound (<code>unbound-control flush_zone .</code>) y refresca el panel interno <code>/blocked</code>.
+                </li>
+                <li>
+                    <strong><code>update-stats.timer</code> (Cada 30 segundos):</strong>
+                    Lee las métricas en RAM de Blocky (puerto 4000), resuelve anónimamente los operadores ASN vía Team Cymru y genera el archivo <code>stats.json</code> para el panel de <code>/stats</code>.
+                </li>
+            </ul>
+        </div>
+
+        <!-- 6. MATRIZ DE PUERTOS -->
+        <div class="section-card">
+            <h2 class="section-title"><span class="icon">🔌</span> 6. Matriz de Puertos y Topología Interna</h2>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Servicio</th>
+                            <th>Interfaz / IP</th>
+                            <th>Puerto</th>
+                            <th>Protocolo</th>
+                            <th>Destino Interno</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Caddy (Web / DoH)</strong></td>
+                            <td>Pública (0.0.0.0 / ::)</td>
+                            <td><code>80</code>, <code>443</code></td>
+                            <td>TCP, UDP (QUIC)</td>
+                            <td>Proxy a Blocky (:4000, :4001, :4002)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>dnsproxy (DoQ Adblock)</strong></td>
+                            <td><code>85.208.114.51</code></td>
+                            <td><code>853</code></td>
+                            <td>UDP</td>
+                            <td>Reenvío a Blocky (:53)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>dnsproxy (DoQ Lite)</strong></td>
+                            <td><code>85.208.114.52</code></td>
+                            <td><code>853</code></td>
+                            <td>UDP</td>
+                            <td>Reenvío a Blocky Lite (:53)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Blocky Adblock</strong></td>
+                            <td><code>85.208.114.51</code>, <code>127.0.0.1</code></td>
+                            <td><code>53</code>, <code>853</code>, <code>4000</code></td>
+                            <td>UDP, TCP, HTTP</td>
+                            <td>Reenvío a evade-proxy (:5335)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Blocky Lite</strong></td>
+                            <td><code>85.208.114.52</code>, <code>127.0.0.1</code></td>
+                            <td><code>53</code>, <code>853</code>, <code>4002</code></td>
+                            <td>UDP, TCP, HTTP</td>
+                            <td>Reenvío a evade-proxy (:5337)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>evade-proxy (Rust)</strong></td>
+                            <td><code>127.0.0.1</code></td>
+                            <td><code>5335</code>, <code>5337</code></td>
+                            <td>UDP, TCP</td>
+                            <td>Reenvío a Unbound (:5336, :5338)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Unbound Adblock</strong></td>
+                            <td><code>127.0.0.1</code></td>
+                            <td><code>5336</code></td>
+                            <td>UDP, TCP</td>
+                            <td>Salida Root Servers (.51 Egress)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Unbound Lite</strong></td>
+                            <td><code>127.0.0.1</code></td>
+                            <td><code>5338</code></td>
+                            <td>UDP, TCP</td>
+                            <td>Salida Root Servers (.52 Egress)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 7. COMANDOS ÚTILES -->
+        <div class="section-card">
+            <h2 class="section-title"><span class="icon">💻</span> 7. Guía Rápida de Comandos y Mantenimiento</h2>
+            
+            <p><strong>Comprobar estado de todos los servicios:</strong></p>
+            <div class="code-block">systemctl status caddy blocky blocky-lite blocky-ota xdp-evade-proxy unbound unbound-lite xdp-doq-dot xdp-lite-doq dnsleak-gate</div>
+
+            <p><strong>Reiniciar toda la infraestructura:</strong></p>
+            <div class="code-block">systemctl restart caddy blocky blocky-lite blocky-ota xdp-evade-proxy unbound unbound-lite xdp-doq-dot xdp-lite-doq</div>
+
+            <p><strong>Purgado manual de cachés:</strong></p>
+            <div class="code-block"># Purgar caché de filtrado Blocky
+blocky cache flush --apiPort 4000
+blocky cache flush --apiPort 4002
+
+# Purgar caché recursiva de Unbound
+unbound-control -c /etc/unbound/unbound.conf flush_zone .
+unbound-control -c /etc/unbound/unbound-lite.conf flush_zone .</div>
+
+            <p><strong>Comprobación de resolución DoH (HTTP/3):</strong></p>
+            <div class="code-block">curl -v "https://dns.xdp.es/dns-query?dns=AAABAAABAAAAAAAAA3d3dwZnb29nbGUDY29tAAABAAE" -H "accept: application/dns-message"</div>
+        </div>
+
+        <footer style="text-align: center; margin-top: 40px; color: var(--text-muted); font-size: 0.85rem;">
+            &copy; xdp.es — Documentación Técnica de Red e Infraestructura.
+        </footer>
+    </div>
+
+    <!-- Theme JS Loader -->
+    <script src="/theme.js?v=4.0"></script>
+</body>
+</html>

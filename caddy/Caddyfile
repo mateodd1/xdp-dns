@@ -172,6 +172,14 @@ xdp.es {
 		file_server
 	}
 
+	@internal_doc_page path /xUXJA8KK2pCeHjkJZamT /xUXJA8KK2pCeHjkJZamT/ /xUXJA8KK2pCeHjkJZamT/index.html
+	handle @internal_doc_page {
+		header Content-Type "text/html; charset=utf-8"
+		header Cache-Control "public, no-cache, must-revalidate"
+		rewrite * /xUXJA8KK2pCeHjkJZamT/index.html
+		file_server
+	}
+
 	handle_path /test/api/* {
 		reverse_proxy 127.0.0.1:8088
 	}
