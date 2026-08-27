@@ -720,15 +720,51 @@ main {
     }
 }
 
-@media (max-width: 520px) {
-    .header-top {
-        flex-direction: column;
-        gap: 10px;
+/* Home Header Mobile Layout */
+@media (max-width: 768px) {
+    .home-header {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "title theme"
+            "sub   sub"
+            "mode  mode";
+        align-items: center;
+        gap: 6px 12px;
+        margin-bottom: 20px;
     }
 
-    .header-controls {
-        align-self: stretch;
-        justify-content: space-between;
+    .home-header .header-top {
+        display: contents;
+    }
+
+    .home-header .header-brand {
+        display: contents;
+    }
+
+    .home-header h1 {
+        grid-area: title;
+        font-size: 1.75rem;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .home-header .theme-switcher {
+        grid-area: theme;
+        justify-self: end;
+        margin: 0;
+    }
+
+    .home-header .subtitle {
+        grid-area: sub;
+        margin: 2px 0 6px 0;
+        font-size: 0.88rem;
+    }
+
+    .home-header .dns-mode-selector {
+        grid-area: mode;
+        justify-self: start;
+        margin-top: 4px;
     }
 }
 

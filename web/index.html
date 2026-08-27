@@ -81,7 +81,7 @@
     </noscript>
 
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="/index.css?v=4.5">
+    <link rel="stylesheet" href="/index.css?v=4.6">
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -93,7 +93,7 @@
 <body>
     <div class="container">
         <!-- Site Header -->
-        <header>
+        <header class="home-header">
             <div class="header-top">
                 <div class="dns-mode-selector" role="group" aria-label="Modo DNS" data-agent-role="dns-mode-control">
                     <button type="button" class="dns-mode-btn active" data-dns-mode="adblock" aria-pressed="true" onclick="setDnsMode('adblock')" data-i18n="mode.adblock">Adblock</button>
@@ -130,8 +130,10 @@
                     </button>
                 </div>
             </div>
-            <h1>xdp.es DNS</h1>
-            <div class="subtitle" data-i18n="hero.subtitle">Resolución DNS recursiva, ultra-rápida y con validación DNSSEC.</div>
+            <div class="header-brand">
+                <h1>xdp.es DNS</h1>
+                <div class="subtitle" data-i18n="hero.subtitle">Resolución DNS recursiva, ultra-rápida y con validación DNSSEC.</div>
+            </div>
         </header>
 
         <!-- Main Content -->
