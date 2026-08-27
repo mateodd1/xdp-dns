@@ -362,6 +362,16 @@
                     <div class="feature-desc" data-i18n="about.card_dnssec_desc">Validación criptográfica completa contra el ancla de confianza raíz, garantizando que las respuestas no hayan sido manipuladas ni sufran ataques de suplantación o envenenamiento de caché.</div>
                 </div>
                 <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <div class="feature-title" data-i18n="about.card_recursive_title">Resolución Recursiva Propia</div>
+                    <div class="feature-desc" data-i18n="about.card_recursive_desc">No reenviamos tus consultas a terceros (como Google o Cloudflare). Nuestro resolver Unbound consulta directamente a los 13 servidores raíz mundiales de IANA y a los autoritativos de cada zona, eliminando intermediarios.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <div class="feature-title" data-i18n="about.card_qname_title">Minimización de Consultas (QNAME)</div>
+                    <div class="feature-desc" data-i18n="about.card_qname_desc">Implementamos el estándar RFC 9156: no se envía el dominio completo a los servidores raíz ni a los TLDs, sino solo la parte estrictamente necesaria para cada nivel, protegiendo qué subdominio o servicio exacto estás visitando.</div>
+                </div>
+                <div class="feature-card">
                     <div class="feature-icon">📍</div>
                     <div class="feature-title" data-i18n="about.card_location_title">Ubicado en Madrid (España)</div>
                     <div class="feature-desc" data-i18n="about.card_location_desc">Servidores alojados directamente en Madrid con baja latencia y excelente conectividad para usuarios de toda España y la península ibérica.</div>
@@ -500,7 +510,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=4.3"></script>
+    <script src="/i18n.js?v=4.4"></script>
     <script src="/theme.js?v=4.1" defer></script>
     <script>
         // Copy-to-clipboard for the addresses table
