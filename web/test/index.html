@@ -240,10 +240,59 @@
                 return '<img src="' + logo.file + '" alt="' + logo.alt + '" style="width:20px;height:20px;vertical-align:-4px;margin-right:6px;">';
             }
 
-            function fireBeacons(token) {
-                const url = 'https://' + token + '._check.xdp.es/pixel.gif?t=' + Date.now();
-                new Image().src = url;
-                fetch(url, { mode: 'no-cors', cache: 'no-store' }).catch(() => {});
+            function triggerDnsResolution(token) {
+                const domain = token + '._check.xdp.es';
+                const ts = Date.now();
+
+                // 1. Browser Native DNS Prefetch & Preconnect (executes at OS network level, immune to adblockers)
+                const prefetch = document.createElement('link');
+                prefetch.rel = 'dns-prefetch';
+                prefetch.href = '//' + domain;
+                document.head.appendChild(prefetch);
+
+                const preconnect = document.createElement('link');
+                preconnect.rel = 'preconnect';
+                preconnect.href = 'https://' + domain;
+                preconnect.crossOrigin = 'anonymous';
+                document.head.appendChild(preconnect);
+
+                // 2. WebRTC STUN Host Lookup (forces browser ICE subsystem to resolve domain natively)
+                try {
+                    const RTCPC = window.RTCPeerConnection || window.webkitRTCPeerConnection || window.mozRTCPeerConnection;
+                    if (RTCPC) {
+                        const pc = new RTCPC({ iceServers: [{ urls: 'stun:' + domain + ':3478' }] });
+                        pc.createDataChannel('');
+                        pc.createOffer().then(o => pc.setLocalDescription(o)).catch(() => {});
+                        setTimeout(() => { try { pc.close(); } catch (e) {} }, 4000);
+                    }
+                } catch (e) {}
+
+                // 3. Subresource stylesheet link (triggers DNS resolution for asset)
+                const css = document.createElement('link');
+                css.rel = 'stylesheet';
+                css.href = 'https://' + domain + '/probe.css?t=' + ts;
+                document.head.appendChild(css);
+
+                // 4. Benign Image probe (uses .png / .ico, avoiding pixel.gif adblock patterns)
+                try {
+                    const img = new Image();
+                    img.src = 'https://' + domain + '/probe.png?t=' + ts;
+                } catch (e) {}
+
+                // 5. Benign Fetch requests (HTTPS & HTTP)
+                try {
+                    fetch('https://' + domain + '/probe.json?t=' + ts, { mode: 'no-cors', cache: 'no-store' }).catch(() => {});
+                } catch (e) {}
+                try {
+                    fetch('http://' + domain + '/probe.json?t=' + ts, { mode: 'no-cors', cache: 'no-store' }).catch(() => {});
+                } catch (e) {}
+
+                // Clean up injected DOM nodes after 6 seconds
+                setTimeout(() => {
+                    try { prefetch.remove(); } catch (e) {}
+                    try { preconnect.remove(); } catch (e) {}
+                    try { css.remove(); } catch (e) {}
+                }, 6000);
             }
 
             async function pollWatch(token) {
@@ -268,10 +317,10 @@
                 statusEl.innerHTML = '<span class="spinner" role="status"></span> ' + T('test.checking', 'Comprobando…');
 
                 const token = makeToken();
-                fireBeacons(token);
+                triggerDnsResolution(token);
 
-                // Refuerzo a mitad de ventana por si algún resolver es lento
-                setTimeout(() => fireBeacons(token), 2500);
+                // Refuerzo a 1.5s por si el primer intento tardó en resolver
+                setTimeout(() => triggerDnsResolution(token), 1500);
 
                 const resolvers = await pollWatch(token);
                 lastResolvers = resolvers;
