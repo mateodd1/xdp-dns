@@ -32,7 +32,7 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     </noscript>
 
-    <link rel="stylesheet" href="/index.css?v=4.3">
+    <link rel="stylesheet" href="/index.css?v=4.4">
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -58,42 +58,23 @@
             gap: 6px;
             margin-top: 10px;
         }
-        .domain-tag {
-            background-color: var(--bg-code);
+        .domain-item {
+            background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 6px;
-            padding: 6px 10px;
-            font-family: SFMono-Regular, Consolas, monospace;
-            font-size: 0.78rem;
-            color: var(--text-primary);
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            font-family: monospace;
             display: flex;
             align-items: center;
-            gap: 6px;
-            word-break: break-all;
+            gap: 8px;
+            color: var(--text-primary);
         }
-        .domain-tag::before {
+        .domain-item::before {
             content: "✕";
             color: #ef4444;
             font-weight: 700;
             font-size: 0.75rem;
-        }
-        .back-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .back-link {
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .back-link:hover {
-            text-decoration: underline;
         }
     </style>
 </head>
@@ -101,9 +82,9 @@
     <div class="container">
         <!-- Site Header -->
         <header>
-            <div class="back-nav">
-                <a href="/" class="back-link" aria-label="Volver" data-i18n="nav.home">
-                    &larr; Inicio
+            <div class="header-top">
+                <a href="/" class="back-link" aria-label="Volver al inicio" data-i18n="nav.back_home">
+                    &larr; Volver al inicio
                 </a>
                 <div class="theme-switcher" role="group" aria-label="Seleccionar tema">
                         <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro">

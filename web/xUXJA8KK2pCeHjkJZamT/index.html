@@ -27,15 +27,20 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
     </noscript>
 
-    <!-- Favicons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="stylesheet" href="/index.css?v=4.3">
+    <link rel="stylesheet" href="/index.css?v=4.4">
 
     <style>
         .doc-container {
             max-width: 1040px;
-            margin: 0 auto;
-            padding: 0 16px 60px 16px;
+            margin: 44px auto 60px auto;
+            padding: 0 20px;
+        }
+
+        @media (max-width: 768px) {
+            .doc-container {
+                margin: 20px auto 32px auto;
+                padding: 0 14px;
+            }
         }
 
         .doc-header {
@@ -246,8 +251,8 @@
 </head>
 <body>
     <div class="doc-container">
-        <header style="padding: 20px 0;">
-            <div class="header-top" style="display: flex; justify-content: space-between; align-items: center;">
+        <header>
+            <div class="header-top">
                 <a href="/" class="back-link">← Volver al inicio</a>
                 <div class="theme-switcher">
                     <button class="theme-btn" data-theme-val="light" aria-label="Tema claro">
