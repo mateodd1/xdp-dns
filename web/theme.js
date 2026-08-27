@@ -83,6 +83,7 @@
         if (!target) return;
         const href = target.getAttribute('href');
         if (href && href.startsWith('/') && !href.startsWith('//') && !href.includes('#') && !target.hasAttribute('download')) {
+            if (href === '/test' || href.startsWith('/test/') || href === '/block-ota' || href.startsWith('/block-ota/')) return;
             prefetchUrl(href);
         }
     }
