@@ -1,0 +1,21 @@
+[Unit]
+Description=XDP probe ingest server (residential block detection)
+After=network-online.target unbound.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+EnvironmentFile=/root/xpd-dns/.env
+ExecStart=/usr/bin/python3 /root/xpd-dns/probe/probe-server.py
+Restart=always
+RestartSec=3s
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+# Debe escribir el blocklist de la sonda y el fichero de redirects del evade-proxy.
+ReadWritePaths=/etc/unbound /run/evade-proxy
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

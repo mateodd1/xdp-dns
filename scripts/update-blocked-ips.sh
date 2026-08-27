@@ -13,6 +13,10 @@ SOURCE_IPV6="/root/ooni_bloqueados_ipv6.txt"
 TARGET_IPV6="/etc/unbound/blocked_ipv6.txt"
 BACKUP_IPV6="/root/xpd-dns/unbound/blocked_ipv6.txt"
 
+# IPs detectadas por la sonda residencial (xdp-probe-server). Se unen al blocklist.
+PROBE_V4="/etc/unbound/probe_blocked_ips.txt"
+PROBE_V6="/etc/unbound/probe_blocked_ipv6.txt"
+
 TEMP_FILE=$(mktemp)
 
 cleanup() {
@@ -30,6 +34,10 @@ fi
 if curl -s -f -L --connect-timeout 10 --max-time 20 -H "User-Agent: xdp-dns-sync/1.0" "$URL" -o "$TEMP_FILE"; then
     FILTERED_TEMP=$(mktemp)
     grep -E '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$' "$TEMP_FILE" | sort -u > "$FILTERED_TEMP" || true
+    # Une las IPs IPv4 detectadas por la sonda residencial (Movistar), si las hay.
+    if [[ -f "$PROBE_V4" ]]; then
+        cat "$FILTERED_TEMP" "$PROBE_V4" | grep -E '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$' | sort -u > "${FILTERED_TEMP}.u" && mv "${FILTERED_TEMP}.u" "$FILTERED_TEMP"
+    fi
     COUNT=$(wc -l < "$FILTERED_TEMP")
 
     mkdir -p "$(dirname "$TARGET_FILE")" "$(dirname "$BACKUP_FILE")"
@@ -52,15 +60,19 @@ else
     echo "[$(date -u '+%Y-%m-%d %H:%M:%S UTC')] Error: Failed to fetch $URL" >&2
 fi
 
-# 2. Sync IPv6 Blocklist
-if [[ -f "$SOURCE_IPV6" ]]; then
+# 2. Sync IPv6 Blocklist (unión: OONI estático + sonda residencial)
+if [[ -f "$SOURCE_IPV6" ]] || [[ -f "$PROBE_V6" ]]; then
     mkdir -p "$(dirname "$TARGET_IPV6")" "$(dirname "$BACKUP_IPV6")"
-    if [[ ! -f "$TARGET_IPV6" ]] || ! cmp -s "$SOURCE_IPV6" "$TARGET_IPV6"; then
-        cp "$SOURCE_IPV6" "$TARGET_IPV6"
+    V6_TMP=$(mktemp)
+    { [[ -f "$SOURCE_IPV6" ]] && cat "$SOURCE_IPV6"; [[ -f "$PROBE_V6" ]] && cat "$PROBE_V6"; } 2>/dev/null \
+        | grep -E ':' | sort -u > "$V6_TMP" || true
+    if [[ ! -f "$TARGET_IPV6" ]] || ! cmp -s "$V6_TMP" "$TARGET_IPV6"; then
+        cp "$V6_TMP" "$TARGET_IPV6"
         chmod 644 "$TARGET_IPV6"
-        cp "$SOURCE_IPV6" "$BACKUP_IPV6"
-        echo "[$(date -u '+%Y-%m-%d %H:%M:%S UTC')] Blocked IPv6 list synced from $SOURCE_IPV6."
+        cp "$V6_TMP" "$BACKUP_IPV6"
+        echo "[$(date -u '+%Y-%m-%d %H:%M:%S UTC')] Blocked IPv6 updated: $(wc -l < "$V6_TMP") entries (OONI + sonda)."
     fi
+    rm -f "$V6_TMP"
 fi
 
 # 3. Update /blocked dashboard JSON

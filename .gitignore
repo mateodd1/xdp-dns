@@ -25,3 +25,9 @@ venv/
 
 # Generated dashboard snapshot (written every minute by update-blocked-ips.timer)
 web/blocked/data.json
+
+# Blocklists y prefijos sincronizados en runtime (datos, no código)
+unbound/blocked_ips.txt
+unbound/blocked_ipv6.txt
+unbound/cloudflare_prefixes_v4.txt
+unbound/cloudflare_prefixes_v6.txt

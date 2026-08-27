@@ -63,6 +63,11 @@ dns.xdp.es {
 		}
 	}
 
+	# Ingesta de la sonda residencial (token verificado dentro del propio servicio)
+	handle /probe/* {
+		reverse_proxy 127.0.0.1:8090
+	}
+
 	# Any non-DNS request on dns.xdp.es is redirected immediately to the canonical web domain xdp.es
 	handle {
 		redir https://xdp.es{uri} permanent
@@ -188,11 +193,11 @@ xdp.es {
 	handle @known_assets {
 		@css path *.css
 		header @css Content-Type "text/css; charset=utf-8"
-		header @css Cache-Control "public, no-cache, must-revalidate"
+		header @css Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
 
 		@js path *.js
 		header @js Content-Type "application/javascript; charset=utf-8"
-		header @js Cache-Control "public, no-cache, must-revalidate"
+		header @js Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
 
 		@json path *.json
 		header @json Content-Type "application/json; charset=utf-8"
