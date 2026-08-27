@@ -7,18 +7,63 @@
     <meta name="description" content="Comprueba si tu conexión resuelve las DNS a través de los servidores de xdp.es.">
     <link rel="canonical" href="https://xdp.es/test">
 
+    <!-- Critical Anti-FOUC Background Style -->
+    <style>
+        html, body {
+            background-color: #0e0f12;
+            color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+        }
+        html[data-theme="light"], html[data-theme="light"] body {
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        html[data-theme="dark"], html[data-theme="dark"] body {
+            background-color: #0e0f12;
+            color: #f3f4f6;
+        }
+        @media (prefers-color-scheme: light) {
+            html:not([data-theme="dark"]), html:not([data-theme="dark"]) body {
+                background-color: #f8fafc;
+                color: #1e293b;
+            }
+        }
+    </style>
+
     <!-- Anti-FOIT Instant Theme Loader -->
     <script>
         (function() {
             try {
                 const theme = localStorage.getItem('xdp_theme') || 'auto';
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+                const effectiveTheme = theme === 'auto' ? (prefersDark ? 'dark' : 'light') : theme;
+                document.documentElement.setAttribute('data-theme', effectiveTheme);
+                document.documentElement.style.backgroundColor = effectiveTheme === 'dark' ? '#0e0f12' : '#f8fafc';
+                document.documentElement.style.colorScheme = effectiveTheme;
+
                 const navLang = (navigator.language || (navigator.languages && navigator.languages[0]) || 'es').toLowerCase();
-                document.documentElement.setAttribute('lang', navLang.startsWith('es') ? 'es' : 'en');
+                const userLang = navLang.startsWith('es') ? 'es' : 'en';
+                document.documentElement.setAttribute('lang', userLang);
             } catch (e) {}
         })();
     </script>
+
+    <!-- Speculation Rules for Instant 0ms Page Navigation -->
+    <script type="speculationrules">
+    {
+      "prerender": [
+        {
+          "source": "list",
+          "urls": ["/", "/about", "/stats", "/test", "/block-ota", "/blocked"],
+          "eagerness": "moderate"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Priority Stylesheet -->
+    <link rel="stylesheet" href="/index.css?v=4.6">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,8 +79,6 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="manifest" href="/site.webmanifest">
-
-    <link rel="stylesheet" href="/index.css?v=4.6">
     <style>
         .container {
             max-width: 980px;

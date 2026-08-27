@@ -65,4 +65,28 @@
     } else {
         updateThemeUI(getStoredTheme());
     }
+
+    // Instant prefetch on link hover/touch to eliminate navigation delay & white flash
+    const prefetchedUrls = new Set();
+    function prefetchUrl(url) {
+        if (!url || prefetchedUrls.has(url)) return;
+        prefetchedUrls.add(url);
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = url;
+        link.as = 'document';
+        document.head.appendChild(link);
+    }
+
+    function handleLinkInteraction(e) {
+        const target = e.target && e.target.closest && e.target.closest('a[href]');
+        if (!target) return;
+        const href = target.getAttribute('href');
+        if (href && href.startsWith('/') && !href.startsWith('//') && !href.includes('#') && !target.hasAttribute('download')) {
+            prefetchUrl(href);
+        }
+    }
+
+    document.addEventListener('pointerenter', handleLinkInteraction, { passive: true, capture: true });
+    document.addEventListener('touchstart', handleLinkInteraction, { passive: true, capture: true });
 })();
