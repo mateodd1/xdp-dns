@@ -273,6 +273,7 @@
                         <button type="button" class="guide-tab" id="tab-windows" data-platform="windows" role="tab" aria-selected="false" aria-controls="guide-windows" onclick="switchGuide('windows', this)" data-agent-tab="windows" data-i18n="guide.tab_windows">Windows 11</button>
                         <button type="button" class="guide-tab" id="tab-linux" data-platform="linux" role="tab" aria-selected="false" aria-controls="guide-linux" onclick="switchGuide('linux', this)" data-agent-tab="linux" data-i18n="guide.tab_linux">Linux</button>
                         <button type="button" class="guide-tab" id="tab-mikrotik" data-platform="mikrotik" role="tab" aria-selected="false" aria-controls="guide-mikrotik" onclick="switchGuide('mikrotik', this)" data-agent-tab="mikrotik" data-i18n="guide.tab_mikrotik">MikroTik</button>
+                        <button type="button" class="guide-tab" id="tab-ubiquiti" data-platform="ubiquiti" role="tab" aria-selected="false" aria-controls="guide-ubiquiti" onclick="switchGuide('ubiquiti', this)" data-agent-tab="ubiquiti" data-i18n="guide.tab_ubiquiti">Ubiquiti</button>
                         <button type="button" class="guide-tab" id="tab-browser" data-platform="browser" role="tab" aria-selected="false" aria-controls="guide-browser" onclick="switchGuide('browser', this)" data-agent-tab="browser" data-i18n="guide.tab_browser">Navegadores</button>
                     </div>
 
@@ -330,6 +331,25 @@ DNSSEC=allow-downgrade</code></pre>
 /ip dns set allow-remote-requests=yes</code></pre>
                     </div>
 
+                    <!-- Ubiquiti Guide -->
+                    <div id="guide-ubiquiti" class="guide-panel" role="tabpanel" aria-labelledby="tab-ubiquiti" data-platform-guide="ubiquiti">
+                        <p data-i18n-html="guide.ubiquiti.title_unifi" style="font-weight: 600; margin-bottom: 6px;">UniFi OS / Gateways (DNS Shield - DoH):</p>
+                        <ol class="steps-list">
+                            <li data-i18n-html="guide.ubiquiti.s1">Abre <strong>UniFi Network</strong> y ve a <strong>Settings (Ajustes)</strong> &rarr; <strong>Security (Seguridad)</strong> &rarr; <strong>General</strong>.</li>
+                            <li data-i18n-html="guide.ubiquiti.s2">En <strong>DNS Shield</strong> (DNS cifrado), activa la opción y selecciona <em>"Custom"</em> (Personalizado).</li>
+                            <li data-i18n-html="guide.ubiquiti.s3">Introduce la URL DoH: <code class="code-inline">https://dns.xdp.es/dns-query</code> y la IP de resolución: <code class="code-inline">85.208.114.51</code>.</li>
+                        </ol>
+                        <p data-i18n-html="guide.ubiquiti.title_wan" style="font-weight: 600; margin-top: 14px; margin-bottom: 6px;">Configuración estándar por interfaz WAN:</p>
+                        <ol class="steps-list" start="4">
+                            <li data-i18n-html="guide.ubiquiti.s4">Ve a <strong>Settings</strong> &rarr; <strong>Internet</strong> &rarr; tu conexión WAN &rarr; <strong>Advanced (Manual)</strong>.</li>
+                            <li data-i18n-html="guide.ubiquiti.s5">Introduce como <em>Primary DNS</em>: <code class="code-inline">85.208.114.51</code> y como <em>Secondary DNS</em>: <code class="code-inline">2a0e:97c0:c40::51</code>.</li>
+                        </ol>
+                        <p data-i18n-html="guide.ubiquiti.cli" style="margin-top: 12px; margin-bottom: 6px;">Para EdgeRouter / EdgeOS por terminal (<code>CLI</code>):</p>
+                        <pre class="code-block"><code>set service dns forwarding name-server 85.208.114.51
+set service dns forwarding name-server 2a0e:97c0:c40::51
+commit ; save</code></pre>
+                    </div>
+
                     <!-- Browser Guide -->
                     <div id="guide-browser" class="guide-panel" role="tabpanel" aria-labelledby="tab-browser" data-platform-guide="browser">
                         <p data-i18n-html="guide.browser.ff" style="margin-bottom: 6px;"><strong>Firefox:</strong> Ajustes &rarr; Privacidad y Seguridad &rarr; DNS sobre HTTPS &rarr; Protección máxima &rarr; Proveedor personalizado: <code class="code-inline">https://dns.xdp.es/dns-query</code></p>
@@ -373,8 +393,8 @@ DNSSEC=allow-downgrade</code></pre>
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=4.1"></script>
-    <script src="/theme.js?v=4.0" defer></script>
+    <script src="/i18n.js?v=4.2"></script>
+    <script src="/theme.js?v=4.1" defer></script>
     <script src="/index.js?v=3.7" defer></script>
 </body>
 </html>

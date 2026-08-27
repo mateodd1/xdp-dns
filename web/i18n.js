@@ -71,6 +71,17 @@ const translations = {
         "guide.mikrotik.s5": "Apunta los clientes al router vía DHCP: <strong>IP</strong> → <strong>DHCP Server</strong> → <strong>Networks</strong> → <em>DNS Servers</em> = IP LAN del router.",
         "guide.mikrotik.cli": "Equivalente por terminal (<code>/terminal</code>):",
 
+        // Guide Steps - Ubiquiti
+        "guide.tab_ubiquiti": "Ubiquiti",
+        "guide.ubiquiti.title_unifi": "UniFi OS / Gateways (DNS Shield - DoH):",
+        "guide.ubiquiti.s1": "Abre <strong>UniFi Network</strong> y ve a <strong>Settings (Ajustes)</strong> → <strong>Security (Seguridad)</strong> → <strong>General</strong>.",
+        "guide.ubiquiti.s2": "En <strong>DNS Shield</strong> (DNS cifrado), activa la opción y selecciona <em>\"Custom\"</em> (Personalizado).",
+        "guide.ubiquiti.s3": "Introduce la URL DoH: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code> y la IP de resolución: <code class=\"code-inline\">85.208.114.51</code>.",
+        "guide.ubiquiti.title_wan": "Configuración estándar por interfaz WAN:",
+        "guide.ubiquiti.s4": "Ve a <strong>Settings</strong> → <strong>Internet</strong> → tu conexión WAN → <strong>Advanced (Manual)</strong>.",
+        "guide.ubiquiti.s5": "Introduce como <em>Primary DNS</em>: <code class=\"code-inline\">85.208.114.51</code> y como <em>Secondary DNS</em>: <code class=\"code-inline\">2a0e:97c0:c40::51</code>.",
+        "guide.ubiquiti.cli": "Para EdgeRouter / EdgeOS por terminal (<code>CLI</code>):",
+
         // Guide Steps - Browsers
         "guide.browser.ff": "<strong>Firefox:</strong> Ajustes → Privacidad y Seguridad → DNS sobre HTTPS → Protección máxima → Proveedor personalizado: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
         "guide.browser.chrome": "<strong>Chrome / Brave / Edge:</strong> Configuración → Privacidad y Seguridad → Usar DNS seguro → Con: Personalizado → <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
@@ -272,6 +283,17 @@ const translations = {
         "guide.mikrotik.s4": "Check <strong>Allow Remote Requests</strong> so the router serves DNS to your LAN.",
         "guide.mikrotik.s5": "Point LAN clients to the router via DHCP: <strong>IP</strong> → <strong>DHCP Server</strong> → <strong>Networks</strong> → <em>DNS Servers</em> = router's LAN IP.",
         "guide.mikrotik.cli": "Terminal equivalent (<code>/terminal</code>):",
+
+        // Guide Steps - Ubiquiti
+        "guide.tab_ubiquiti": "Ubiquiti",
+        "guide.ubiquiti.title_unifi": "UniFi OS / Gateways (DNS Shield - DoH):",
+        "guide.ubiquiti.s1": "Open <strong>UniFi Network</strong> and go to <strong>Settings</strong> → <strong>Security</strong> → <strong>General</strong>.",
+        "guide.ubiquiti.s2": "Under <strong>DNS Shield</strong> (Encrypted DNS), toggle it on and select <em>\"Custom\"</em>.",
+        "guide.ubiquiti.s3": "Enter the DoH URL: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code> and IP address: <code class=\"code-inline\">85.208.114.51</code>.",
+        "guide.ubiquiti.title_wan": "Standard WAN DNS configuration:",
+        "guide.ubiquiti.s4": "Go to <strong>Settings</strong> → <strong>Internet</strong> → select your WAN connection → <strong>Advanced (Manual)</strong>.",
+        "guide.ubiquiti.s5": "Enter <em>Primary DNS</em>: <code class=\"code-inline\">85.208.114.51</code> and <em>Secondary DNS</em>: <code class=\"code-inline\">2a0e:97c0:c40::51</code>.",
+        "guide.ubiquiti.cli": "For EdgeRouter / EdgeOS via terminal (<code>CLI</code>):",
 
         // Guide Steps - Browsers
         "guide.browser.ff": "<strong>Firefox:</strong> Settings → Privacy & Security → DNS over HTTPS → Max Protection → Custom provider: <code class=\"code-inline\">https://dns.xdp.es/dns-query</code>",
