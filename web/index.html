@@ -81,7 +81,7 @@
     </noscript>
 
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="/index.css?v=4.4">
+    <link rel="stylesheet" href="/index.css?v=4.5">
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -95,13 +95,11 @@
         <!-- Site Header -->
         <header>
             <div class="header-top">
-                <h1>xdp.es DNS</h1>
-                <div class="header-controls">
-                    <div class="dns-mode-selector" role="group" aria-label="Modo DNS" data-agent-role="dns-mode-control">
-                        <button type="button" class="dns-mode-btn active" data-dns-mode="adblock" aria-pressed="true" onclick="setDnsMode('adblock')" data-i18n="mode.adblock">Adblock</button>
-                        <button type="button" class="dns-mode-btn" data-dns-mode="standard" aria-pressed="false" onclick="setDnsMode('standard')" data-i18n="mode.standard">Standard</button>
-                    </div>
-                    <div class="theme-switcher" role="group" aria-label="Seleccionar tema de color" data-agent-role="theme-control">
+                <div class="dns-mode-selector" role="group" aria-label="Modo DNS" data-agent-role="dns-mode-control">
+                    <button type="button" class="dns-mode-btn active" data-dns-mode="adblock" aria-pressed="true" onclick="setDnsMode('adblock')" data-i18n="mode.adblock">Adblock</button>
+                    <button type="button" class="dns-mode-btn" data-dns-mode="standard" aria-pressed="false" onclick="setDnsMode('standard')" data-i18n="mode.standard">Standard</button>
+                </div>
+                <div class="theme-switcher" role="group" aria-label="Seleccionar tema de color" data-agent-role="theme-control">
                     <button type="button" class="theme-btn" data-theme-val="light" onclick="setTheme('light')" title="Modo Claro" aria-label="Modo Claro" data-agent-action="set-light-theme">
                         <svg class="theme-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <circle cx="12" cy="12" r="5"></circle>
@@ -130,9 +128,10 @@
                         </svg>
                         <span class="theme-text" data-i18n="theme.auto">Auto</span>
                     </button>
-                    </div>
                 </div>
             </div>
+            <h1>xdp.es DNS</h1>
+            <div class="subtitle" data-i18n="hero.subtitle">Resolución DNS recursiva, ultra-rápida y con validación DNSSEC.</div>
         </header>
 
         <!-- Main Content -->
@@ -333,7 +332,7 @@ DNSSEC=allow-downgrade</code></pre>
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=4.0"></script>
+    <script src="/i18n.js?v=4.1"></script>
     <script src="/theme.js?v=4.0" defer></script>
     <script src="/index.js?v=3.7" defer></script>
 </body>

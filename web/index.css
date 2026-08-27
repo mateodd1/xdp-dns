@@ -104,7 +104,7 @@ body {
 }
 
 .container {
-    max-width: 880px;
+    max-width: 980px;
     margin: 44px auto;
     padding: 0 20px;
 }
@@ -174,6 +174,7 @@ body[data-dns-mode="standard"] [data-adblock-only] {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 12px;
     gap: 16px;
     min-height: 44px;
 }

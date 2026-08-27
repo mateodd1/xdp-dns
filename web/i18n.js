@@ -19,6 +19,7 @@ const translations = {
         "mode.adblock_desc": "Con filtrado",
         "mode.standard": "Standard",
         "mode.standard_desc": "Sin filtrado",
+        "hero.subtitle": "Resolución DNS recursiva, ultra-rápida y con validación DNSSEC.",
 
         // Protocols
         "doh.desc": "Cifrado de extremo a extremo a través de HTTPS.",
@@ -220,6 +221,7 @@ const translations = {
         "mode.adblock_desc": "Filtered",
         "mode.standard": "Standard",
         "mode.standard_desc": "Unfiltered",
+        "hero.subtitle": "High-performance recursive DNS with DNSSEC validation.",
 
         // Protocols
         "doh.desc": "End-to-end encryption over HTTPS.",
