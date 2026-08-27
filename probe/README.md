@@ -60,6 +60,8 @@ Comandos:
 systemctl status xdp-probe-server
 journalctl -u xdp-probe-server -f
 curl -s -H "Authorization: Bearer $TOKEN" https://dns.xdp.es/probe/targets | jq
+# Estado: sondas conectadas (last-seen), redirects activos y recuento de bloqueos
+curl -s -H "Authorization: Bearer $TOKEN" https://dns.xdp.es/probe/status | jq
 ```
 
 ## Instalar la sonda en casa (Raspberry Pi / mini-PC)

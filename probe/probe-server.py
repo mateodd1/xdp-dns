@@ -50,6 +50,7 @@ _control_cache = {}                 # (ip,sni,fam) -> (ts, serving)
 _state = {}                         # key -> {"blocked": int, "serving": int, "last": float}
 _redirects = {}                     # domain -> {4: ip, 6: ip}
 _blocked = {4: set(), 6: set()}     # IPs confirmadas bloqueadas (para los ficheros)
+_probes = {}                        # probe_id -> {last, reports, last_results, last_confirmed}
 
 
 # ----------------------------- utilidades ---------------------------------
@@ -195,9 +196,11 @@ def strategy_of(domain, family):
     return None, domain
 
 
-def process_report(results):
+def process_report(probe_id, results):
     """results: [{domain, family, ip, serving(bool), rtt_ms}]. Devuelve resumen."""
     now = time.time()
+    if probe_id and probe_id not in _probes:
+        print(f"[probe-server] sonda conectada: {probe_id}", flush=True)
     # Agrupa por dominio+familia para decidir a nivel de dominio.
     by_dom = {}
     confirmed = []
@@ -259,6 +262,13 @@ def process_report(results):
         for k in [k for k, v in _state.items() if now - v["last"] > 3600]:
             del _state[k]
 
+        if probe_id:
+            prev = _probes.get(probe_id, {}).get("reports", 0)
+            _probes[probe_id] = {
+                "last": now, "reports": prev + 1,
+                "last_results": len(results), "last_confirmed": len(confirmed),
+            }
+
         flush_blocked_files()
         flush_redirects()
 
@@ -301,6 +311,19 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(401, {"error": "unauthorized"})
         if path.endswith("/targets"):
             return self._send(200, build_targets())
+        if path.endswith("/status"):
+            now = time.time()
+            with _lock:
+                probes = {
+                    pid: {**v, "seen_ago_s": round(now - v["last"], 1)}
+                    for pid, v in _probes.items()
+                }
+                redirects = {d: v for d, v in _redirects.items() if any(v.values())}
+                counts = {"v4": len(_blocked[4]), "v6": len(_blocked[6])}
+            return self._send(200, {
+                "probes": probes, "active_redirects": redirects,
+                "blocked_counts": counts,
+            })
         self._send(404, {"error": "not found"})
 
     def do_POST(self):
@@ -313,11 +336,12 @@ class Handler(BaseHTTPRequestHandler):
             n = int(self.headers.get("Content-Length", 0))
             body = json.loads(self.rfile.read(n) or b"{}")
             results = body.get("results", [])
+            probe_id = str(body.get("probe_id", "") or "")[:64]
             if not isinstance(results, list) or len(results) > 5000:
                 raise ValueError("bad results")
         except Exception as exc:
             return self._send(400, {"error": f"bad request: {exc}"})
-        self._send(200, process_report(results))
+        self._send(200, process_report(probe_id, results))
 
 
 def main():
