@@ -92,6 +92,7 @@ const translations = {
         "stats.view_metrics": "Ver métricas →",
         "stats.processed": "Consultas",
         "stats.blocked": "Bloqueadas",
+        "stats.evaded": "Reemplazadas",
         "stats.block_rate": "Tasa de bloqueo",
 
         // Stats Dashboard Page
@@ -306,6 +307,7 @@ const translations = {
         "stats.view_metrics": "View metrics →",
         "stats.processed": "Queries",
         "stats.blocked": "Blocked",
+        "stats.evaded": "Replaced",
         "stats.block_rate": "Block rate",
 
         // Stats Dashboard Page

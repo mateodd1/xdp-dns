@@ -190,18 +190,31 @@ function loadStats() {
             if (data.stats_24h) {
                 const total = data.stats_24h.total || 0;
                 const blocked = data.stats_24h.blocked || 0;
+                const evaded = data.stats_24h.evaded || 0;
                 const pct = data.stats_24h.blocked_pct !== undefined ? data.stats_24h.blocked_pct : (total > 0 ? ((blocked / total) * 100).toFixed(1) : 0);
 
-                document.getElementById('stat-total').innerText = Number(total).toLocaleString();
-                document.getElementById('stat-blocked').innerText = Number(blocked).toLocaleString();
-                document.getElementById('stat-percent').innerText = pct + '%';
+                const elTotal = document.getElementById('stat-total');
+                const elBlocked = document.getElementById('stat-blocked');
+                const elEvaded = document.getElementById('stat-evaded');
+                const elPercent = document.getElementById('stat-percent');
+
+                if (elTotal) elTotal.innerText = Number(total).toLocaleString();
+                if (elBlocked) elBlocked.innerText = Number(blocked).toLocaleString();
+                if (elEvaded) elEvaded.innerText = Number(evaded).toLocaleString();
+                if (elPercent) elPercent.innerText = pct + '%';
             }
         })
         .catch(err => {
             console.log('Esperando actualización de estadísticas:', err);
-            document.getElementById('stat-total').innerText = '0';
-            document.getElementById('stat-blocked').innerText = '0';
-            document.getElementById('stat-percent').innerText = '0.0%';
+            const elTotal = document.getElementById('stat-total');
+            const elBlocked = document.getElementById('stat-blocked');
+            const elEvaded = document.getElementById('stat-evaded');
+            const elPercent = document.getElementById('stat-percent');
+
+            if (elTotal) elTotal.innerText = '0';
+            if (elBlocked) elBlocked.innerText = '0';
+            if (elEvaded) elEvaded.innerText = '0';
+            if (elPercent) elPercent.innerText = '0.0%';
         });
 }
 
