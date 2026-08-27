@@ -29,10 +29,13 @@ no desde casa**, con histéresis (3 rondas) para evitar falsos positivos.
 - **cf-blocklist** (Cloudflare anycast: `sc.ohz.ovh`, `turgame.com`, `descargasdd.org`):
   la IP bloqueada se añade a `/etc/unbound/probe_blocked_ipv6.txt`, `update-blocked-ips.sh`
   la une a `blocked_ipv6.txt` y el evade-proxy salta al vecino del prefijo (seguro en CF).
-- **verified-pool** (GitHub/Fastly, no anycast: `github.com`, `gist.github.com`,
-  `gist.githubusercontent.com`): NO se puede saltar a ciegas (una IP vecina puede estar
-  muerta), así que se fija un `redirect` a una IP del pool **verificada sirviendo** desde
-  casa y desde el servidor, en `/run/evade-proxy/redirects.txt`.
+- **verified-pool** (CDN NO anycast — GitHub, Fastly y Akamai/GeoDNS: `github.com`,
+  `gist.github.com`, `gist.githubusercontent.com`, `raw.githubusercontent.com`,
+  `twitch.tv`, `steamcommunity.com`, `store.steampowered.com`): NO se puede saltar a
+  ciegas (una IP vecina puede estar muerta o servir otro sitio — los edges de Akamai
+  **no** son intercambiables), así que se fija un `redirect` a una IP del pool
+  **verificada sirviendo** desde casa Y desde el servidor (con su SNI y cert válido),
+  en `/run/evade-proxy/redirects.txt`. Si ninguna candidata sirve, no se toca nada.
 
 ## Configuración de dominios — `domains.json`
 
@@ -43,9 +46,11 @@ no desde casa**, con histéresis (3 rondas) para evitar falsos positivos.
 ```
 
 `extra_candidates` da un pool de failover a dominios con una sola IP en DNS
-(github.com / gist.github.com traen las IPs-frontend de GitHub verificadas).
-`turgame.com` no publica AAAA ahora mismo: queda configurado y empezará a
-sondearse en cuanto tenga registro IPv6.
+(github.com / gist.github.com traen las IPs-frontend de GitHub verificadas;
+Steam trae edges Akamai verificados sirviendo cada hostname; Twitch, las 4 IPs
+Fastly). `turgame.com` no publica AAAA ahora mismo: queda configurado y empezará
+a sondearse en cuanto tenga registro IPv6. Steam y Twitch solo publican A (sin
+AAAA), por eso van en `families: [4]`.
 
 ## Servidor (ya desplegado)
 

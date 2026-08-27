@@ -10,6 +10,11 @@
 
     { "domain": "production.cloudflare.docker.com", "sni": "production.cloudflare.docker.com", "families": [4, 6], "strategy": "cf-blocklist" },
     { "domain": "auth.docker.io",              "sni": "auth.docker.io",             "families": [4, 6], "strategy": "cf-blocklist" },
-    { "domain": "hub.docker.com",              "sni": "hub.docker.com",             "families": [4, 6], "strategy": "cf-blocklist" }
+    { "domain": "hub.docker.com",              "sni": "hub.docker.com",             "families": [4, 6], "strategy": "cf-blocklist" },
+
+    { "domain": "raw.githubusercontent.com",   "sni": "raw.githubusercontent.com",  "families": [4, 6], "strategy": "verified-pool", "extra_candidates": ["185.199.108.133","185.199.109.133","185.199.110.133","185.199.111.133","2606:50c0:8000::154","2606:50c0:8001::154","2606:50c0:8002::154","2606:50c0:8003::154"] },
+    { "domain": "twitch.tv",                   "sni": "twitch.tv",                  "families": [4], "strategy": "verified-pool", "extra_candidates": ["151.101.2.167","151.101.66.167","151.101.130.167","151.101.194.167"] },
+    { "domain": "steamcommunity.com",          "sni": "steamcommunity.com",         "families": [4], "strategy": "verified-pool", "extra_candidates": ["2.22.208.231","23.46.85.17"] },
+    { "domain": "store.steampowered.com",      "sni": "store.steampowered.com",     "families": [4], "strategy": "verified-pool", "extra_candidates": ["2.22.208.231","2.22.210.125","2.17.154.29","23.46.85.17"] }
   ]
 }
