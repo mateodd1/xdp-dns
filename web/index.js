@@ -7,7 +7,8 @@ const DNS_MODES = {
         ipv4: '85.208.114.51',
         ipv6: '2a0e:97c0:c40::51',
         dohProfile: 'dns_xdp_es_doh.mobileconfig',
-        dotProfile: 'dns_xdp_es_dot.mobileconfig'
+        dotProfile: 'dns_xdp_es_dot.mobileconfig',
+        stamp: 'sdns://AgMAAAAAAAAADTg1LjIwOC4xMTQuNTEACmRucy54ZHAuZXMKL2Rucy1xdWVyeQ'
     },
     standard: {
         doh: 'https://lite.xdp.es/dns-query',
@@ -15,7 +16,8 @@ const DNS_MODES = {
         ipv4: '85.208.114.52',
         ipv6: '2a0e:97c0:c40::52',
         dohProfile: 'lite_xdp_es_doh.mobileconfig',
-        dotProfile: 'lite_xdp_es_dot.mobileconfig'
+        dotProfile: 'lite_xdp_es_dot.mobileconfig',
+        stamp: 'sdns://AgcAAAAAAAAADTg1LjIwOC4xMTQuNTIAC2xpdGUueGRwLmVzCi9kbnMtcXVlcnk'
     }
 };
 
@@ -35,7 +37,8 @@ function refreshGuideEndpoints() {
             .replaceAll('85.208.114.51', selected.ipv4)
             .replaceAll('2a0e:97c0:c40::51', selected.ipv6)
             .replaceAll('dns_xdp_es_doh.mobileconfig', selected.dohProfile)
-            .replaceAll('dns_xdp_es_dot.mobileconfig', selected.dotProfile);
+            .replaceAll('dns_xdp_es_dot.mobileconfig', selected.dotProfile)
+            .replaceAll('sdns://AgMAAAAAAAAADTg1LjIwOC4xMTQuNTEACmRucy54ZHAuZXMKL2Rucy1xdWVyeQ', selected.stamp);
     });
 }
 
