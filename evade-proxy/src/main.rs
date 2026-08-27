@@ -380,6 +380,10 @@ impl App {
                         }
                     }
                 }
+                (64, _) | (65, _) => {
+                    let redirect = if rr.answer { test_redirect } else { None };
+                    changes.extend(svcb_hint_changes(packet, rr, data.as_ref(), redirect));
+                }
                 _ => {}
             }
         }
@@ -451,6 +455,102 @@ fn resource_records(packet: &[u8]) -> Option<Vec<Record>> {
         });
     }
     Some(records)
+}
+
+// Rewrite ipv4hint (SvcParamKey 4) and ipv6hint (SvcParamKey 6) inside an
+// HTTPS (type 65) or SVCB (type 64) record. Modern browsers connect straight to
+// the address in these hints, bypassing the A/AAAA record entirely, so the same
+// block-evasion logic must apply here. Hints are rewritten in place (same width),
+// so no packet resizing is needed. Returns (offset, new_bytes) edits.
+fn svcb_hint_changes(
+    packet: &[u8],
+    rr: &Record,
+    data: &Data,
+    test_redirect: Option<&TestRedirect>,
+) -> Vec<(usize, Vec<u8>)> {
+    let mut changes = Vec::new();
+    let end = match rr.rdata.checked_add(rr.rdlen) {
+        Some(end) if end <= packet.len() => end,
+        _ => return changes,
+    };
+    // SvcPriority (2 bytes)
+    let mut pos = match rr.rdata.checked_add(2) {
+        Some(p) if p <= end => p,
+        _ => return changes,
+    };
+    // TargetName: uncompressed per RFC 9460. Bail on any compression pointer.
+    loop {
+        if pos >= end {
+            return changes;
+        }
+        let n = packet[pos];
+        if n & 0xc0 != 0 {
+            return changes;
+        }
+        pos += 1;
+        if n == 0 {
+            break;
+        }
+        match pos.checked_add(n as usize) {
+            Some(p) if p <= end => pos = p,
+            _ => return changes,
+        }
+    }
+    // SvcParams: repeated { key(2) len(2) value(len) }, keys ascending.
+    while pos + 4 <= end {
+        let key = u16::from_be_bytes([packet[pos], packet[pos + 1]]);
+        let vlen = u16::from_be_bytes([packet[pos + 2], packet[pos + 3]]) as usize;
+        pos += 4;
+        let vend = match pos.checked_add(vlen) {
+            Some(v) if v <= end => v,
+            _ => break,
+        };
+        match key {
+            4 => {
+                let mut off = pos;
+                while off + 4 <= vend {
+                    let ip = u32::from_be_bytes(packet[off..off + 4].try_into().unwrap());
+                    let new = test_redirect.and_then(|r| r.v4).or_else(|| {
+                        if data.blocked_v4.contains(&ip) {
+                            data.evasive_v4(ip)
+                        } else {
+                            None
+                        }
+                    });
+                    if let Some(new_ip) = new {
+                        let bytes = new_ip.to_be_bytes();
+                        if packet[off..off + 4] != bytes {
+                            changes.push((off, bytes.to_vec()));
+                        }
+                    }
+                    off += 4;
+                }
+            }
+            6 => {
+                let mut off = pos;
+                while off + 16 <= vend {
+                    let ip = u128::from_be_bytes(packet[off..off + 16].try_into().unwrap());
+                    let new = test_redirect.and_then(|r| r.v6).or_else(|| {
+                        if data.blocked_v6.contains(&ip) {
+                            data.evasive_v6(ip)
+                        } else {
+                            None
+                        }
+                    });
+                    if let Some(new_ip) = new {
+                        let bytes = new_ip.to_be_bytes();
+                        if packet[off..off + 16] != bytes {
+                            changes.push((off, bytes.to_vec()));
+                        }
+                    }
+                    off += 16;
+                }
+            }
+            _ => {}
+        }
+        pos = vend;
+    }
+    changes
 }
 
 fn question_name(packet: &[u8]) -> Option<String> {
@@ -873,6 +973,39 @@ mod tests {
         assert_eq!(app.rewrite(&mut packet), 1);
         assert_eq!(&packet[packet.len() - 4..], &[104, 16, 1, 2]);
         assert_eq!(&packet[packet.len() - 10..packet.len() - 6], &[0, 0, 0, 0]);
+    }
+
+    #[test]
+    fn rewrites_https_ipv4hint_and_zeros_ttl() {
+        // HTTPS (type 65) answer for a.com carrying ipv4hint=104.16.1.1.
+        // RDATA: priority(0001) target(00) key4(0004) len(0004) hint(104.16.1.1)
+        let mut packet = vec![
+            0x12, 0x34, 0x81, 0x80, 0, 1, 0, 1, 0, 0, 0, 0, // header
+            1, b'a', 3, b'c', b'o', b'm', 0, 0, 65, 0, 1, // question a.com HTTPS IN
+            0xc0, 0x0c, 0, 65, 0, 1, 0, 0, 1, 0x2c, // answer name/type/class/ttl
+            0, 11, // rdlen = 11
+            0, 1, 0, 0, 4, 0, 4, 104, 16, 1, 1, // rdata
+        ];
+        let ttl_at = 29;
+        let hint_at = packet.len() - 4;
+        let data = Data {
+            blocked_v4: HashSet::from([u32::from(Ipv4Addr::new(104, 16, 1, 1))]),
+            cf_v4: vec![(
+                u32::from(Ipv4Addr::new(104, 16, 0, 0)),
+                u32::from(Ipv4Addr::new(104, 16, 255, 255)),
+            )],
+            ..Default::default()
+        };
+        let app = App {
+            data: RwLock::new(Arc::new(data)),
+            counters: Counters::default(),
+            paths: Paths::from_env(true),
+            test_redirects: HashMap::new(),
+            temporary_redirects: RwLock::new(Arc::new(HashMap::new())),
+        };
+        assert_eq!(app.rewrite(&mut packet), 1);
+        assert_eq!(&packet[hint_at..hint_at + 4], &[104, 16, 1, 2]);
+        assert_eq!(&packet[ttl_at..ttl_at + 4], &[0, 0, 0, 0]);
     }
 
     #[test]

@@ -1,9 +1,9 @@
 [Unit]
-Description=Run update-blocked-ips every 1 minute
+Description=Run update-blocked-ips every 15 seconds
 
 [Timer]
 OnBootSec=30s
-OnUnitActiveSec=1min
+OnUnitActiveSec=15s
 Persistent=true
 
 [Install]
