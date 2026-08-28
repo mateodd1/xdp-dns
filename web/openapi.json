@@ -3,7 +3,12 @@
   "info": {
     "title": "xdp.es DNS Services & Real-Time Metrics API",
     "description": "API and endpoints for querying encrypted DNS (DoH/DoT) and accessing anonymous recursive resolver statistics.",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "contact": {
+      "name": "xdp.es",
+      "email": "contacto@xdp.es",
+      "url": "https://xdp.es/about"
+    }
   },
   "servers": [
     {

@@ -19,3 +19,7 @@
 
 - [IPv4 DNS Resolver](https://xdp.es/): Standard recursive DNS on 85.208.114.51 (Port 53 UDP/TCP).
 - [IPv6 DNS Resolver](https://xdp.es/): Standard recursive DNS on 2a0e:97c0:c40::51 (Port 53 UDP/TCP).
+
+## Contact
+
+- Email: [contacto@xdp.es](mailto:contacto@xdp.es)

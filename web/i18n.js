@@ -174,6 +174,10 @@ const translations = {
         "about.addr_doh": "Endpoint DoH / DoH3:",
         "about.addr_dot": "Endpoint DoT:",
 
+        // Section 4: Contact
+        "about.sec_contact_title": "Contacto",
+        "about.sec_contact_desc": "Para consultas, incidencias o sugerencias: <a href=\"mailto:contacto@xdp.es\" class=\"text-link\">contacto@xdp.es</a>",
+
         // Blocked IPs / Evasion Monitor Page
         "blocked.page_title": "Monitor de Evasión de Bloqueos | xdp.es DNS",
         "blocked.title": "Monitor de Evasión de Bloqueos",
@@ -392,6 +396,10 @@ const translations = {
         "about.addr_ipv6": "IPv6 Address:",
         "about.addr_doh": "DoH / DoH3 Endpoint:",
         "about.addr_dot": "DoT Endpoint:",
+
+        // Section 4: Contact
+        "about.sec_contact_title": "Contact",
+        "about.sec_contact_desc": "For questions, issues or suggestions: <a href=\"mailto:contacto@xdp.es\" class=\"text-link\">contacto@xdp.es</a>",
 
         // Blocked IPs / Evasion Monitor Page
         "blocked.page_title": "Block Evasion Monitor | xdp.es DNS",

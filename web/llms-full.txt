@@ -9,6 +9,7 @@
 - [JSON Metrics](https://xdp.es/stats.json): Real-time metrics API endpoint.
 - [OpenAPI Schema](https://xdp.es/openapi.json): Machine-readable OpenAPI 3.1.0 API definition.
 - [Compact LLMs Summary](https://xdp.es/llms.txt): Quick summary for LLM agents.
+- Contact: [contacto@xdp.es](mailto:contacto@xdp.es)
 
 ## Protocols & Endpoints
 
