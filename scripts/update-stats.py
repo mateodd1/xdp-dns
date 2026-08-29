@@ -113,7 +113,7 @@ def save_json(filepath, data):
 CUSTOM_ASN_NAMES = {
     # Spanish National and Regional ISPs
     '3352': 'Telefonica de España',
-    '6739': 'Telefonica de España',
+    '6739': 'VODAFONE ONO',
     '57269': 'Digi Spain',
     '206238': 'Digi Spain',
     '15704': 'XTRA TELECOM',
