@@ -124,6 +124,8 @@ CUSTOM_ASN_NAMES = {
     '12715': 'Jazztel',
 
     # Datacenters
+    '212238': 'CDN77',
+    '60068': 'CDN77',
     '8560': 'IONOS',
     '51167': 'Contabo',
     '13335': 'Cloudflare',
