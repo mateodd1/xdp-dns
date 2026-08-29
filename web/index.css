@@ -816,6 +816,9 @@ main {
 }
 
 .site-footer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     color: var(--text-muted);
     text-decoration: none;
     transition: color 0.2s ease;
