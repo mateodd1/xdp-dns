@@ -4,6 +4,9 @@
 	email admin@xdp.es
 	# Sin SNI (clientes por IP, sobre todo QUIC/h3): usar el cert de dns.xdp.es, que incluye las IPs
 	default_sni dns.xdp.es
+	# Encrypted ClientHello: el SNI real (dns.xdp.es, lite...) viaja cifrado; el SNI visible es xdp.es.
+	# Publicación del registro HTTPS (ech=) en Cloudflare: scripts/xdp-ech-publish.sh (timer).
+	ech xdp.es
 	# Enable HTTP/3 (QUIC) for ultra-low latency DoH
 	servers {
 		protocols h1 h2 h3

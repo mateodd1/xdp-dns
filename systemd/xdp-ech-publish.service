@@ -1,0 +1,6 @@
+[Unit]
+Description=Publicar claves ECH de Caddy en el registro HTTPS de Cloudflare
+After=network-online.target caddy.service
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/xdp-ech-publish.sh

@@ -94,6 +94,12 @@ el perfil de bloqueo y solo entonces entrega la consulta al proxy Rust.
 * **Servicio Systemd**: `caddy.service`
 * **Funciones**:
   * Gestión de certificados automáticos Wildcard Let's Encrypt para `xdp.es`, `dns.xdp.es` y subdominios.
+  * **ECH (Encrypted ClientHello)**: Caddy (>=2.10) genera las claves ECH (`ech xdp.es` en opciones globales);
+    el SNI real (`dns.xdp.es`, `lite.xdp.es`) viaja cifrado y el visible es `xdp.es`. `scripts/xdp-ech-publish.sh`
+    (timer diario `xdp-ech-publish.timer`) publica la `ECHConfigList` en los registros HTTPS de Cloudflare
+    (`alpn="h2,h3" ech=...`); Caddy rota claves cada 30 días. OJO: un HTTPS explícito hace que el wildcard
+    `*.xdp.es` deje de cubrir ese nombre (RFC 4592): todo nombre con HTTPS debe tener A/AAAA explícitos
+    (el script lo comprueba). `scripts/ech-check/` es un cliente Go para verificar que el servidor acepta ECH.
   * **Certificado para las IPs** (`85.208.114.51/.52/.54` y sus IPv6): Let's Encrypt perfil `shortlived`
     (6 días, reto `http-01`, certbot 5.x en `/opt/certbot-ip`, config en `/etc/letsencrypt-ip`). Incluye también
     `dns.xdp.es` y `lite.xdp.es`, así DoH/DoT/DoQ/DoH3 funcionan por IP sin SNI (routers, AdGuard con `tls://IP`...).
