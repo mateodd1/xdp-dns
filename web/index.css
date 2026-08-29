@@ -808,6 +808,13 @@ main {
     color: var(--text-muted);
 }
 
+.site-footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
 .site-footer-links {
     display: flex;
     align-items: center;
