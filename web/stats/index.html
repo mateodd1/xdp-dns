@@ -1150,7 +1150,7 @@
             if (/\bas57269\b/.test(lower) || /\bdigi\b/.test(lower)) {
                 return { src: '/stats/img/digi.png', alt: 'Digi' };
             }
-            if (/\bas(15704|12338)\b/.test(lower) || lower.includes('masmovil') || lower.includes('másmóvil') || lower.includes('yoigo') || lower.includes('pepephone') || lower.includes('euskaltel') || lower.includes('xtra')) {
+            if (/\bas15704\b/.test(lower) || lower.includes('masmovil') || lower.includes('másmóvil') || lower.includes('yoigo') || lower.includes('pepephone') || lower.includes('xtra')) {
                 return { src: '/stats/img/masmovil.svg', alt: 'MásMóvil' };
             }
             if (/\bas13335\b/.test(lower) || lower.includes('cloudflare')) {
@@ -1167,6 +1167,9 @@
             }
             if (/\bas8560\b/.test(lower) || lower.includes('ionos')) {
                 return { src: '/stats/img/ionos.svg', alt: 'IONOS' };
+            }
+            if (/\bas9009\b/.test(lower) || lower.includes('m247')) {
+                return { src: '/stats/img/m247.svg', alt: 'M247' };
             }
             return null;
         }
