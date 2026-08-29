@@ -1153,6 +1153,9 @@
             if (/\bas15704\b/.test(lower) || lower.includes('masmovil') || lower.includes('másmóvil') || lower.includes('yoigo') || lower.includes('pepephone') || lower.includes('xtra')) {
                 return { src: '/stats/img/masmovil.svg', alt: 'MásMóvil' };
             }
+            if (/\bas12338\b/.test(lower) || lower.includes('euskaltel')) {
+                return { src: '/stats/img/euskaltel.svg', alt: 'Euskaltel' };
+            }
             if (/\bas13335\b/.test(lower) || lower.includes('cloudflare')) {
                 return { src: '/stats/img/cloudflare.svg', alt: 'Cloudflare' };
             }
