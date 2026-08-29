@@ -4,7 +4,7 @@ caching:
   minTime: -1m
   maxTime: -1m
   maxItemsCount: 0
-certFile: /etc/letsencrypt/live/xdp.es/fullchain.pem
+certFile: /etc/xdp-tls/fullchain.pem
 customDNS:
   customTTL: 1h
   mapping:
@@ -13,7 +13,7 @@ customDNS:
 ecs:
   forward: false
   useAsClient: true
-keyFile: /etc/letsencrypt/live/xdp.es/privkey.pem
+keyFile: /etc/xdp-tls/privkey.pem
 log:
   format: text
   level: warn

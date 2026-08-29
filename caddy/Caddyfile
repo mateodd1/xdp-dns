@@ -2,6 +2,8 @@
 # Caddy configuration with Wildcard TLS (*.xdp.es) for xdp.es, dns.xdp.es and all subdomains
 {
 	email admin@xdp.es
+	# Sin SNI (clientes por IP, sobre todo QUIC/h3): usar el cert de dns.xdp.es, que incluye las IPs
+	default_sni dns.xdp.es
 	# Enable HTTP/3 (QUIC) for ultra-low latency DoH
 	servers {
 		protocols h1 h2 h3
@@ -14,13 +16,18 @@
 
 # Lite resolver: IP-evasion and DNSSEC, deliberately without ad blocking.
 lite.xdp.es {
-	tls /etc/letsencrypt/live/xdp.es/fullchain.pem /etc/letsencrypt/live/xdp.es/privkey.pem
+	tls /etc/xdp-tls/fullchain.pem /etc/xdp-tls/privkey.pem
 
 	handle /dns-query* {
 		reverse_proxy 127.0.0.1:4002 {
 			header_up Host {host}
 			header_up X-Real-IP {remote_host}
 		}
+	}
+
+	handle /.well-known/acme-challenge/* {
+		root * /var/www/acme
+		file_server
 	}
 
 	handle {
@@ -39,7 +46,7 @@ lite.xdp.es {
 
 # Dedicated DoH & DoT Subdomain (dns.xdp.es) - EXCLUSIVELY FOR DNS QUERIES
 dns.xdp.es {
-	tls /etc/letsencrypt/live/xdp.es/fullchain.pem /etc/letsencrypt/live/xdp.es/privkey.pem
+	tls /etc/xdp-tls/fullchain.pem /etc/xdp-tls/privkey.pem
 
 	handle /block-ota/dns-query* {
 		rewrite * /dns-query
@@ -68,6 +75,11 @@ dns.xdp.es {
 		reverse_proxy 127.0.0.1:8090
 	}
 
+	handle /.well-known/acme-challenge/* {
+		root * /var/www/acme
+		file_server
+	}
+
 	# Any non-DNS request on dns.xdp.es is redirected immediately to the canonical web domain xdp.es
 	handle {
 		redir https://xdp.es{uri} permanent
@@ -80,6 +92,39 @@ dns.xdp.es {
 		Access-Control-Allow-Origin "*"
 		Access-Control-Allow-Methods "GET, POST, OPTIONS"
 		Access-Control-Allow-Headers "Content-Type, Accept"
+	}
+}
+
+# Acceso DoH por IP (clientes que no usan SNI/hostname). Cert con IPs en SAN.
+https://85.208.114.51, https://85.208.114.54, https://[2a0e:97c0:c40::51], https://[2a0e:97c0:c40::54] {
+	tls /etc/xdp-tls/fullchain.pem /etc/xdp-tls/privkey.pem
+	handle /dns-query* {
+		reverse_proxy 127.0.0.1:4000 {
+			header_up Host dns.xdp.es
+			header_up X-Real-IP {remote_host}
+		}
+	}
+	handle /.well-known/dns-query* {
+		reverse_proxy 127.0.0.1:4000 {
+			header_up Host dns.xdp.es
+			header_up X-Real-IP {remote_host}
+		}
+	}
+	handle {
+		redir https://xdp.es{uri} permanent
+	}
+}
+
+https://85.208.114.52, https://[2a0e:97c0:c40::52] {
+	tls /etc/xdp-tls/fullchain.pem /etc/xdp-tls/privkey.pem
+	handle /dns-query* {
+		reverse_proxy 127.0.0.1:4002 {
+			header_up Host lite.xdp.es
+			header_up X-Real-IP {remote_host}
+		}
+	}
+	handle {
+		redir https://xdp.es{uri} permanent
 	}
 }
 
@@ -253,6 +298,11 @@ xdp.es {
 
 # Catch-all on HTTP for non-xdp.es hostnames or direct IP
 http:// {
+	handle /.well-known/acme-challenge/* {
+		root * /var/www/acme
+		file_server
+	}
+
 	@not_xdp {
 		not header_regexp Host ^([a-zA-Z0-9-]+\.)*xdp\.es(:[0-9]+)?$
 	}

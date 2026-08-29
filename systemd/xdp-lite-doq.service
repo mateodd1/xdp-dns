@@ -5,7 +5,7 @@ Wants=blocky-lite.service
 
 [Service]
 Type=simple
-ExecStart=/root/xpd-dns/bin/dnsproxy -l 85.208.114.52 -l 2a0e:97c0:c40::52 -p 0 -t 0 -s 0 -q 853 -u 85.208.114.52:5353 -c /etc/letsencrypt/live/xdp.es/fullchain.pem -k /etc/letsencrypt/live/xdp.es/privkey.pem --tls-min-version=1.2 --insecure=false --edns
+ExecStart=/root/xpd-dns/bin/dnsproxy -l 85.208.114.52 -l 2a0e:97c0:c40::52 -p 0 -t 0 -s 0 -q 853 -u 85.208.114.52:53 -c /etc/xdp-tls/fullchain.pem -k /etc/xdp-tls/privkey.pem --tls-min-version=1.2 --insecure=false --edns
 Restart=always
 RestartSec=2
 StandardOutput=journal

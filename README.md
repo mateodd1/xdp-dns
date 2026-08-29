@@ -94,6 +94,11 @@ el perfil de bloqueo y solo entonces entrega la consulta al proxy Rust.
 * **Servicio Systemd**: `caddy.service`
 * **Funciones**:
   * Gestión de certificados automáticos Wildcard Let's Encrypt para `xdp.es`, `dns.xdp.es` y subdominios.
+  * **Certificado para las IPs** (`85.208.114.51/.52/.54` y sus IPv6): Let's Encrypt perfil `shortlived`
+    (6 días, reto `http-01`, certbot 5.x en `/opt/certbot-ip`, config en `/etc/letsencrypt-ip`). Incluye también
+    `dns.xdp.es` y `lite.xdp.es`, así DoH/DoT/DoQ/DoH3 funcionan por IP sin SNI (routers, AdGuard con `tls://IP`...).
+    `scripts/xdp-tls-select.sh` publica en `/etc/xdp-tls/` el cert de IP si le quedan >24h y, si no, **vuelve al
+    wildcard** automáticamente; lo ejecutan el timer `xdp-ip-cert.timer` (2x/día, ARI decide) y el deploy hook del wildcard.
   * Terminación TLS con soporte **HTTP/3 (QUIC)** sobre UDP 443 para consultas DoH ultra-rápidas sin retardo de handshake TCP.
   * Reverse proxy del endpoint `/dns-query` hacia Blocky (`127.0.0.1:4000`) enviando la cabecera `X-Real-IP`.
   * Reverse proxy de `/block-ota/dns-query` hacia Blocky OTA (`127.0.0.1:4001`).
@@ -104,7 +109,7 @@ el perfil de bloqueo y solo entonces entrega la consulta al proxy Rust.
 * **Servicio Systemd**: `blocky.service`
 * **Puertos de escucha**:
   * `53` (UDP/TCP): DNS estándar para IPv4 e IPv6.
-  * `853` (TCP): DoT nativo con certificados en `/etc/letsencrypt/live/xdp.es/`.
+  * `853` (TCP): DoT nativo con el certificado activo en `/etc/xdp-tls/` (IPs + dns/lite, o wildcard de fallback).
   * `127.0.0.1:4000` (HTTP): Endpoint `/dns-query` para DoH y `/metrics` para Prometheus.
 * **Listas de Bloqueo Activas**:
   * Hagezi Multi PRO (`https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro.txt`)

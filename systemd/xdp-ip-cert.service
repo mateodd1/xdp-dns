@@ -1,0 +1,10 @@
+[Unit]
+Description=Renovar certificado corto con IPs (Let's Encrypt shortlived) y publicar en /etc/xdp-tls
+After=network-online.target caddy.service
+[Service]
+Type=oneshot
+ExecStart=/opt/certbot-ip/bin/certbot renew --quiet --non-interactive --no-random-sleep-on-renew \
+  --config-dir /etc/letsencrypt-ip --work-dir /var/lib/letsencrypt-ip --logs-dir /var/log/letsencrypt-ip \
+  --deploy-hook /usr/local/sbin/xdp-tls-select.sh
+# aunque falle la renovación, re-evalúa: si el cert IP caduca, vuelve al wildcard
+ExecStartPost=-/usr/local/sbin/xdp-tls-select.sh

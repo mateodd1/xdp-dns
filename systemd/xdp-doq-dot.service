@@ -1,0 +1,27 @@
+[Unit]
+Description=XDP DNS over QUIC (DoQ) and DNS over TLS (DoT) Proxy
+After=network.target blocky.service
+Wants=blocky.service
+
+[Service]
+Type=simple
+ExecStart=/root/xpd-dns/bin/dnsproxy \
+  -l 85.208.114.51 -l 2a0e:97c0:c40::51 -l 127.0.0.1 \
+  -p 0 \
+  -t 0 \
+  -s 0 \
+  -q 853 \
+  -u 127.0.0.1:53 \
+  -c /etc/xdp-tls/fullchain.pem \
+  -k /etc/xdp-tls/privkey.pem \
+  --tls-min-version=1.2 \
+  --insecure=false \
+  --edns
+Restart=always
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
