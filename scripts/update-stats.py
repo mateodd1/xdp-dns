@@ -111,18 +111,54 @@ def save_json(filepath, data):
         print(f"Error saving {filepath}: {e}")
 
 CUSTOM_ASN_NAMES = {
-    '12479': 'Orange Espagne SA',
+    # Spanish National and Regional ISPs
+    '3352': 'Telefonica de España',
+    '6739': 'Telefonica de España',
+    '57269': 'Digi Spain',
+    '206238': 'Digi Spain',
+    '15704': 'XTRA TELECOM',
+    '210344': 'XTRA TELECOM',
+    '56645': 'MásMóvil',
+    '12479': 'Orange Espagne',
+    '34048': 'Orange Espagne',
+    '12715': 'Jazztel',
+    '12430': 'VODAFONE ESPAÑA',
+    '12353': 'VODAFONE ONO',
+    '12338': 'EUSKALTEL',
+    '12946': 'R Cable y Telecable',
+    '12334': 'R Cable y Telecable',
+    '29259': 'Adamo Telecom',
+    '35699': 'Adamo Telecom',
+    '205423': 'Adamo Telecom',
+    '29119': 'Aire Networks',
+    '43590': 'Aire Networks',
+    '200845': 'Avatel Telecom',
+    '34977': 'Procono (PTV Telecom)',
+    '41368': 'Populoos',
+    '50392': 'Fibracat',
+    '20743': 'Goufone',
+    '200543': 'Parlem Telecom',
+    '208272': 'Asteo Red Neutra',
     '14593': 'SpaceX Starlink',
     '27277': 'SpaceX Starlink',
     '397446': 'SpaceX Starlink',
-    '57269': 'DIGI Spain Telecom S.L.U.',
-    '29119': 'AireNetworks',
-    '43590': 'AireNetworks',
-    '200845': 'Avatel Telecom S.A.',
-    '34977': 'Procono SA',
-    '12338': 'Euskaltel S.A.',
-    '12946': 'R Cable y Telecable Telecomunicaciones S.A.U.',
-    '41368': 'Populoos',
+
+    # Major Datacenters & CDNs
+    '13335': 'Cloudflare',
+    '15169': 'Google',
+    '19281': 'Quad9',
+    '16509': 'Amazon Web Services',
+    '14618': 'Amazon Web Services',
+    '8075': 'Microsoft Azure',
+    '51167': 'Contabo',
+    '16276': 'OVHcloud',
+    '24940': 'Hetzner Online',
+    '14061': 'DigitalOcean',
+    '63949': 'Linode (Akamai)',
+    '210423': 'Atuaxanela',
+    '198760': 'Quattre Internet',
+    '9009': 'M247 Europe',
+    '202673': 'OHZ Networks',
 }
 
 def normalize_cached_asns(cache_dict):
@@ -223,11 +259,11 @@ def resolve_asn(ip_str):
 
 KNOWN_ISP_ASNS = {
     # Spanish National and Regional ISPs & Operators + Satellite / Starlink Residential
-    '3352', '12338', '6739', '12430', '12353', '12715', '12479', '34048', '29259', '15704',
-    '57269', '206238', '20743', '197828', '200543', '50392', '43590', '206385',
-    '212456', '29119', '202673', '203870', '205423', '210100', '208880', '210678', '209867',
-    '207421', '208272', '205779', '206979', '206412', '206684', '29647', '15399', '208861',
-    '14593', '27277', '397446', '200845', '34977', '12946', '41368'
+    '3352', '6739', '12338', '12430', '12353', '12715', '12479', '34048', '29259', '205423',
+    '15704', '210344', '56645', '15954', '57269', '206238', '20743', '197828', '200543',
+    '50392', '43590', '206385', '212456', '29119', '202673', '203870', '210100', '208880',
+    '210678', '209867', '207421', '208272', '205779', '206979', '206412', '206684', '29647',
+    '15399', '208861', '14593', '27277', '397446', '200845', '34977', '12946', '12334', '35699', '41368'
 }
 
 KNOWN_DC_ASNS = {
