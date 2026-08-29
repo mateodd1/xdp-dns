@@ -7,6 +7,8 @@ caching:
 certFile: /etc/xdp-tls/fullchain.pem
 customDNS:
   customTTL: 1h
+  # A/AAAA locales, pero HTTPS (ECH), TXT, etc. siguen a Unbound (si no, el HTTPS RR con ech= sale vacío)
+  filterUnmappedTypes: false
   mapping:
     dns.xdp.es: 85.208.114.51,2a0e:97c0:c40::51
     lite.xdp.es: 85.208.114.52,2a0e:97c0:c40::52
