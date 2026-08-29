@@ -543,6 +543,11 @@
             display: inline-block;
         }
 
+        [data-theme="dark"] .isp-logo-adaptive,
+        [data-theme="oled"] .isp-logo-adaptive {
+            filter: brightness(0) invert(1);
+        }
+
         .conn-isp-logo-main {
             width: 24px;
             height: 24px;
@@ -1177,6 +1182,9 @@
             if (/\bas(212238|60068)\b/.test(lower) || lower.includes('cdn77')) {
                 return { src: '/stats/img/cdn77.svg', alt: 'CDN77' };
             }
+            if (/\bas35699\b/.test(lower) || lower.includes('adamo')) {
+                return { src: '/stats/img/adamo.svg', alt: 'Adamo Telecom', className: 'isp-logo-adaptive' };
+            }
             return null;
         }
 
@@ -1217,7 +1225,7 @@
                 const logo = getIspLogo(item.name);
                 if (logo) {
                     const img = document.createElement('img');
-                    img.className = 'isp-logo';
+                    img.className = 'isp-logo' + (logo.className ? ' ' + logo.className : '');
                     img.src = logo.src || logo;
                     img.alt = logo.alt || '';
                     img.loading = 'lazy';
