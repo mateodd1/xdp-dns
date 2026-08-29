@@ -1138,34 +1138,34 @@
         function getIspLogo(name) {
             if (!name) return null;
             const lower = name.toLowerCase();
-            if (lower.includes('telefonica') || lower.includes('movistar') || lower.includes('as3352')) {
+            if (/\bas3352\b/.test(lower) || lower.includes('telefonica') || lower.includes('movistar')) {
                 return { src: '/stats/img/movistar.svg', alt: 'Telefónica / Movistar' };
             }
-            if (lower.includes('vodafone') || lower.includes('as12430') || lower.includes('as6739') || lower.includes('ono')) {
+            if (/\bas(12430|6739)\b/.test(lower) || lower.includes('vodafone') || /\bvodafone\s+ono\b/.test(lower) || /\bono\b/.test(lower)) {
                 return { src: '/stats/img/vodafone.svg', alt: 'Vodafone' };
             }
-            if (lower.includes('orange') || lower.includes('jazztel') || lower.includes('as12479') || lower.includes('as12715')) {
+            if (/\bas(12479|12715)\b/.test(lower) || lower.includes('orange') || lower.includes('jazztel')) {
                 return { src: '/stats/img/orange.svg', alt: 'Orange' };
             }
-            if (lower.includes('digi') || lower.includes('as57269')) {
+            if (/\bas57269\b/.test(lower) || /\bdigi\b/.test(lower)) {
                 return { src: '/stats/img/digi.png', alt: 'Digi' };
             }
-            if (lower.includes('yoigo') || lower.includes('masmovil') || lower.includes('másmóvil') || lower.includes('xfera') || lower.includes('pepephone') || lower.includes('euskaltel') || lower.includes('xtra') || lower.includes('as15704') || lower.includes('as12338')) {
+            if (/\bas(15704|12338)\b/.test(lower) || lower.includes('masmovil') || lower.includes('másmóvil') || lower.includes('yoigo') || lower.includes('pepephone') || lower.includes('euskaltel') || lower.includes('xtra')) {
                 return { src: '/stats/img/masmovil.svg', alt: 'MásMóvil' };
             }
-            if (lower.includes('cloudflare') || lower.includes('as13335')) {
+            if (/\bas13335\b/.test(lower) || lower.includes('cloudflare')) {
                 return { src: '/stats/img/cloudflare.svg', alt: 'Cloudflare' };
             }
-            if (lower.includes('google') || lower.includes('as15169')) {
+            if (/\bas15169\b/.test(lower) || lower.includes('google')) {
                 return { src: '/stats/img/google.svg', alt: 'Google' };
             }
-            if (lower.includes('quad9') || lower.includes('as19281')) {
+            if (/\bas19281\b/.test(lower) || lower.includes('quad9')) {
                 return { src: '/stats/img/quad9.svg', alt: 'Quad9' };
             }
-            if (lower.includes('contabo') || lower.includes('as51167')) {
+            if (/\bas51167\b/.test(lower) || lower.includes('contabo')) {
                 return { src: '/stats/img/contabo.svg', alt: 'Contabo' };
             }
-            if (lower.includes('ionos') || lower.includes('as8560')) {
+            if (/\bas8560\b/.test(lower) || lower.includes('ionos')) {
                 return { src: '/stats/img/ionos.svg', alt: 'IONOS' };
             }
             return null;

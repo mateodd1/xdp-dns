@@ -111,7 +111,7 @@ def save_json(filepath, data):
         print(f"Error saving {filepath}: {e}")
 
 CUSTOM_ASN_NAMES = {
-    # Spanish National and Regional ISPs
+    # Requested Operators
     '3352': 'Telefonica de España',
     '6739': 'VODAFONE ONO',
     '12430': 'VODAFONE ESPAÑA',
@@ -122,36 +122,13 @@ CUSTOM_ASN_NAMES = {
     '35699': 'Adamo Telecom',
     '12946': 'R Cable y Telecable',
     '12715': 'Jazztel',
-    '29119': 'Aire Networks',
-    '43590': 'Aire Networks',
-    '200845': 'Avatel Telecom',
-    '34977': 'Procono (PTV Telecom)',
-    '41368': 'Populoos',
-    '50392': 'Fibracat',
-    '20743': 'Goufone',
-    '200543': 'Parlem Telecom',
-    '208272': 'Asteo Red Neutra',
-    '14593': 'SpaceX Starlink',
-    '27277': 'SpaceX Starlink',
-    '397446': 'SpaceX Starlink',
 
-    # Major Datacenters & CDNs
+    # Datacenters
+    '8560': 'IONOS',
+    '51167': 'Contabo',
     '13335': 'Cloudflare',
     '15169': 'Google',
     '19281': 'Quad9',
-    '16509': 'Amazon Web Services',
-    '14618': 'Amazon Web Services',
-    '8075': 'Microsoft Azure',
-    '51167': 'Contabo',
-    '8560': 'IONOS',
-    '16276': 'OVHcloud',
-    '24940': 'Hetzner Online',
-    '14061': 'DigitalOcean',
-    '63949': 'Linode (Akamai)',
-    '210423': 'Atuaxanela',
-    '198760': 'Quattre Internet',
-    '9009': 'M247 Europe',
-    '202673': 'OHZ Networks',
 }
 
 def normalize_cached_asns(cache_dict):
