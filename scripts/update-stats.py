@@ -144,8 +144,6 @@ CUSTOM_ASN_NAMES = {
     '8075': 'Microsoft Azure',
     '51167': 'Contabo',
     '8560': 'IONOS',
-    '31898': 'IONOS',
-    '400556': 'IONOS',
     '16276': 'OVHcloud',
     '24940': 'Hetzner Online',
     '14061': 'DigitalOcean',
