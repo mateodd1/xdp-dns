@@ -136,16 +136,25 @@ def normalize_cached_asns(cache_dict):
 asn_cache = load_json(ASN_CACHE_FILE, {})
 normalize_cached_asns(asn_cache)
 
+SERVER_IPS_AND_HOSTS = {
+    "85.208.114.51", "85.208.114.52", "85.208.114.53", "85.208.114.54",
+    "2a0e:97c0:c40::51", "2a0e:97c0:c40::52", "2a0e:97c0:c40::53", "2a0e:97c0:c40::54",
+    "dns.xdp.es", "lite.xdp.es", "xdp.es", "xpd.es", "localhost"
+}
+
 def is_local_ip(ip_str):
     if not ip_str or ip_str in ["127.0.0.1", "::1", "localhost"]:
         return True
     if ip_str.startswith("127."):
         return True
+    if ip_str in SERVER_IPS_AND_HOSTS or ip_str.endswith(".xdp.es") or ip_str.endswith(".xpd.es"):
+        return True
     try:
         ip = ipaddress.ip_address(ip_str)
         return ip.is_loopback or ip.is_private or ip.is_link_local
     except Exception:
-        return False
+        # Non-IP strings (e.g. hostnames, ports, labels) are internal/invalid
+        return True
 
 def resolve_asn(ip_str):
     if is_local_ip(ip_str):
@@ -611,7 +620,7 @@ def build_window_stats(history, window_seconds):
             continue
 
         asn_name, asn_num, country = resolve_asn(ip)
-        if not asn_name:
+        if not asn_name or str(asn_num) == "0" or asn_name.startswith("AS-Unknown") or asn_name.startswith("IP ("):
             continue
 
         is_ipv6 = ":" in ip
