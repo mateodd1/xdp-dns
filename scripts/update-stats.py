@@ -114,22 +114,14 @@ CUSTOM_ASN_NAMES = {
     # Spanish National and Regional ISPs
     '3352': 'Telefonica de España',
     '6739': 'VODAFONE ONO',
-    '57269': 'Digi Spain',
-    '206238': 'Digi Spain',
-    '15704': 'XTRA TELECOM',
-    '210344': 'XTRA TELECOM',
-    '56645': 'MásMóvil',
-    '12479': 'Orange Espagne',
-    '34048': 'Orange Espagne',
-    '12715': 'Jazztel',
     '12430': 'VODAFONE ESPAÑA',
-    '12353': 'VODAFONE ONO',
+    '57269': 'Digi Spain',
+    '15704': 'XTRA TELECOM',
+    '12479': 'Orange Espagne',
     '12338': 'EUSKALTEL',
-    '12946': 'R Cable y Telecable',
-    '12334': 'R Cable y Telecable',
-    '29259': 'Adamo Telecom',
     '35699': 'Adamo Telecom',
-    '205423': 'Adamo Telecom',
+    '12946': 'R Cable y Telecable',
+    '12715': 'Jazztel',
     '29119': 'Aire Networks',
     '43590': 'Aire Networks',
     '200845': 'Avatel Telecom',
@@ -259,11 +251,9 @@ def resolve_asn(ip_str):
 
 KNOWN_ISP_ASNS = {
     # Spanish National and Regional ISPs & Operators + Satellite / Starlink Residential
-    '3352', '6739', '12338', '12430', '12353', '12715', '12479', '34048', '29259', '205423',
-    '15704', '210344', '56645', '15954', '57269', '206238', '20743', '197828', '200543',
-    '50392', '43590', '206385', '212456', '29119', '202673', '203870', '210100', '208880',
-    '210678', '209867', '207421', '208272', '205779', '206979', '206412', '206684', '29647',
-    '15399', '208861', '14593', '27277', '397446', '200845', '34977', '12946', '12334', '35699', '41368'
+    '3352', '6739', '12430', '57269', '15704', '12479', '12338', '35699', '12946', '12715',
+    '29119', '43590', '200845', '34977', '41368', '50392', '20743', '200543', '208272',
+    '202673', '14593', '27277', '397446'
 }
 
 KNOWN_DC_ASNS = {
