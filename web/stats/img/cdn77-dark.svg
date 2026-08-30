@@ -1,7 +1,7 @@
-<svg id="cdn77_logo" xmlns="http://www.w3.org/2000/svg" viewBox="15 340 250 280">
+<svg id="cdn77_logo_dark" xmlns="http://www.w3.org/2000/svg" viewBox="15 340 250 280">
   <defs>
     <style>
-      .cls-pin { fill: #04151f; }
+      .cls-pin { fill: #ffffff; }
       .cls-ring { fill: #ffe115; }
     </style>
   </defs>
