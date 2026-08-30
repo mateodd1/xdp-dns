@@ -1062,11 +1062,15 @@
                             <div class="skeleton-row"></div>
                             <div class="skeleton-row"></div>
                             <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
                         </div>
                     </div>
                     <div class="table-card">
                         <h3 data-i18n="stats.table_types">Tipos de Registro</h3>
                         <div class="stats-list" id="list-types-24h" data-agent-list="top-query-types-24h">
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
                             <div class="skeleton-row"></div>
                             <div class="skeleton-row"></div>
                             <div class="skeleton-row"></div>
@@ -1120,11 +1124,15 @@
                             <div class="skeleton-row"></div>
                             <div class="skeleton-row"></div>
                             <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
                         </div>
                     </div>
                     <div class="table-card">
                         <h3 data-i18n="stats.table_types">Tipos de Registro</h3>
                         <div class="stats-list" id="list-types-30d" data-agent-list="top-query-types-30d">
+                            <div class="skeleton-row"></div>
+                            <div class="skeleton-row"></div>
                             <div class="skeleton-row"></div>
                             <div class="skeleton-row"></div>
                             <div class="skeleton-row"></div>
@@ -1384,7 +1392,7 @@
             const ispItems = statsObj.top_asns_isp && statsObj.top_asns_isp.length > 0 ? statsObj.top_asns_isp : (statsObj.top_asns || []);
             const dcItems = statsObj.top_asns_datacenter || [];
 
-            const currentItems = (isIsp ? ispItems : dcItems).slice(0, 8);
+            const currentItems = (isIsp ? ispItems : dcItems).slice(0, otherItems.length > 0 ? 9 : 10);
             const otherItems = isIsp ? dcItems : ispItems;
 
             if (!currentItems || currentItems.length === 0) {
@@ -1400,13 +1408,13 @@
             }
             const maxCount = Math.max(...allItemsForMax.map(i => i.count), 1);
 
-            // 1. Render Top 8 current items
+            // 1. Render Top 9 current items
             currentItems.forEach(item => {
                 const row = createStatRow(item, maxCount, true);
                 container.appendChild(row);
             });
 
-            // 2. Render 9th item: Toggle card with identical layout and count
+            // 2. Render 10th item: Toggle card with identical layout and count
             if (otherItems.length > 0) {
                 const targetCategory = isIsp ? 'datacenter' : 'isp';
                 const nameKey = isIsp ? 'stats.asn_toggle_to_dc' : 'stats.asn_toggle_to_isp';

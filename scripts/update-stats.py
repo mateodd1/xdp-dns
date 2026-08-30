@@ -680,8 +680,8 @@ def build_window_stats(history, window_seconds):
         else:
             top_asns_datacenter.append(entry)
 
-    top_asns_isp = top_asns_isp[:8]
-    top_asns_datacenter = top_asns_datacenter[:8]
+    top_asns_isp = top_asns_isp[:15]
+    top_asns_datacenter = top_asns_datacenter[:15]
 
     top_asns_all = []
     for name, item in sorted(asn_data.items(), key=lambda x: x[1]["count"], reverse=True):
@@ -701,7 +701,7 @@ def build_window_stats(history, window_seconds):
             "ipv6_percent": v6_pct,
             "type": item.get("type", "isp")
         })
-    top_asns_all = top_asns_all[:8]
+    top_asns_all = top_asns_all[:15]
 
     # Default fallback realistic operator network distribution if no real ISP queries yet
     if not top_asns_isp and total_queries > 0:
