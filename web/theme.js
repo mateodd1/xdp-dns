@@ -14,12 +14,39 @@
 
     function applyTheme(theme) {
         const root = document.documentElement;
+        let effectiveTheme = theme;
         if (theme === 'auto') {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-        } else {
-            root.setAttribute('data-theme', theme);
+            effectiveTheme = prefersDark ? 'dark' : 'light';
         }
+
+        root.setAttribute('data-theme', effectiveTheme);
+        const isDark = (effectiveTheme === 'dark' || effectiveTheme === 'oled');
+        const bgColor = isDark ? '#0e0f12' : '#f8fafc';
+        const textColor = isDark ? '#f3f4f6' : '#1e293b';
+
+        // Update inline styles on html and body to ensure instant canvas, top/bottom overscroll recoloring
+        root.style.backgroundColor = bgColor;
+        root.style.colorScheme = isDark ? 'dark' : 'light';
+        if (document.body) {
+            document.body.style.backgroundColor = bgColor;
+            document.body.style.color = textColor;
+        }
+
+        // Update all meta[name="theme-color"] tags for browser status bar and address bar
+        const metaThemes = document.querySelectorAll('meta[name="theme-color"]');
+        if (metaThemes.length > 0) {
+            metaThemes.forEach(m => {
+                m.removeAttribute('media');
+                m.setAttribute('content', bgColor);
+            });
+        } else {
+            const m = document.createElement('meta');
+            m.setAttribute('name', 'theme-color');
+            m.setAttribute('content', bgColor);
+            document.head.appendChild(m);
+        }
+
         updateThemeUI(theme);
     }
 

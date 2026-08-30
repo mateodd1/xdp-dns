@@ -89,6 +89,13 @@
 html {
     touch-action: manipulation;
     scrollbar-gutter: stable;
+    background-color: var(--bg-main);
+    color-scheme: dark;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html[data-theme="light"] {
+    color-scheme: light;
 }
 
 body {
