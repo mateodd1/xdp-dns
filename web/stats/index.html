@@ -4,20 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="stats.page_title">Estadísticas en Tiempo Real | xdp.es DNS</title>
-    <meta name="description" content="Métricas en vivo, origen por ASN, tasa de bloqueo de malware y estadísticas de resolución DNS anónimas.">
+    <meta name="description" content="Métricas en vivo de resolución DNS en Madrid, origen por operador (ISP/ASN), tasa de bloqueo y telemetría anónima Zero-Logs de xdp.es.">
+    <meta name="keywords" content="estadisticas dns, metricas dns espana, telemetria zero logs, trafico isp dns, dns madrid en vivo">
     <link rel="canonical" href="https://xdp.es/stats">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
     <!-- Open Graph & Social -->
     <meta property="og:title" content="Estadísticas en Tiempo Real | xdp.es DNS">
-    <meta property="og:description" content="Métricas en vivo, origen por ASN, tasa de bloqueo de malware y estadísticas de resolución DNS anónimas.">
+    <meta property="og:description" content="Métricas en vivo de resolución DNS en Madrid, origen por operador (ISP/ASN), tasa de bloqueo y telemetría anónima Zero-Logs de xdp.es.">
     <meta property="og:url" content="https://xdp.es/stats">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="xdp.es DNS">
+    <meta property="og:locale" content="es_ES">
+    <meta property="og:locale:alternate" content="en_US">
     <meta property="og:image" content="https://xdp.es/android-chrome-512x512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Logo de xdp.es DNS">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Estadísticas en Tiempo Real | xdp.es DNS">
-    <meta name="twitter:description" content="Métricas en vivo, origen por ASN, tasa de bloqueo de malware y estadísticas de resolución DNS anónimas.">
+    <meta name="twitter:description" content="Métricas en vivo de resolución DNS en Madrid, origen por operador (ISP/ASN), tasa de bloqueo y telemetría anónima Zero-Logs de xdp.es.">
     <meta name="twitter:image" content="https://xdp.es/android-chrome-512x512.png">
+    <meta name="twitter:image:alt" content="Logo de xdp.es DNS">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "ItemPage",
+          "@id": "https://xdp.es/stats#webpage",
+          "url": "https://xdp.es/stats",
+          "name": "Estadísticas en Tiempo Real | xdp.es DNS",
+          "description": "Telemetría en tiempo real y estadísticas de resolución DNS agregadas",
+          "isPartOf": {
+            "@type": "WebSite",
+            "@id": "https://xdp.es/#website",
+            "name": "xdp.es DNS",
+            "url": "https://xdp.es/"
+          },
+          "inLanguage": ["es", "en"]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://xdp.es/stats#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Inicio",
+              "item": "https://xdp.es/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Estadísticas",
+              "item": "https://xdp.es/stats"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 
     <!-- Critical Anti-FOUC Background Style -->
     <style>
@@ -1115,8 +1165,10 @@
                 </a>
             </div>
             <div class="site-footer-links">
-                <a href="mailto:contacto@xdp.es" class="site-footer-link">contacto@xdp.es</a>
+                <a href="/test" class="site-footer-link" data-i18n="nav.test">Test DNS</a>
+                <a href="/stats" class="site-footer-link" data-i18n="nav.stats">Estadísticas</a>
                 <a href="/about" class="site-footer-link" data-i18n="nav.about">Acerca de</a>
+                <a href="mailto:contacto@xdp.es" class="site-footer-link">contacto@xdp.es</a>
             </div>
         </footer>
     </div>

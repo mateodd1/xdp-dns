@@ -3,23 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="about.page_title">Acerca de | xdp.es DNS</title>
-    <meta name="description" content="Servidor DNS recursivo público, ultrarrápido y enfocado en la privacidad con servidores en Madrid.">
+    <title data-i18n="about.page_title">Acerca de xdp.es DNS | Neutralidad y Mitigación de Bloqueos Indiscriminados</title>
+    <meta name="description" content="Descubre la arquitectura de xdp.es DNS: resolución recursiva propia en Madrid con enrutamiento inteligente para mitigar bloqueos indiscriminados y falsos positivos a CDNs.">
+    <meta name="keywords" content="arquitectura dns, dns madrid, mitigacion bloqueos indiscriminados, dnssec recursivo, unencrypted dns bypass, dns zero logs espana, unfilter cloudflare blocks">
     <link rel="canonical" href="https://xdp.es/about">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
     <!-- Open Graph & Social -->
-    <meta property="og:title" content="Acerca de xdp.es DNS">
-    <meta property="og:description" content="Servidor DNS recursivo público, ultrarrápido y enfocado en la privacidad con servidores en Madrid.">
+    <meta property="og:title" content="Acerca de xdp.es DNS | Neutralidad y Mitigación de Bloqueos Indiscriminados">
+    <meta property="og:description" content="Descubre la arquitectura de xdp.es DNS: resolución recursiva propia en Madrid con enrutamiento inteligente para mitigar bloqueos indiscriminados y falsos positivos a CDNs.">
     <meta property="og:url" content="https://xdp.es/about">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="xdp.es">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="xdp.es DNS">
     <meta property="og:locale" content="es_ES">
+    <meta property="og:locale:alternate" content="en_US">
     <meta property="og:image" content="https://xdp.es/android-chrome-512x512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Logo de xdp.es DNS">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Acerca de xdp.es DNS">
-    <meta name="twitter:description" content="Servidor DNS recursivo público, ultrarrápido y enfocado en la privacidad con servidores en Madrid.">
+    <meta name="twitter:title" content="Acerca de xdp.es DNS | Neutralidad y Mitigación de Bloqueos Indiscriminados">
+    <meta name="twitter:description" content="Descubre la arquitectura de xdp.es DNS: resolución recursiva propia en Madrid con enrutamiento inteligente para mitigar bloqueos indiscriminados y falsos positivos a CDNs.">
     <meta name="twitter:image" content="https://xdp.es/android-chrome-512x512.png">
+    <meta name="twitter:image:alt" content="Logo de xdp.es DNS">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "AboutPage",
+          "@id": "https://xdp.es/about#webpage",
+          "url": "https://xdp.es/about",
+          "name": "Acerca de xdp.es DNS",
+          "description": "Información sobre la infraestructura, política Zero-Logs y mitigación de bloqueos de xdp.es",
+          "isPartOf": {
+            "@type": "WebSite",
+            "@id": "https://xdp.es/#website",
+            "name": "xdp.es DNS",
+            "url": "https://xdp.es/"
+          },
+          "inLanguage": ["es", "en"]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://xdp.es/about#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Inicio",
+              "item": "https://xdp.es/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Acerca de",
+              "item": "https://xdp.es/about"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 
     <!-- Theme Color for Mobile Browsers -->
     <meta name="theme-color" content="#0e0f12" media="(prefers-color-scheme: dark)">
@@ -521,6 +569,9 @@
                 </a>
             </div>
             <div class="site-footer-links">
+                <a href="/test" class="site-footer-link" data-i18n="nav.test">Test DNS</a>
+                <a href="/stats" class="site-footer-link" data-i18n="nav.stats">Estadísticas</a>
+                <a href="/about" class="site-footer-link" data-i18n="nav.about">Acerca de</a>
                 <a href="mailto:contacto@xdp.es" class="site-footer-link">contacto@xdp.es</a>
             </div>
         </footer>

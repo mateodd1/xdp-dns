@@ -1,10 +1,12 @@
 # xdp.es DNS Comprehensive AI & LLM Agent Documentation
 
-> Full specification, protocol reference, and configuration instructions for the xdp.es public recursive DNS resolver.
+> Full specification, protocol reference, and configuration instructions for the xdp.es public recursive DNS resolver hosted in Madrid, Spain. Features native DNSSEC, DoH (HTTP/3 QUIC), DoT, zero logging, and smart routing to mitigate ISP indiscriminate blocking of legitimate services.
 
 ## Overview & Architecture
 
 - [Main Service](https://xdp.es/): Canonical home page and overview.
+- [DNS Connection Test](https://xdp.es/test): Real-time verification of client DNS resolution.
+- [About & Architecture](https://xdp.es/about): Full details on zero-logs policy, recursive resolution, and block mitigation.
 - [Telemetry Dashboard](https://xdp.es/stats): Live graphical dashboard.
 - [JSON Metrics](https://xdp.es/stats.json): Real-time metrics API endpoint.
 - [OpenAPI Schema](https://xdp.es/openapi.json): Machine-readable OpenAPI 3.1.0 API definition.

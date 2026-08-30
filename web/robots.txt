@@ -1,6 +1,9 @@
 User-agent: *
 Disallow: /blocked
+Disallow: /xUXJA8KK2pCeHjkJZamT
 Allow: /
+Allow: /about
+Allow: /test
 Allow: /stats
 Allow: /stats.json
 Allow: /llms.txt

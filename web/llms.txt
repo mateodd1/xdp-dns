@@ -1,10 +1,11 @@
 # xdp.es DNS
 
-> Public, zero-logging recursive DNS resolver with DNSSEC, DoH, DoT, and built-in malware and ad blocking.
+> Public, zero-logging recursive DNS resolver hosted in Madrid (Spain) with DNSSEC, DoH (HTTP/3 QUIC), DoT, built-in malware and ad blocking, and dynamic routing to mitigate ISP indiscriminate over-blocking against legitimate CDN-hosted services.
 
 ## Endpoints
 
 - [DNS over HTTPS (DoH)](https://dns.xdp.es/dns-query): RFC 8484 endpoint supporting HTTP/2 and HTTP/3 QUIC with GET and POST wireformat queries.
+- [DNS Connection Test](https://xdp.es/test): Real-time verification tool to check if client DNS queries resolve via xdp.es and are protected.
 - [Live Metrics API](https://xdp.es/stats.json): Real-time anonymized telemetry and resolution statistics in JSON format.
 - [OpenAPI 3.1 Specification](https://xdp.es/openapi.json): Machine-readable schema for agent function-calling and tool use.
 - [Comprehensive Agent Documentation](https://xdp.es/llms-full.txt): In-depth system architecture, parameters, and OS configuration scripts.

@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
-    <title>xdp.es DNS</title>
-    <meta name="description" content="Servidor DNS ultrarrápido enfocado en la privacidad">
+    <title data-i18n="site.title">xdp.es DNS | DNS público en España contra bloqueos indiscriminados</title>
+    <meta name="description" content="Servidor DNS recursivo público en Madrid diseñado para mitigar bloqueos indiscriminados a CDNs y servicios legítimos. Soporte DoH (HTTP/3), DoT, DNSSEC y Zero-Logs.">
+    <meta name="keywords" content="dns publico espana, bloqueos indiscriminados dns, bloqueo cloudflare isp, falsos positivos dns, doh madrid, dot, dns sobre https, dnssec, servidor dns privado, dns adblock, dns neutral">
     <link rel="canonical" href="https://xdp.es/">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
     <!-- Agentic & AI Machine-Readable Discovery -->
     <link rel="help" type="text/markdown" href="/llms.txt" title="LLM & AI Agent Context">
@@ -15,17 +16,23 @@
     <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 
     <!-- Open Graph & Social -->
-    <meta property="og:title" content="xdp.es DNS">
-    <meta property="og:description" content="Servidor DNS ultrarrápido enfocado en la privacidad">
+    <meta property="og:title" content="xdp.es DNS | DNS público en España contra bloqueos indiscriminados">
+    <meta property="og:description" content="Servidor DNS recursivo público en Madrid diseñado para mitigar bloqueos indiscriminados a CDNs y servicios legítimos. Soporte DoH (HTTP/3), DoT, DNSSEC y Zero-Logs.">
     <meta property="og:url" content="https://xdp.es/">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="xdp.es">
+    <meta property="og:site_name" content="xdp.es DNS">
     <meta property="og:locale" content="es_ES">
+    <meta property="og:locale:alternate" content="en_US">
     <meta property="og:image" content="https://xdp.es/android-chrome-512x512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Logo de xdp.es DNS">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="xdp.es DNS">
-    <meta name="twitter:description" content="Servidor DNS ultrarrápido enfocado en la privacidad">
+    <meta name="twitter:title" content="xdp.es DNS | DNS público en España contra bloqueos indiscriminados">
+    <meta name="twitter:description" content="Servidor DNS recursivo público en Madrid diseñado para mitigar bloqueos indiscriminados a CDNs y servicios legítimos. Soporte DoH (HTTP/3), DoT, DNSSEC y Zero-Logs.">
     <meta name="twitter:image" content="https://xdp.es/android-chrome-512x512.png">
+    <meta name="twitter:image:alt" content="Logo de xdp.es DNS">
 
     <!-- Theme Color for Mobile Browsers -->
     <meta name="theme-color" content="#0e0f12" media="(prefers-color-scheme: dark)">
@@ -41,18 +48,32 @@
           "@id": "https://xdp.es/#website",
           "url": "https://xdp.es/",
           "name": "xdp.es DNS",
-          "inLanguage": "es"
+          "description": "Servidor DNS recursivo público en España enfocado en privacidad y mitigación de bloqueos indiscriminados",
+          "inLanguage": ["es", "en"]
         },
         {
           "@type": "Organization",
           "@id": "https://xdp.es/#organization",
           "name": "xdp.es DNS",
           "url": "https://xdp.es/",
+          "logo": "https://xdp.es/android-chrome-512x512.png",
           "email": "contacto@xdp.es",
           "contactPoint": {
             "@type": "ContactPoint",
             "email": "contacto@xdp.es",
             "contactType": "customer support"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://xdp.es/#service",
+          "name": "xdp.es DNS",
+          "applicationCategory": "SecurityApplication",
+          "operatingSystem": "Android, iOS, macOS, Windows, Linux, RouterOS",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
           }
         },
         {
@@ -62,6 +83,44 @@
           "documentation": "https://xdp.es/llms.txt",
           "termsOfService": "https://xdp.es/",
           "endpointUrl": "https://dns.xdp.es/dns-query"
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://xdp.es/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "¿Cómo protege xdp.es frente a bloqueos indiscriminados?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Muchos proveedores de Internet bloquean rangos de IPs enteros pertenecientes a redes CDN para frenar emisiones no autorizadas, provocando que miles de sitios web legítimos e inocentes queden inaccesibles. xdp.es detecta estas incidencias y enruta la resolución hacia direcciones alternativas no afectadas dentro de la misma red, garantizando el acceso ininterrumpido a servicios legítimos."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Guarda xdp.es registros o historial de navegación?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. xdp.es opera bajo una estricta política Zero-Logs: no se almacena ninguna dirección IP ni historial de consultas, garantizando la total privacidad de los usuarios."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Dónde están ubicados los servidores de xdp.es?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Nuestros servidores están alojados en centros de datos en Madrid (España), ofreciendo latencias mínimas y conectividad directa con los principales operadores y puntos de intercambio de tráfico."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Qué protocolos DNS soporta xdp.es?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Soporta DNS over HTTPS (DoH con HTTP/2 y HTTP/3 QUIC), DNS over TLS (DoT en el puerto 853) y DNS estándar (UDP/TCP en el puerto 53 con validación DNSSEC y soporte dual-stack IPv4/IPv6)."
+              }
+            }
+          ]
         }
       ]
     }
@@ -408,8 +467,10 @@ commit ; save</code></pre>
                 </a>
             </div>
             <div class="site-footer-links">
-                <a href="mailto:contacto@xdp.es" class="site-footer-link">contacto@xdp.es</a>
+                <a href="/test" class="site-footer-link" data-i18n="nav.test">Test DNS</a>
+                <a href="/stats" class="site-footer-link" data-i18n="nav.stats">Estadísticas</a>
                 <a href="/about" class="site-footer-link" data-i18n="nav.about">Acerca de</a>
+                <a href="mailto:contacto@xdp.es" class="site-footer-link">contacto@xdp.es</a>
             </div>
         </footer>
     </div>

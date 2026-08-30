@@ -3,9 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="test.page_title">¿Navegas por XDP? | xdp.es DNS</title>
-    <meta name="description" content="Comprueba si tu conexión resuelve las DNS a través de los servidores de xdp.es.">
+    <title data-i18n="test.page_title">Test DNS | Comprueba si tu conexión está protegida con xdp.es</title>
+    <meta name="description" content="Comprueba en tiempo real si tu conexión resuelve a través de los servidores de xdp.es DNS y está protegida contra bloqueos indiscriminados y falsos positivos de operadoras.">
+    <meta name="keywords" content="test dns, dns leak test espana, comprobar dns, verificar dns xdp, prueba dnssec, dns contra bloqueos indiscriminados">
     <link rel="canonical" href="https://xdp.es/test">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+
+    <!-- Open Graph & Social -->
+    <meta property="og:title" content="Test DNS | Comprueba si tu conexión está protegida con xdp.es">
+    <meta property="og:description" content="Comprueba en tiempo real si tu conexión resuelve a través de los servidores de xdp.es DNS y está protegida contra bloqueos indiscriminados y falsos positivos de operadoras.">
+    <meta property="og:url" content="https://xdp.es/test">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="xdp.es DNS">
+    <meta property="og:locale" content="es_ES">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta property="og:image" content="https://xdp.es/android-chrome-512x512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Logo de xdp.es DNS">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Test DNS | Comprueba si tu conexión está protegida con xdp.es">
+    <meta name="twitter:description" content="Comprueba en tiempo real si tu conexión resuelve a través de los servidores de xdp.es DNS y está protegida contra bloqueos indiscriminados y falsos positivos de operadoras.">
+    <meta name="twitter:image" content="https://xdp.es/android-chrome-512x512.png">
+    <meta name="twitter:image:alt" content="Logo de xdp.es DNS">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://xdp.es/test#app",
+          "name": "Comprobador de conexión xdp.es DNS",
+          "url": "https://xdp.es/test",
+          "applicationCategory": "UtilitiesApplication",
+          "operatingSystem": "All",
+          "browserRequirements": "Requires JavaScript",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://xdp.es/test#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Inicio",
+              "item": "https://xdp.es/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Test DNS",
+              "item": "https://xdp.es/test"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 
     <!-- Critical Anti-FOUC Background Style -->
     <style>
@@ -74,41 +136,82 @@
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="manifest" href="/site.webmanifest">
     <style>
+        html, body {
+            min-height: 100vh;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
         .container {
             max-width: 980px;
-            margin: 44px auto;
-            padding: 0 20px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 36px 20px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            box-sizing: border-box;
+        }
+
+        header {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 30px 0 50px 0;
+            text-align: center;
+        }
+
+        .test-title {
+            font-size: 1.85rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            color: var(--text-heading);
         }
 
         .result-card {
             background-color: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 34px 28px;
+            border-radius: 12px;
+            padding: 38px 28px;
             text-align: center;
             box-shadow: var(--shadow-card);
             max-width: 640px;
+            width: 100%;
             margin: 0 auto;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .verdict { font-size: 1.35rem; font-weight: 700; margin-bottom: 8px; }
+        .verdict { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; }
         .verdict.yes  { color: #10b981; }
         .verdict.no   { color: #ef4444; }
         .verdict.warn { color: #f59e0b; }
 
-        .sub { color: var(--text-secondary); font-size: 0.92rem; margin-top: 4px; }
+        .sub { color: var(--text-secondary); font-size: 0.95rem; margin-top: 6px; }
 
         .asn-list {
             list-style: none;
-            padding: 0; margin: 14px 0 0;
-            font-size: 0.88rem;
+            padding: 0; margin: 16px 0 0;
+            font-size: 0.9rem;
             color: var(--text-secondary);
         }
-        .asn-list li { padding: 3px 0; font-variant-numeric: tabular-nums; }
+        .asn-list li { padding: 4px 0; font-variant-numeric: tabular-nums; }
 
         .spinner {
             display: inline-block;
-            width: 22px; height: 22px;
+            width: 26px; height: 26px;
             border: 3px solid var(--accent);
             border-top-color: transparent;
             border-radius: 50%;
@@ -119,15 +222,38 @@
 
         .retry {
             display: inline-block;
-            margin-top: 18px;
+            margin-top: 20px;
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             background: none;
             border: none;
             cursor: pointer;
             text-decoration: underline;
+            transition: color 0.2s ease;
         }
         .retry:hover { color: var(--text-primary); }
+
+        .site-footer {
+            margin-top: auto;
+            width: 100%;
+            padding: 24px 0 12px 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 14px 16px 14px;
+            }
+            main {
+                padding: 10px 0 30px 0;
+            }
+            .test-title {
+                font-size: 1.5rem;
+                margin-bottom: 18px;
+            }
+            .result-card {
+                padding: 28px 20px;
+            }
+        }
 
         @media (prefers-reduced-motion: reduce) {
             .spinner { animation: none; }
@@ -158,7 +284,7 @@
         </header>
 
         <main>
-            <h1 data-i18n="test.title" style="font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 22px;">
+            <h1 class="test-title" data-i18n="test.title">
                 ¿Navegas por XDP?
             </h1>
 
@@ -180,8 +306,10 @@
                 </a>
             </div>
             <div class="site-footer-links">
-                <a href="mailto:contacto@xdp.es" class="site-footer-link">contacto@xdp.es</a>
+                <a href="/test" class="site-footer-link" data-i18n="nav.test">Test DNS</a>
+                <a href="/stats" class="site-footer-link" data-i18n="nav.stats">Estadísticas</a>
                 <a href="/about" class="site-footer-link" data-i18n="nav.about">Acerca de</a>
+                <a href="mailto:contacto@xdp.es" class="site-footer-link">contacto@xdp.es</a>
             </div>
         </footer>
     </div>

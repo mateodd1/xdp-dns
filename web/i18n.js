@@ -3,7 +3,7 @@
 
 const translations = {
     es: {
-        "site.title": "xdp.es DNS",
+        "site.title": "xdp.es DNS | DNS público en España contra bloqueos indiscriminados",
         "theme.light": "Claro",
         "theme.dark": "Oscuro",
         "theme.auto": "Auto",
@@ -11,6 +11,7 @@ const translations = {
         "copy.copied": "¡Copiado!",
         "nav.back_home": "← Volver al inicio",
         "nav.home": "← Inicio",
+        "nav.test": "Test DNS",
         "nav.stats": "Estadísticas",
         "nav.about": "Acerca de",
         "nav.github": "GitHub",
@@ -131,7 +132,7 @@ const translations = {
         "ota.domains_title": "Dominios Bloqueados",
 
         // About Page
-        "about.page_title": "Acerca de | xdp.es DNS",
+        "about.page_title": "Acerca de xdp.es DNS | Neutralidad y Mitigación de Bloqueos Indiscriminados",
         "about.title": "Acerca de xdp.es DNS",
         "about.subtitle": "Servidor DNS recursivo público, ultrarrápido y enfocado en la privacidad.",
         "about.pill_nologs": "Zero-Logs",
@@ -213,7 +214,7 @@ const translations = {
         "blocked.loading": "Cargando datos...",
 
         // /test page
-        "test.page_title": "¿Navegas por XDP? | xdp.es DNS",
+        "test.page_title": "Test DNS | Comprueba si tu conexión está protegida con xdp.es",
         "test.title": "¿Navegas por XDP?",
         "test.checking": "Comprobando…",
         "test.retry": "Repetir test",
@@ -226,7 +227,7 @@ const translations = {
         "test.asn_unknown": "ASN desconocido"
     },
     en: {
-        "site.title": "xdp.es DNS",
+        "site.title": "xdp.es DNS | Public DNS in Spain against indiscriminate blocking",
         "theme.light": "Light",
         "theme.dark": "Dark",
         "theme.auto": "Auto",
@@ -234,6 +235,7 @@ const translations = {
         "copy.copied": "Copied!",
         "nav.back_home": "← Back to home",
         "nav.home": "← Home",
+        "nav.test": "DNS Test",
         "nav.stats": "Statistics",
         "nav.about": "About",
         "nav.github": "GitHub",
@@ -354,7 +356,7 @@ const translations = {
         "ota.domains_title": "Blocked Domains",
 
         // About Page
-        "about.page_title": "About | xdp.es DNS",
+        "about.page_title": "About xdp.es DNS | Neutrality & Over-blocking Mitigation",
         "about.title": "About xdp.es DNS",
         "about.subtitle": "A high-performance, privacy-first, zero-logging recursive DNS resolver.",
         "about.pill_nologs": "Zero-Logs",
@@ -436,7 +438,7 @@ const translations = {
         "blocked.loading": "Loading data...",
 
         // /test page
-        "test.page_title": "Are you browsing via XDP? | xdp.es DNS",
+        "test.page_title": "DNS Test | Check if your connection is protected with xdp.es",
         "test.title": "Are you browsing via XDP?",
         "test.checking": "Checking…",
         "test.retry": "Run again",
