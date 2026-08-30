@@ -122,10 +122,12 @@ CUSTOM_ASN_NAMES = {
     '35699': 'Adamo Telecom',
     '12946': 'R Cable y Telecable',
     '12715': 'Jazztel',
+    '202673': 'Ohz Digital',
+    '203600': 'VIVAFIBRA',
 
     # Datacenters
-    '212238': 'CDN77',
-    '60068': 'CDN77',
+    '212238': 'Datacamp/CDN77',
+    '60068': 'Datacamp/CDN77',
     '8560': 'IONOS',
     '51167': 'Contabo',
     '13335': 'Cloudflare',
@@ -233,7 +235,7 @@ KNOWN_ISP_ASNS = {
     # Spanish National and Regional ISPs & Operators + Satellite / Starlink Residential
     '3352', '6739', '12430', '57269', '15704', '12479', '12338', '35699', '12946', '12715',
     '29119', '43590', '200845', '34977', '41368', '50392', '20743', '200543', '208272',
-    '202673', '14593', '27277', '397446'
+    '202673', '203600', '14593', '27277', '397446'
 }
 
 KNOWN_DC_ASNS = {
