@@ -1190,6 +1190,9 @@
             if (/\bas35699\b/.test(lower) || lower.includes('adamo')) {
                 return { src: '/stats/img/adamo.svg', alt: 'Adamo Telecom', className: 'isp-logo-adaptive' };
             }
+            if (/\bas16276\b/.test(lower) || lower.includes('ovh')) {
+                return { src: '/stats/img/ovh.svg', alt: 'OVH SAS' };
+            }
             return null;
         }
 

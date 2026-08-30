@@ -130,6 +130,7 @@ CUSTOM_ASN_NAMES = {
     '60068': 'Datacamp/CDN77',
     '8560': 'IONOS',
     '51167': 'Contabo',
+    '16276': 'OVH SAS',
     '13335': 'Cloudflare',
     '15169': 'Google',
     '19281': 'Quad9',
