@@ -1391,9 +1391,8 @@
             const isIsp = category === 'isp';
             const ispItems = statsObj.top_asns_isp && statsObj.top_asns_isp.length > 0 ? statsObj.top_asns_isp : (statsObj.top_asns || []);
             const dcItems = statsObj.top_asns_datacenter || [];
-
-            const currentItems = (isIsp ? ispItems : dcItems).slice(0, otherItems.length > 0 ? 9 : 10);
             const otherItems = isIsp ? dcItems : ispItems;
+            const currentItems = (isIsp ? ispItems : dcItems).slice(0, otherItems.length > 0 ? 9 : 10);
 
             if (!currentItems || currentItems.length === 0) {
                 const noDataText = (window.i18n && window.i18n.t('stats.no_data')) || 'Sin consultas registradas.';
