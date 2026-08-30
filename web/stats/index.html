@@ -1220,6 +1220,9 @@
             if (/\bas12338\b/.test(lower) || lower.includes('euskaltel')) {
                 return { src: '/stats/img/euskaltel.svg', alt: 'Euskaltel' };
             }
+            if (/\bas(12334|12946)\b/.test(lower) || lower.includes('r cable') || lower.includes('telecable') || /\br-cable\b/.test(lower)) {
+                return { src: '/stats/img/r.svg', alt: 'R Cable y Telecable' };
+            }
             if (/\bas13335\b/.test(lower) || lower.includes('cloudflare')) {
                 return { src: '/stats/img/cloudflare.svg', alt: 'Cloudflare' };
             }

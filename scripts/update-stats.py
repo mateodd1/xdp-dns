@@ -121,6 +121,7 @@ CUSTOM_ASN_NAMES = {
     '12338': 'EUSKALTEL',
     '35699': 'Adamo Telecom',
     '12946': 'R Cable y Telecable',
+    '12334': 'R Cable y Telecable',
     '12715': 'Jazztel',
     '202513': 'Fibritel',
     '202673': 'Ohz Digital',
@@ -235,7 +236,7 @@ def resolve_asn(ip_str):
 
 KNOWN_ISP_ASNS = {
     # Spanish National and Regional ISPs & Operators + Satellite / Starlink Residential
-    '3352', '6739', '12430', '57269', '15704', '12479', '12338', '35699', '12946', '12715',
+    '3352', '6739', '12430', '57269', '15704', '12479', '12338', '35699', '12946', '12334', '12715',
     '29119', '43590', '200845', '34977', '41368', '50392', '20743', '200543', '208272',
     '202513', '202673', '203600', '14593', '27277', '397446'
 }
