@@ -127,6 +127,18 @@ CUSTOM_ASN_NAMES = {
     '202673': 'Ohz Digital',
     '203600': 'VIVAFIBRA',
     '200845': 'Avatel Telecom',
+    '202583': 'Avatel Telecom',
+    '201337': 'Avatel Telecom',
+    '44188': 'Avatel Telecom',
+    '50977': 'Avatel Telecom',
+    '59631': 'Avatel Telecom',
+    '60675': 'Avatel Telecom',
+    '3348': 'Avatel Telecom',
+    '39744': 'Avatel Telecom',
+    '39281': 'Avatel Telecom',
+    '41531': 'Avatel Telecom',
+    '199952': 'Avatel Telecom',
+    '200290': 'Avatel Telecom',
 
     # Datacenters
     '212238': 'Datacamp/CDN77',

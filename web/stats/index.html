@@ -1376,13 +1376,29 @@
                 id: 'masorange',
                 name: 'MásOrange',
                 asns: ['12479', '15704', '12338', '12946', '12334', '12715'],
-                logo: { src: '/stats/img/masorange.svg', alt: 'MásOrange', className: 'isp-logo-masorange' }
+                logo: { src: '/stats/img/masorange.svg', alt: 'MásOrange', className: 'isp-logo-masorange' },
+                alwaysGroup: true
             },
             {
                 id: 'vodafone',
                 name: 'Vodafone',
                 asns: ['12430', '6739'],
-                logo: { src: '/stats/img/vodafone.svg', alt: 'Vodafone' }
+                logo: { src: '/stats/img/vodafone.svg', alt: 'Vodafone' },
+                alwaysGroup: true
+            },
+            {
+                id: 'avatel',
+                name: 'Avatel Telecom',
+                asns: ['200845', '201337', '202583', '44188', '50977', '59631', '60675', '3348', '39744', '39281', '41531', '199952', '200290'],
+                logo: { src: '/stats/img/avatel.svg', alt: 'Avatel Telecom' },
+                alwaysGroup: true
+            },
+            {
+                id: 'datacamp',
+                name: 'Datacamp / CDN77',
+                asns: ['212238', '60068'],
+                logo: { src: '/stats/img/cdn77.svg', alt: 'Datacamp / CDN77', className: 'isp-logo-cdn77' },
+                alwaysGroup: true
             },
             {
                 id: 'telefonica',
@@ -1401,18 +1417,6 @@
                 name: 'Adamo Telecom',
                 asns: ['35699'],
                 logo: { src: '/stats/img/adamo.svg', alt: 'Adamo Telecom', className: 'isp-logo-adaptive' }
-            },
-            {
-                id: 'avatel',
-                name: 'Avatel Telecom',
-                asns: ['200845', '201337', '202583', '44188', '50977', '59631', '60675', '3348', '39744'],
-                logo: { src: '/stats/img/avatel.svg', alt: 'Avatel Telecom' }
-            },
-            {
-                id: 'datacamp',
-                name: 'Datacamp / CDN77',
-                asns: ['212238', '60068'],
-                logo: { src: '/stats/img/cdn77.svg', alt: 'Datacamp / CDN77', className: 'isp-logo-cdn77' }
             },
             {
                 id: 'airenetworks',
@@ -1482,7 +1486,7 @@
                         };
                     });
 
-                    const isMulti = matchingChildren.length > 1;
+                    const isMulti = grp.alwaysGroup || matchingChildren.length > 1;
                     const displayName = isMulti ? grp.name : matchingChildren[0].name;
 
                     groupedList.push({
@@ -1659,10 +1663,10 @@
             nameSpan.innerText = groupItem.name;
             nameRow.appendChild(nameSpan);
 
-            if (groupItem.isGroup && groupItem.children && groupItem.children.length > 1) {
+            if (groupItem.isGroup && groupItem.children && groupItem.children.length > 0) {
                 const badge = document.createElement('span');
                 badge.className = 'asn-group-badge';
-                badge.innerText = `${groupItem.children.length} ASNs`;
+                badge.innerText = `${groupItem.children.length} ASN${groupItem.children.length > 1 ? 's' : ''}`;
                 nameRow.appendChild(badge);
             }
 
@@ -1684,7 +1688,7 @@
                 ? `${groupItem.percent}% (${Number(groupItem.count).toLocaleString()})`
                 : Number(groupItem.count).toLocaleString();
 
-            if (groupItem.isGroup && groupItem.children && groupItem.children.length > 1) {
+            if (groupItem.isGroup && groupItem.children && groupItem.children.length > 0) {
                 countSpan.innerHTML = `${countText} <span class="asn-expand-icon">▼</span>`;
             } else {
                 countSpan.innerText = countText;
@@ -1695,9 +1699,9 @@
                 bgBar.style.width = `${percent}%`;
             }, 50);
 
-            // If it is a group with multiple children, create drawer and wire up toggle
+            // If it is a group, create drawer and wire up toggle
             let drawer = null;
-            if (groupItem.isGroup && groupItem.children && groupItem.children.length > 1) {
+            if (groupItem.isGroup && groupItem.children && groupItem.children.length > 0) {
                 row.classList.add('stats-row-group');
                 row.setAttribute('role', 'button');
                 row.setAttribute('tabindex', '0');
