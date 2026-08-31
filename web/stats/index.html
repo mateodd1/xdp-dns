@@ -1386,6 +1386,9 @@
             if (/\bas(5410|25543|29074|43389)\b/.test(lower) || lower.includes('bouygues')) {
                 return { src: '/stats/img/bouygues.svg', alt: 'Bouygues Telecom SA' };
             }
+            if (/\bas208909\b/.test(lower) || lower.includes('vera') || lower.includes('gurbtec') || lower.includes('iguana telecom')) {
+                return { src: '/stats/img/vera.svg', alt: 'Vera' };
+            }
             return null;
         }
 
