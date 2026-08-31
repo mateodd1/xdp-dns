@@ -161,15 +161,15 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 14px;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 860px) {
             .stats-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
             }
         }
 
@@ -193,7 +193,7 @@
         }
 
         .stat-card-value {
-            font-size: 1.6rem;
+            font-size: 1.55rem;
             font-weight: 800;
             color: var(--text-heading);
             letter-spacing: -0.02em;
@@ -208,6 +208,237 @@
             }
         }
 
+        /* Section Titles */
+        .section-header {
+            margin: 28px 0 14px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .section-title {
+            font-size: 1.22rem;
+            font-weight: 800;
+            color: var(--text-heading);
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+
+        .section-subtitle {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin: 0;
+        }
+
+        /* Services Grid & Cards */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 860px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .service-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+        }
+
+        .service-card.is-evaded {
+            border-color: rgba(249, 115, 22, 0.45);
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.09);
+        }
+
+        .service-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .service-identity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .service-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--text-heading);
+        }
+
+        .service-name-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .service-name {
+            font-size: 0.96rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .service-cat-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 1px 6px;
+            border-radius: 5px;
+            background: var(--bg-code);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            width: fit-content;
+        }
+
+        .service-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .service-status-pill.operational {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .service-status-pill.evading {
+            background: rgba(249, 115, 22, 0.15);
+            color: #f97316;
+            border: 1px solid rgba(249, 115, 22, 0.35);
+        }
+
+        .service-pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .service-pulse-dot.green {
+            background: #10b981;
+        }
+
+        .service-pulse-dot.orange {
+            background: #f97316;
+            box-shadow: 0 0 8px #f97316;
+            animation: pulse-glow 1.5s infinite;
+        }
+
+        .service-impact-desc {
+            font-size: 0.83rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            margin: 0;
+        }
+
+        .service-metrics-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        .service-metric-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .service-metric-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+
+        .service-metric-val {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .service-footer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.78rem;
+            padding-top: 4px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .service-incident-line, .service-mitigation-line {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .service-incident-line strong, .service-mitigation-line strong {
+            color: var(--text-primary);
+        }
+
+        .service-domains-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 2px;
+        }
+
+        .service-domain-code {
+            font-size: 0.72rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        /* Controls Card */
         .controls-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -620,16 +851,44 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <span class="stat-card-label" data-i18n="blocked.stat_total">IPs Baneadas</span>
-                    <span class="stat-card-value" id="stat-total" style="color: #ef4444;">-</span>
+                    <span class="stat-card-value mono" id="stat-total" style="color: #ef4444;">-</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-card-label" data-i18n="blocked.stat_cf">En Cloudflare</span>
-                    <span class="stat-card-value" id="stat-cf" style="color: #f97316;">-</span>
+                    <span class="stat-card-value mono" id="stat-cf" style="color: #f97316;">-</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-card-label" data-i18n="blocked.stat_evaded">Rutas Evasivas</span>
-                    <span class="stat-card-value" id="stat-evaded" style="color: #10b981;">-</span>
+                    <span class="stat-card-value mono" id="stat-evaded" style="color: #10b981;">-</span>
                 </div>
+                <div class="stat-card">
+                    <span class="stat-card-label" data-i18n="blocked.stat_services">Servicios Monit.</span>
+                    <span class="stat-card-value mono" id="stat-services" style="color: var(--accent);">-</span>
+                </div>
+            </div>
+
+            <!-- Main Services Monitored & Impact Section -->
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span aria-hidden="true">🛡️</span>
+                    <span data-i18n="blocked.services_title">Servicios Principales Afectados</span>
+                </h2>
+                <p class="section-subtitle" data-i18n="blocked.services_subtitle">
+                    Monitorización de servicios esenciales afectados por bloqueos indiscriminados y tiempo acumulado de afectación mitigada.
+                </p>
+            </div>
+
+            <!-- Services Grid -->
+            <div class="services-grid" id="services-grid" aria-live="polite">
+                <div class="empty-state" data-i18n="blocked.loading">Cargando servicios...</div>
+            </div>
+
+            <!-- IP Addresses Detailed Section Header -->
+            <div class="section-header" style="margin-top: 32px;">
+                <h2 class="section-title">
+                    <span aria-hidden="true">📋</span>
+                    <span data-i18n="blocked.ips_title">Listado de IPs Bloqueadas</span>
+                </h2>
             </div>
 
             <!-- Controls: Search & Filters -->
@@ -706,10 +965,11 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=4.5"></script>
+    <script src="/i18n.js?v=4.7"></script>
     <script src="/theme.js?v=4.2"></script>
     <script>
         let allEntries = [];
+        let allServices = [];
         let filteredEntries = [];
         let currentFilter = 'all';
         let currentSearch = '';
@@ -764,6 +1024,135 @@
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
+        }
+
+        function getServiceIconSvg(icon) {
+            switch (icon) {
+                case 'docker':
+                    return `<svg width="22" height="22" viewBox="0 0 24 24" fill="#00d2ff" aria-hidden="true"><path d="M13.983 11.078h2.119a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.119a.185.185 0 00-.185.186v1.887c0 .102.083.185.185.185zm-2.954-5.43h2.118a.186.186 0 00.186-.186V3.574a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.186.185.186zm0 2.716h2.118a.187.187 0 00.186-.186V6.29a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.186.185.186zm-2.93 0h2.12a.186.186 0 00.184-.186V6.29a.185.185 0 00-.185-.185H8.1a.185.185 0 00-.185.185v1.888c0 .102.083.186.185.186zm-2.964 0h2.119a.186.186 0 00.185-.186V6.29a.185.185 0 00-.185-.185H5.135a.186.186 0 00-.186.185v1.888c0 .102.084.186.186.186zm5.893 2.714h2.119a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.119a.185.185 0 00-.185.186v1.887c0 .102.083.185.185.185zm-2.93 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.186v1.887c0 .102.083.185.185.185zm-2.964 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.185-.186H5.135a.186.186 0 00-.186.186v1.887c0 .102.084.185.186.185zm-2.928 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.185-.186H2.207a.186.186 0 00-.186.186v1.887c0 .102.084.185.186.185zm21.614-.72a4.524 4.524 0 00-2.484-2.433c-.158-.066-.33-.102-.504-.102-.387 0-.75.163-1.025.437l-.803.804c-.31.31-.73.483-1.168.483H1.428A1.428 1.428 0 000 13.064c.264 4.898 3.522 9.079 8.283 10.428 1.13.322 2.313.487 3.5.487 3.96 0 7.747-1.782 10.32-4.835 1.096-1.3 1.83-2.83 2.146-4.475.056-.29.076-.588.072-.885a2.532 2.532 0 00-.501-1.644z"/></svg>`;
+                case 'github':
+                    return `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>`;
+                case 'steam':
+                    return `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.005.105.005.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 12-5.373 12-12s-5.373-12-12-12zm-3.613 14.654l-1.393-.577c.23-.522.69-.924 1.261-1.077.202.498.248 1.115.132 1.654zm7.574-8.003c1.249 0 2.262 1.013 2.262 2.261 0 1.25-1.013 2.263-2.262 2.263-1.249 0-2.262-1.013-2.262-2.263 0-1.248 1.013-2.261 2.262-2.261zm0 .754c-.832 0-1.507.675-1.507 1.507 0 .833.675 1.509 1.507 1.509.833 0 1.509-.676 1.509-1.509 0-.832-.676-1.507-1.509-1.507z"/></svg>`;
+                case 'twitch':
+                    return `<svg width="22" height="22" viewBox="0 0 24 24" fill="#a855f7" aria-hidden="true"><path d="M2.149 0L.537 4.119v16.836h5.731V24h3.224l3.045-3.045h4.657l6.269-6.269V0H2.149zm19.164 13.612l-3.582 3.582H12l-3.045 3.045v-3.045H4.119V2.149h17.194v11.463zm-3.582-7.343v6.09h-2.149v-6.09h2.149zm-5.731 0v6.09H9.851v-6.09h2.15z"/></svg>`;
+                case 'deepseek':
+                    return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="2" fill="#3b82f6"/></svg>`;
+                case 'cloudflare':
+                    return `<svg width="22" height="22" viewBox="0 0 24 24" fill="#f97316" aria-hidden="true"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>`;
+                default:
+                    return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+            }
+        }
+
+        function renderServices(services) {
+            const grid = document.getElementById('services-grid');
+            if (!grid) return;
+
+            if (!services || services.length === 0) {
+                grid.innerHTML = `<div class="empty-state" data-i18n="blocked.no_services">No hay información de servicios disponible.</div>`;
+                return;
+            }
+
+            const lang = (window.i18n && window.i18n.getLanguage()) || 'es';
+            const isSpanish = lang.startsWith('es');
+
+            const statusOpLabel = t('blocked.service_status_operational', 'Operativo (Protegido)');
+            const statusEvLabel = t('blocked.service_status_evaded', 'Evasión Activa');
+            const time30dLabel = t('blocked.time_30d', 'Bloqueado (30d)');
+            const time7dLabel = t('blocked.time_7d', 'Últimos 7d');
+            const timeTodayLabel = t('blocked.time_today', 'Hoy');
+            const lastIncLabel = t('blocked.last_incident_label', 'Última afectación:');
+            const ongoingTpl = t('blocked.ongoing_incident', 'En curso ({duration})');
+            const noRecentLabel = t('blocked.no_recent_incidents', 'Sin incidencias recientes');
+            const mitigationTitle = t('blocked.mitigation_title', 'Mitigación XDP:');
+            const domainsLabel = t('blocked.monitored_domains_label', 'Dominios:');
+
+            let html = '';
+
+            for (const svc of services) {
+                const isEvaded = svc.is_affected || svc.status === 'evaded';
+                const statusBadgeHtml = isEvaded
+                    ? `<span class="service-status-pill evading"><span class="service-pulse-dot orange" aria-hidden="true"></span>${statusEvLabel}</span>`
+                    : `<span class="service-status-pill operational"><span class="service-pulse-dot green" aria-hidden="true"></span>${statusOpLabel}</span>`;
+
+                const catName = t(svc.category_key, svc.category_default);
+                const impactText = isSpanish ? svc.impact_es : svc.impact_en;
+                const mitigationText = isSpanish ? svc.mitigation_es : svc.mitigation_en;
+
+                let incidentHtml = '';
+                if (isEvaded && svc.current_incident) {
+                    const durFormatted = esc(svc.current_incident.duration_formatted || '1m');
+                    const ongoingText = ongoingTpl.replace('{duration}', durFormatted);
+                    incidentHtml = `<strong style="color: #f97316;">${ongoingText}</strong>`;
+                } else if (svc.last_incident) {
+                    const dateText = isSpanish ? svc.last_incident.date_es : svc.last_incident.date_en;
+                    const durText = svc.last_incident.duration_formatted;
+                    incidentHtml = `<span>${lastIncLabel}</span> <strong>${esc(dateText)}</strong> (${esc(durText)})`;
+                } else {
+                    incidentHtml = `<span>${noRecentLabel}</span>`;
+                }
+
+                const domainsList = svc.domains || [];
+                const domainsPillsHtml = domainsList.map(d => `<code class="service-domain-code mono">${esc(d)}</code>`).join(' ');
+
+                html += `
+                    <div class="service-card ${isEvaded ? 'is-evaded' : ''}">
+                        <div class="service-card-top">
+                            <div class="service-identity">
+                                <div class="service-icon-box">
+                                    ${getServiceIconSvg(svc.icon)}
+                                </div>
+                                <div class="service-name-wrap">
+                                    <span class="service-name">${esc(svc.name)}</span>
+                                    <span class="service-cat-badge">${esc(catName)}</span>
+                                </div>
+                            </div>
+                            <div>
+                                ${statusBadgeHtml}
+                            </div>
+                        </div>
+
+                        <p class="service-impact-desc">${esc(impactText)}</p>
+
+                        <div class="service-metrics-row">
+                            <div class="service-metric-item">
+                                <span class="service-metric-label">${time30dLabel}</span>
+                                <span class="service-metric-val mono">${esc(svc.time_blocked_30d_formatted || '0m')}</span>
+                            </div>
+                            <div class="service-metric-item">
+                                <span class="service-metric-label">${time7dLabel}</span>
+                                <span class="service-metric-val mono">${esc(svc.time_blocked_7d_formatted || '0m')}</span>
+                            </div>
+                            <div class="service-metric-item">
+                                <span class="service-metric-label">${timeTodayLabel}</span>
+                                <span class="service-metric-val mono" style="${svc.time_blocked_today_s > 0 ? 'color: #f97316;' : ''}">${esc(svc.time_blocked_today_formatted || '0m')}</span>
+                            </div>
+                        </div>
+
+                        <div class="service-footer-info">
+                            <div class="service-incident-line">
+                                <span aria-hidden="true">🕒</span>
+                                <div>${incidentHtml}</div>
+                            </div>
+                            <div class="service-mitigation-line">
+                                <span aria-hidden="true">🛡️</span>
+                                <span>${mitigationTitle} <strong>${esc(mitigationText)}</strong></span>
+                            </div>
+                            ${domainsList.length > 0 ? `
+                                <div style="margin-top: 4px;">
+                                    <span style="color: var(--text-muted); font-size: 0.72rem; font-weight: 700; text-transform: uppercase;">${domainsLabel}</span>
+                                    <div class="service-domains-pills">
+                                        ${domainsPillsHtml}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            grid.innerHTML = html;
         }
 
         function filterAndRender(keepPage) {
@@ -826,7 +1215,7 @@
                 const isEvaded = item.status && item.status.startsWith('Evadida');
 
                 const cfBadge = isCF 
-                    ? `<span class="badge-cf"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg> Cloudflare</span>`
+                    ? `<span class="badge-cf"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg> Cloudflare</span>`
                     : `<span class="badge-other">${otherLabel}</span>`;
 
                 // Desktop Row
@@ -921,10 +1310,11 @@
         let loadController = null;
 
         function renderLoadError() {
-            if (allEntries.length > 0) return; // keep last known good data on screen
+            if (allEntries.length > 0 || allServices.length > 0) return; // keep last known good data on screen
             const errorMsg = t('blocked.load_error', '⚠️ No se pudieron cargar los datos. Pulsa «Actualizar» para reintentar.');
             document.getElementById('desktop-table-body').innerHTML = `<tr><td colspan="5" class="empty-state">${errorMsg}</td></tr>`;
             document.getElementById('mobile-cards-body').innerHTML = `<div class="empty-state">${errorMsg}</div>`;
+            document.getElementById('services-grid').innerHTML = `<div class="empty-state">${errorMsg}</div>`;
         }
 
         async function loadBlockedData() {
@@ -942,13 +1332,18 @@
 
                 cachedData = data;
                 allEntries = data.entries || [];
+                allServices = data.services || [];
 
                 updateLiveBadge(data);
 
                 document.getElementById('stat-total').textContent = (data.total_blocked || 0).toLocaleString();
                 document.getElementById('stat-cf').textContent = (data.cf_blocked_count || 0).toLocaleString();
                 document.getElementById('stat-evaded').textContent = (data.evaded_count || 0).toLocaleString();
+                
+                const servicesTotal = allServices.length || 6;
+                document.getElementById('stat-services').textContent = servicesTotal.toString();
 
+                renderServices(allServices);
                 filterAndRender(true);
             } catch (err) {
                 if (!controller.signal.aborted) {
@@ -963,7 +1358,10 @@
         }
 
         window.addEventListener('langchange', () => {
-            if (cachedData) updateLiveBadge(cachedData);
+            if (cachedData) {
+                updateLiveBadge(cachedData);
+                renderServices(allServices);
+            }
             renderViews();
         });
 
