@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="blocked.page_title">Monitor de Evasión de Bloqueos | xdp.es DNS</title>
-    <meta name="description" content="Monitor interno de IPs bloqueadas y rutas de evasión dinámicas del DNS de xdp.es.">
+    <meta name="description" content="Monitor interno de IPs bloqueadas, servicios afectados y registro histórico de cortes para reclamaciones judiciales.">
     <meta name="robots" content="noindex, nofollow, noarchive">
 
     <!-- Critical Anti-FOUC Background Style -->
@@ -75,8 +75,8 @@
     <link rel="manifest" href="/site.webmanifest">
     <style>
         .container {
-            max-width: 1120px;
-            margin: 44px auto 60px auto;
+            max-width: 1140px;
+            margin: 40px auto 60px auto;
             padding: 0 20px;
         }
 
@@ -110,7 +110,7 @@
 
         .hero-section {
             text-align: center;
-            padding: 24px 0 16px 0;
+            padding: 20px 0 14px 0;
             margin-bottom: 20px;
         }
 
@@ -159,6 +159,7 @@
             50% { opacity: 0.4; transform: scale(1.2); }
         }
 
+        /* Top 4 Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -210,14 +211,14 @@
 
         /* Section Titles */
         .section-header {
-            margin: 28px 0 14px 0;
+            margin: 34px 0 16px 0;
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
 
         .section-title {
-            font-size: 1.22rem;
+            font-size: 1.25rem;
             font-weight: 800;
             color: var(--text-heading);
             letter-spacing: -0.02em;
@@ -239,7 +240,7 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 14px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         @media (max-width: 860px) {
@@ -438,7 +439,259 @@
             color: var(--text-muted);
         }
 
-        /* Controls Card */
+        /* Incident History Section Styles */
+        .history-stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 640px) {
+            .history-stats-bar {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
+
+        .history-stat-box {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .history-stat-title {
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+
+        .history-stat-val {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-heading);
+        }
+
+        /* Legal Claim Guide Box */
+        .legal-guide-details {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 210, 255, 0.25);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 14px rgba(0, 210, 255, 0.04);
+        }
+
+        .legal-guide-details summary {
+            cursor: pointer;
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+            outline: none;
+        }
+
+        .legal-guide-content {
+            margin-top: 10px;
+            font-size: 0.83rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            border-top: 1px dashed var(--border);
+            padding-top: 10px;
+        }
+
+        .legal-guide-content p {
+            margin: 0 0 8px 0;
+        }
+
+        .legal-guide-content p:last-child {
+            margin: 0;
+        }
+
+        /* Incident List & Cards */
+        .incidents-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        .incident-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: var(--shadow-card);
+            transition: border-color 0.2s ease;
+        }
+
+        .incident-card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .incident-card.is-ongoing {
+            border-color: rgba(239, 68, 68, 0.45);
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.08);
+        }
+
+        .incident-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .incident-id-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 5px;
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .incident-badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 0.74rem;
+            font-weight: 700;
+        }
+
+        .incident-badge-status.ongoing {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+
+        .incident-badge-status.resolved {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .incident-time-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            flex-wrap: wrap;
+        }
+
+        .incident-time-val {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .incident-duration-badge {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .incident-body-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.82rem;
+            line-height: 1.45;
+        }
+
+        .incident-field-row {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .incident-field-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+
+        .incident-field-text {
+            color: var(--text-secondary);
+        }
+
+        .incident-ips-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 3px;
+        }
+
+        .incident-ip-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 7px;
+            border-radius: 5px;
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            font-size: 0.74rem;
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .incident-card-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border);
+            flex-wrap: wrap;
+        }
+
+        .incident-legal-ref {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .btn-copy-report {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: var(--accent-dim);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-size: 0.76rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-copy-report:hover {
+            opacity: 0.85;
+        }
+
+        /* Controls Card (Search & Filters) */
         .controls-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -847,7 +1100,7 @@
                 </p>
             </div>
 
-            <!-- Metrics Grid -->
+            <!-- Top 4 Metrics Grid -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <span class="stat-card-label" data-i18n="blocked.stat_total">IPs Baneadas</span>
@@ -867,7 +1120,7 @@
                 </div>
             </div>
 
-            <!-- Main Services Monitored & Impact Section -->
+            <!-- SECTION 1: Main Monitored Services & Status -->
             <div class="section-header">
                 <h2 class="section-title">
                     <span aria-hidden="true">🛡️</span>
@@ -883,15 +1136,87 @@
                 <div class="empty-state" data-i18n="blocked.loading">Cargando servicios...</div>
             </div>
 
-            <!-- IP Addresses Detailed Section Header -->
-            <div class="section-header" style="margin-top: 32px;">
+            <!-- SECTION 2: Forensic Incident History & Legal Audit Log -->
+            <div class="section-header" style="margin-top: 36px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2 class="section-title">
+                            <span aria-hidden="true">📜</span>
+                            <span data-i18n="blocked.history_title">Registro Histórico de Incidencias para Reclamaciones</span>
+                        </h2>
+                        <p class="section-subtitle" data-i18n="blocked.history_subtitle">
+                            Historial cronológico verificable de cortes, horas de afectación e IPs censuradas para su uso en reclamaciones judiciales y administrativas.
+                        </p>
+                    </div>
+                    <button type="button" class="btn-copy-report" id="btn-copy-all-reports" style="padding: 8px 14px; font-size: 0.8rem;">
+                        <span data-i18n="blocked.history_export_all">📋 Copiar Informe Pericial (Todas)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- History Stats Bar -->
+            <div class="history-stats-bar">
+                <div class="history-stat-box">
+                    <span class="history-stat-title" data-i18n="blocked.history_stat_incidents">Incidencias Totales</span>
+                    <span class="history-stat-val mono" id="hist-stat-incidents" style="color: var(--accent);">-</span>
+                </div>
+                <div class="history-stat-box">
+                    <span class="history-stat-title" data-i18n="blocked.history_stat_hours">Horas Totales Afectadas</span>
+                    <span class="history-stat-val mono" id="hist-stat-hours" style="color: #f97316;">-</span>
+                </div>
+                <div class="history-stat-box">
+                    <span class="history-stat-title" data-i18n="blocked.history_stat_services">Servicios Impactados</span>
+                    <span class="history-stat-val mono" id="hist-stat-services" style="color: #10b981;">-</span>
+                </div>
+            </div>
+
+            <!-- Legal Claim Explanatory Guide Box -->
+            <details class="legal-guide-details">
+                <summary data-i18n="blocked.history_legal_guide_btn">
+                    ⚖️ Guía para Reclamaciones Judiciales y SETID
+                </summary>
+                <div class="legal-guide-content">
+                    <p data-i18n="blocked.history_legal_guide_p1">
+                        Este registro pericial recopila marcas de tiempo UTC exactas, direcciones IP bloqueadas y dominios afectados comprobados diferencialmente mediante monitorización Anycast y sonda residencial en España.
+                    </p>
+                    <p data-i18n="blocked.history_legal_guide_p2">
+                        Puedes adjuntar este informe técnico pericial en reclamaciones ante la Secretaría de Estado de Telecomunicaciones e Infraestructuras Digitales (SETID), la Oficina de Atención al Usuario de Telecomunicaciones (OAUT), o en demandas civiles por daños, perjuicios y lucro cesante al amparo del Reglamento (UE) 2015/2120 de Neutralidad de la Red (Art. 3) y los Arts. 1101 y 1902 del Código Civil.
+                    </p>
+                </div>
+            </details>
+
+            <!-- Incident Controls (Search & Service Filter) -->
+            <div class="controls-card" style="margin-bottom: 14px;">
+                <div class="search-wrapper">
+                    <label class="visually-hidden" for="incident-search-input">Buscar incidencia</label>
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" class="search-input" id="incident-search-input" placeholder="Buscar incidencia por servicio, fecha, IP o dominio..." data-i18n-placeholder="blocked.history_search_placeholder">
+                </div>
+                <div class="filter-buttons" id="incident-filter-buttons">
+                    <button class="filter-btn active" data-inc-filter="all" aria-pressed="true" data-i18n="blocked.history_filter_all">Todos los servicios</button>
+                    <button class="filter-btn" data-inc-filter="docker" aria-pressed="false">Docker</button>
+                    <button class="filter-btn" data-inc-filter="github" aria-pressed="false">GitHub</button>
+                    <button class="filter-btn" data-inc-filter="steam" aria-pressed="false">Steam</button>
+                    <button class="filter-btn" data-inc-filter="twitch" aria-pressed="false">Twitch</button>
+                    <button class="filter-btn" data-inc-filter="deepseek" aria-pressed="false">DeepSeek</button>
+                    <button class="filter-btn" data-inc-filter="cloudflare" aria-pressed="false">Cloudflare</button>
+                </div>
+            </div>
+
+            <!-- Incidents List Container -->
+            <div class="incidents-container" id="incidents-container" aria-live="polite">
+                <div class="empty-state" data-i18n="blocked.loading">Cargando histórico de incidencias...</div>
+            </div>
+
+            <!-- SECTION 3: Detailed Live Blocked IPs List -->
+            <div class="section-header" style="margin-top: 36px;">
                 <h2 class="section-title">
                     <span aria-hidden="true">📋</span>
                     <span data-i18n="blocked.ips_title">Listado de IPs Bloqueadas</span>
                 </h2>
             </div>
 
-            <!-- Controls: Search & Filters -->
+            <!-- Controls: Search & Filters for IPs -->
             <div class="controls-card">
                 <div class="search-wrapper">
                     <label class="visually-hidden" for="search-input">Buscar IP o prefijo</label>
@@ -965,14 +1290,18 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=4.7"></script>
+    <script src="/i18n.js?v=4.8"></script>
     <script src="/theme.js?v=4.2"></script>
     <script>
         let allEntries = [];
         let allServices = [];
+        let allIncidents = [];
         let filteredEntries = [];
+        let filteredIncidents = [];
         let currentFilter = 'all';
+        let currentIncidentFilter = 'all';
         let currentSearch = '';
+        let currentIncidentSearch = '';
         let currentPage = 1;
         const pageSize = 50;
 
@@ -1001,16 +1330,16 @@
                 ta.select();
                 const ok = document.execCommand('copy');
                 document.body.removeChild(ta);
-                markCopy(btn, ok);
+                if (btn) markCopy(btn, ok);
             } catch (e) {
-                markCopy(btn, false);
+                if (btn) markCopy(btn, false);
             }
         }
 
         function copyToClipboard(text, btn) {
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text)
-                    .then(() => markCopy(btn, true))
+                    .then(() => { if (btn) markCopy(btn, true); })
                     .catch(() => fallbackCopy(text, btn));
             } else {
                 fallbackCopy(text, btn);
@@ -1154,6 +1483,251 @@
 
             grid.innerHTML = html;
         }
+
+        // =========================================================================
+        // FORENSIC REPORT GENERATOR (LEGAL AUDIT REPORT)
+        // =========================================================================
+
+        function generateForensicReport(incident, isSpanish) {
+            const divider = "=".repeat(78);
+            const incId = incident.id || "INC-GENERIC";
+            const svcName = incident.service_name || incident.service_id;
+            const dateStr = isSpanish ? (incident.date_es || "") : (incident.date_en || "");
+            const timeWin = isSpanish ? (incident.time_window_es || "") : (incident.time_window_en || "");
+            const durStr = incident.duration_formatted || "N/A";
+            const domains = (incident.affected_targets || []).map(d => `  - ${d}`).join("\n");
+            const ips = (incident.blocked_ips || []).map(ip => `  - ${ip}`).join("\n");
+            const cause = isSpanish ? (incident.cause_es || "") : (incident.cause_en || "");
+            const impact = isSpanish ? (incident.impact_es || "") : (incident.impact_en || "");
+            const mitigation = isSpanish ? (incident.mitigation_es || "") : (incident.mitigation_en || "");
+            const legal = incident.legal_basis || "Reglamento (UE) 2015/2120 de Neutralidad de la Red";
+
+            if (isSpanish) {
+                return `${divider}
+INFORME TÉCNICO PERICIAL DE AFECTACIÓN POR BLOQUEO INDISCRIMINADO
+Fuente: Registro de Evasión y Monitorización DNS xdp.es
+Fecha de generación: ${new Date().toISOString()}
+${divider}
+ID INCIDENCIA: ${incId}
+SERVICIO AFECTADO: ${svcName}
+FECHA DEL CORTE: ${dateStr}
+VENTANA HORARIA: ${timeWin}
+DURACIÓN TOTAL REGISTRADA: ${durStr}
+ESTADO: ${incident.status === 'ongoing' ? 'EN CURSO (Actualmente afectado)' : 'FINALIZADO Y MITIGADO'}
+
+DOMINIOS / HOSTNAMES AFECTADOS:
+${domains || '  - No especificados'}
+
+DIRECCIONES IP / PREFIJOS OBJETO DE BLOQUEO:
+${ips || '  - No especificadas'}
+
+CAUSA Y PROCEDIMIENTO DEL BLOQUEO:
+${cause}
+
+IMPACTO TÉCNICO Y PERJUICIO PRODUCIDO:
+${impact}
+
+MITIGACIÓN Y PROTECCIÓN APLICADA POR XDP.ES:
+${mitigation}
+
+FUNDAMENTO JURÍDICO / NORMATIVA APLICABLE:
+- ${legal}
+- Ley 11/2022, General de Telecomunicaciones (Garantía de continuidad y proporcionalidad).
+- Artículos 1101 y 1902 del Código Civil (Responsabilidad por daños y perjuicios derivados de bloqueo indiscriminado).
+
+MÉTODO DE COMPROBACIÓN:
+Monitorización continua de latencia y encaminamiento Anycast combinada con sonda
+residencial física en España (Movistar / AS3352).
+${divider}`;
+            } else {
+                return `${divider}
+FORENSIC TECHNICAL REPORT OF INDISCRIMINATE ISP BLOCKING
+Source: xdp.es DNS Evasion & Real-Time Monitoring System
+Generated on: ${new Date().toISOString()}
+${divider}
+INCIDENT ID: ${incId}
+IMPACTED SERVICE: ${svcName}
+INCIDENT DATE: ${dateStr}
+TIME WINDOW: ${timeWin}
+TOTAL IMPACT DURATION: ${durStr}
+STATUS: ${incident.status === 'ongoing' ? 'ONGOING' : 'RESOLVED / MITIGATED'}
+
+IMPACTED DOMAINS / HOSTNAMES:
+${domains || '  - None specified'}
+
+CENSORED IP ADDRESSES / PREFIXES:
+${ips || '  - None specified'}
+
+BLOCKING CAUSE & ISP INJUNCTION:
+${cause}
+
+TECHNICAL IMPACT & COLLATERAL DAMAGE:
+${impact}
+
+XDP.ES DNS MITIGATION APPLIED:
+${mitigation}
+
+LEGAL GROUNDS:
+- Regulation (EU) 2015/2120 (Open Internet Access / Net Neutrality, Article 3).
+- Spanish General Telecommunications Act 11/2022.
+- Articles 1101 & 1902 Spanish Civil Code (Liability for collateral damage and service disruption).
+
+VERIFICATION METHOD:
+Continuous Anycast telemetry combined with active differential residential probe in Spain.
+${divider}`;
+            }
+        }
+
+        function filterAndRenderIncidents() {
+            filteredIncidents = allIncidents.filter(inc => {
+                if (currentIncidentFilter !== 'all' && inc.service_id !== currentIncidentFilter) {
+                    return false;
+                }
+
+                if (currentIncidentSearch) {
+                    const q = currentIncidentSearch.toLowerCase();
+                    const sName = (inc.service_name || '').toLowerCase();
+                    const incId = (inc.id || '').toLowerCase();
+                    const dEs = (inc.date_es || '').toLowerCase();
+                    const dEn = (inc.date_en || '').toLowerCase();
+                    const ips = (inc.blocked_ips || []).join(' ').toLowerCase();
+                    const tgts = (inc.affected_targets || []).join(' ').toLowerCase();
+                    const causeEs = (inc.cause_es || '').toLowerCase();
+                    const causeEn = (inc.cause_en || '').toLowerCase();
+
+                    if (!sName.includes(q) && !incId.includes(q) && !dEs.includes(q) && !dEn.includes(q) && !ips.includes(q) && !tgts.includes(q) && !causeEs.includes(q) && !causeEn.includes(q)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            renderIncidentsList();
+        }
+
+        function renderIncidentsList() {
+            const container = document.getElementById('incidents-container');
+            if (!container) return;
+
+            if (filteredIncidents.length === 0) {
+                const noMsg = t('blocked.incident_no_results', 'No se encontraron incidencias que coincidan con la búsqueda.');
+                container.innerHTML = `<div class="empty-state">${noMsg}</div>`;
+                return;
+            }
+
+            const lang = (window.i18n && window.i18n.getLanguage()) || 'es';
+            const isSpanish = lang.startsWith('es');
+
+            const statusOngoingLabel = t('blocked.incident_status_ongoing', 'Bloqueo en Curso');
+            const statusResolvedLabel = t('blocked.incident_status_resolved', 'Mitigado con Éxito');
+            const timeWinLabel = t('blocked.incident_time_window', 'Horario:');
+            const durationLabel = t('blocked.incident_duration', 'Duración:');
+            const targetsLabel = t('blocked.incident_targets', 'Dominios afectados:');
+            const ipsLabel = t('blocked.incident_ips', 'IPs censuradas:');
+            const causeLabel = t('blocked.incident_cause', 'Causa:');
+            const impactLabel = t('blocked.incident_impact', 'Impacto técnico:');
+            const mitigationLabel = t('blocked.incident_mitigation', 'Evasión XDP:');
+            const legalBasisLabel = t('blocked.incident_legal_basis', 'Fundamento legal:');
+            const copyReportLabel = t('blocked.incident_copy_report', '📋 Copiar Informe Pericial');
+
+            let html = '';
+
+            for (const inc of filteredIncidents) {
+                const isOngoing = inc.status === 'ongoing';
+                const statusBadge = isOngoing
+                    ? `<span class="incident-badge-status ongoing"><span class="service-pulse-dot orange" aria-hidden="true"></span>${statusOngoingLabel}</span>`
+                    : `<span class="incident-badge-status resolved"><span class="service-pulse-dot green" aria-hidden="true"></span>${statusResolvedLabel}</span>`;
+
+                const dateStr = isSpanish ? (inc.date_es || '') : (inc.date_en || '');
+                const timeWinStr = isSpanish ? (inc.time_window_es || '') : (inc.time_window_en || '');
+                const causeStr = isSpanish ? (inc.cause_es || '') : (inc.cause_en || '');
+                const impactStr = isSpanish ? (inc.impact_es || '') : (inc.impact_en || '');
+                const mitigationStr = isSpanish ? (inc.mitigation_es || '') : (inc.mitigation_en || '');
+
+                const targetsList = inc.affected_targets || [];
+                const ipsList = inc.blocked_ips || [];
+
+                html += `
+                    <div class="incident-card ${isOngoing ? 'is-ongoing' : ''}" data-incident-id="${esc(inc.id)}">
+                        <div class="incident-card-header">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <span class="incident-id-badge mono">${esc(inc.id)}</span>
+                                <div class="service-icon-box" style="width: 28px; height: 28px;">
+                                    ${getServiceIconSvg(inc.service_id)}
+                                </div>
+                                <strong style="font-size: 0.96rem; color: var(--text-heading);">${esc(inc.service_name)}</strong>
+                                <span style="color: var(--text-muted); font-size: 0.84rem;">• ${esc(dateStr)}</span>
+                            </div>
+                            <div>
+                                ${statusBadge}
+                            </div>
+                        </div>
+
+                        <div class="incident-time-banner">
+                            <div class="incident-time-val">
+                                <span>${timeWinLabel}</span> <strong>${esc(timeWinStr)}</strong>
+                            </div>
+                            <div class="incident-duration-badge mono">
+                                <span>${durationLabel}</span> <span>${esc(inc.duration_formatted || '0m')}</span>
+                            </div>
+                        </div>
+
+                        <div class="incident-body-grid">
+                            ${targetsList.length > 0 ? `
+                                <div class="incident-field-row">
+                                    <span class="incident-field-label">${targetsLabel}</span>
+                                    <div class="service-domains-pills">
+                                        ${targetsList.map(d => `<code class="service-domain-code mono">${esc(d)}</code>`).join(' ')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${ipsList.length > 0 ? `
+                                <div class="incident-field-row">
+                                    <span class="incident-field-label">${ipsLabel}</span>
+                                    <div class="incident-ips-chips">
+                                        ${ipsList.map(ip => `
+                                            <span class="incident-ip-chip mono">
+                                                <span>⛔ ${esc(ip)}</span>
+                                                <button type="button" class="copy-btn-touch" data-copy="${esc(ip)}" style="padding: 1px 4px; font-size: 0.65rem;" title="Copiar IP">📋</button>
+                                            </span>
+                                        `).join(' ')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <div class="incident-field-row">
+                                <span class="incident-field-label">${causeLabel}</span>
+                                <span class="incident-field-text">${esc(causeStr)}</span>
+                            </div>
+
+                            <div class="incident-field-row">
+                                <span class="incident-field-label">${impactLabel}</span>
+                                <span class="incident-field-text">${esc(impactStr)}</span>
+                            </div>
+
+                            <div class="incident-field-row">
+                                <span class="incident-field-label">${mitigationLabel}</span>
+                                <span class="incident-field-text" style="color: #10b981; font-weight: 600;">🛡️ ${esc(mitigationStr)}</span>
+                            </div>
+                        </div>
+
+                        <div class="incident-card-actions">
+                            <span class="incident-legal-ref">${legalBasisLabel} ${esc(inc.legal_basis || 'Reglamento UE 2015/2120')}</span>
+                            <button type="button" class="btn-copy-report btn-copy-single-report" data-incident-id="${esc(inc.id)}">
+                                ${copyReportLabel}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // =========================================================================
+        // REAL-TIME IP LIST (DESKTOP TABLE & MOBILE CARDS)
+        // =========================================================================
 
         function filterAndRender(keepPage) {
             filteredEntries = allEntries.filter(item => {
@@ -1310,11 +1884,12 @@
         let loadController = null;
 
         function renderLoadError() {
-            if (allEntries.length > 0 || allServices.length > 0) return; // keep last known good data on screen
+            if (allEntries.length > 0 || allServices.length > 0 || allIncidents.length > 0) return;
             const errorMsg = t('blocked.load_error', '⚠️ No se pudieron cargar los datos. Pulsa «Actualizar» para reintentar.');
             document.getElementById('desktop-table-body').innerHTML = `<tr><td colspan="5" class="empty-state">${errorMsg}</td></tr>`;
             document.getElementById('mobile-cards-body').innerHTML = `<div class="empty-state">${errorMsg}</div>`;
             document.getElementById('services-grid').innerHTML = `<div class="empty-state">${errorMsg}</div>`;
+            document.getElementById('incidents-container').innerHTML = `<div class="empty-state">${errorMsg}</div>`;
         }
 
         async function loadBlockedData() {
@@ -1333,9 +1908,11 @@
                 cachedData = data;
                 allEntries = data.entries || [];
                 allServices = data.services || [];
+                allIncidents = data.incidents || [];
 
                 updateLiveBadge(data);
 
+                // Top stats
                 document.getElementById('stat-total').textContent = (data.total_blocked || 0).toLocaleString();
                 document.getElementById('stat-cf').textContent = (data.cf_blocked_count || 0).toLocaleString();
                 document.getElementById('stat-evaded').textContent = (data.evaded_count || 0).toLocaleString();
@@ -1343,7 +1920,15 @@
                 const servicesTotal = allServices.length || 6;
                 document.getElementById('stat-services').textContent = servicesTotal.toString();
 
+                // History Summary Stats
+                if (data.incidents_summary) {
+                    document.getElementById('hist-stat-incidents').textContent = (data.incidents_summary.total_incidents || allIncidents.length).toString();
+                    document.getElementById('hist-stat-hours').textContent = (data.incidents_summary.total_duration_formatted || '0m');
+                    document.getElementById('hist-stat-services').textContent = (data.incidents_summary.affected_services_count || 6).toString();
+                }
+
                 renderServices(allServices);
+                filterAndRenderIncidents();
                 filterAndRender(true);
             } catch (err) {
                 if (!controller.signal.aborted) {
@@ -1362,12 +1947,68 @@
                 updateLiveBadge(cachedData);
                 renderServices(allServices);
             }
+            renderIncidentsList();
             renderViews();
         });
 
         document.addEventListener('DOMContentLoaded', () => {
             loadBlockedData();
 
+            // Incident Search
+            const incSearchInput = document.getElementById('incident-search-input');
+            if (incSearchInput) {
+                let incTimer = null;
+                incSearchInput.addEventListener('input', (e) => {
+                    clearTimeout(incTimer);
+                    const value = e.target.value.trim();
+                    incTimer = setTimeout(() => {
+                        currentIncidentSearch = value;
+                        filterAndRenderIncidents();
+                    }, 200);
+                });
+            }
+
+            // Incident Filter Buttons
+            document.querySelectorAll('#incident-filter-buttons .filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#incident-filter-buttons .filter-btn').forEach(b => {
+                        b.classList.remove('active');
+                        b.setAttribute('aria-pressed', 'false');
+                    });
+                    btn.classList.add('active');
+                    btn.setAttribute('aria-pressed', 'true');
+                    currentIncidentFilter = btn.dataset.incFilter;
+                    filterAndRenderIncidents();
+                });
+            });
+
+            // Copy Single Incident Report (Event Delegation)
+            document.getElementById('incidents-container').addEventListener('click', (e) => {
+                const btn = e.target.closest('.btn-copy-single-report');
+                if (btn) {
+                    const incId = btn.dataset.incidentId;
+                    const inc = allIncidents.find(i => i.id === incId);
+                    if (inc) {
+                        const lang = (window.i18n && window.i18n.getLanguage()) || 'es';
+                        const reportText = generateForensicReport(inc, lang.startsWith('es'));
+                        copyToClipboard(reportText, btn);
+                    }
+                }
+            });
+
+            // Copy All / Filtered Incidents Forensic Report
+            const btnCopyAll = document.getElementById('btn-copy-all-reports');
+            if (btnCopyAll) {
+                btnCopyAll.addEventListener('click', () => {
+                    const targetList = filteredIncidents.length > 0 ? filteredIncidents : allIncidents;
+                    const lang = (window.i18n && window.i18n.getLanguage()) || 'es';
+                    const isSpanish = lang.startsWith('es');
+                    const fullReport = targetList.map(inc => generateForensicReport(inc, isSpanish)).join('\n\n');
+                    copyToClipboard(fullReport, btnCopyAll);
+                });
+            }
+
+            // IPs Search Input
             const searchInput = document.getElementById('search-input');
             if (searchInput) {
                 let searchTimer = null;
@@ -1381,9 +2022,10 @@
                 });
             }
 
-            document.querySelectorAll('.filter-btn').forEach(btn => {
+            // IPs Filter Buttons
+            document.querySelectorAll('.filter-buttons:not(#incident-filter-buttons) .filter-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    document.querySelectorAll('.filter-btn').forEach(b => {
+                    document.querySelectorAll('.filter-buttons:not(#incident-filter-buttons) .filter-btn').forEach(b => {
                         b.classList.remove('active');
                         b.setAttribute('aria-pressed', 'false');
                     });
@@ -1407,13 +2049,14 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
-            // Copy buttons (event delegation, works for desktop table and mobile cards)
+            // Copy buttons for IP addresses
             const handleCopyClick = (e) => {
                 const btn = e.target.closest('button[data-copy]');
                 if (btn) copyToClipboard(btn.dataset.copy, btn);
             };
             document.getElementById('desktop-table-body').addEventListener('click', handleCopyClick);
             document.getElementById('mobile-cards-body').addEventListener('click', handleCopyClick);
+            document.getElementById('incidents-container').addEventListener('click', handleCopyClick);
 
             document.getElementById('refresh-btn').addEventListener('click', loadBlockedData);
 
