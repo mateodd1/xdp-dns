@@ -151,6 +151,7 @@ CUSTOM_ASN_NAMES = {
     '50977': 'Avatel Telecom',
     '59631': 'Avatel Telecom',
     '60675': 'Fonored (Avatel)',
+    '34977': 'PTV Telecom',
 
     # Datacenters
     '212238': 'Datacamp/CDN77',

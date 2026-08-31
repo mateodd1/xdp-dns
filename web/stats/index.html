@@ -602,6 +602,16 @@
             content: url('/stats/img/masorange-dark.svg');
         }
 
+        [data-theme="dark"] .isp-logo-ptv,
+        [data-theme="oled"] .isp-logo-ptv {
+            content: url('/stats/img/ptv-dark.svg');
+        }
+
+        [data-theme="dark"] .isp-logo-fibritel,
+        [data-theme="oled"] .isp-logo-fibritel {
+            content: url('/stats/img/fibritel-dark.svg');
+        }
+
         /* Grouped ASN Rows & Accordion Drawers */
         .stats-row-item.stats-row-group {
             cursor: pointer;
@@ -1366,6 +1376,12 @@
             }
             if (/\bas(200845|199952|203936|16030|198411|199841|200290|201337|202169|202583|207030|207923|212941|3348|35404|39281|39744|40996|41418|41531|44188|49000|50977|59631|60675)\b/.test(lower) || lower.includes('avatel') || lower.includes('mismenet') || lower.includes('torrevieja')) {
                 return { src: '/stats/img/avatel.svg', alt: 'Avatel Telecom' };
+            }
+            if (/\bas34977\b/.test(lower) || lower.includes('ptv') || lower.includes('procono')) {
+                return { src: '/stats/img/ptv.svg', alt: 'PTV Telecom', className: 'isp-logo-ptv' };
+            }
+            if (/\bas202513\b/.test(lower) || lower.includes('fibritel')) {
+                return { src: '/stats/img/fibritel.svg', alt: 'Fibritel', className: 'isp-logo-fibritel' };
             }
             return null;
         }
