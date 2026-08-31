@@ -1383,6 +1383,9 @@
             if (/\bas202513\b/.test(lower) || lower.includes('fibritel')) {
                 return { src: '/stats/img/fibritel.svg', alt: 'Fibritel', className: 'isp-logo-fibritel' };
             }
+            if (/\bas(5410|25543|29074|43389)\b/.test(lower) || lower.includes('bouygues')) {
+                return { src: '/stats/img/bouygues.svg', alt: 'Bouygues Telecom SA' };
+            }
             return null;
         }
 

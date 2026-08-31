@@ -152,6 +152,10 @@ CUSTOM_ASN_NAMES = {
     '59631': 'Avatel Telecom',
     '60675': 'Fonored (Avatel)',
     '34977': 'PTV Telecom',
+    '5410': 'Bouygues Telecom SA',
+    '25543': 'Bouygues Telecom SA',
+    '29074': 'Bouygues Telecom SA',
+    '43389': 'Bouygues Telecom SA',
 
     # Datacenters
     '212238': 'Datacamp/CDN77',
@@ -261,10 +265,11 @@ def resolve_asn(ip_str):
         return fallback, "0", ""
 
 KNOWN_ISP_ASNS = {
-    # Spanish National and Regional ISPs & Operators + Satellite / Starlink Residential
+    # Spanish National and Regional ISPs & Operators + Satellite / Starlink Residential + Major European Consumer ISPs
     '3352', '6739', '12430', '57269', '15704', '12479', '12338', '35699', '12946', '12334', '12715',
     '29119', '43590', '200845', '34977', '41368', '50392', '20743', '200543', '208272',
-    '202513', '202673', '203600', '14593', '27277', '397446'
+    '202513', '202673', '203600', '14593', '27277', '397446',
+    '5410', '25543', '29074', '43389'
 }
 
 KNOWN_DC_ASNS = {
