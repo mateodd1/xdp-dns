@@ -1482,15 +1482,18 @@
                         };
                     });
 
+                    const isMulti = matchingChildren.length > 1;
+                    const displayName = isMulti ? grp.name : matchingChildren[0].name;
+
                     groupedList.push({
                         id: grp.id,
-                        name: grp.name,
+                        name: displayName,
                         count: groupCount,
                         percent: Number(groupPct.toFixed(1)),
                         ipv4_percent: Number(v4Pct.toFixed(1)),
                         ipv6_percent: Number(v6Pct.toFixed(1)),
-                        logo: grp.logo,
-                        isGroup: matchingChildren.length > 1,
+                        logo: isMulti ? grp.logo : (getIspLogo(matchingChildren[0].name) || grp.logo),
+                        isGroup: isMulti,
                         children: enrichedChildren
                     });
                 }
