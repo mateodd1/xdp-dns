@@ -1364,6 +1364,9 @@
             if (/\bas202673\b/.test(lower) || lower.includes('ohz')) {
                 return { src: '/stats/img/ohz.svg', alt: 'Ohz Digital' };
             }
+            if (/\bas(200845|201337|202583|44188|50977|59631|60675|3348|39744)\b/.test(lower) || lower.includes('avatel')) {
+                return { src: '/stats/img/avatel.svg', alt: 'Avatel Telecom' };
+            }
             return null;
         }
 
@@ -1398,6 +1401,12 @@
                 name: 'Adamo Telecom',
                 asns: ['35699'],
                 logo: { src: '/stats/img/adamo.svg', alt: 'Adamo Telecom', className: 'isp-logo-adaptive' }
+            },
+            {
+                id: 'avatel',
+                name: 'Avatel Telecom',
+                asns: ['200845', '201337', '202583', '44188', '50977', '59631', '60675', '3348', '39744'],
+                logo: { src: '/stats/img/avatel.svg', alt: 'Avatel Telecom' }
             },
             {
                 id: 'datacamp',

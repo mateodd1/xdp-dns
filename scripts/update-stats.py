@@ -126,6 +126,7 @@ CUSTOM_ASN_NAMES = {
     '202513': 'Fibritel',
     '202673': 'Ohz Digital',
     '203600': 'VIVAFIBRA',
+    '200845': 'Avatel Telecom',
 
     # Datacenters
     '212238': 'Datacamp/CDN77',
