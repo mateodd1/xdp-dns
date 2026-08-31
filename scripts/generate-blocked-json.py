@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # /root/xpd-dns/scripts/generate-blocked-json.py
-# Generates data.json for /blocked dashboard (IPv4 + Services Tracker + Forensic Incident Log)
+# Generates data.json for /blocked dashboard (IPv4+IPv6 + measured service tracker)
 
 import json
 import ipaddress
@@ -9,17 +9,46 @@ import os
 import sys
 import datetime
 import subprocess
-import socket
 
 BLOCKED_V4_FILE = "/etc/unbound/blocked_ips.txt"
 BLOCKED_V6_FILE = "/etc/unbound/blocked_ipv6.txt"
 CF_V4_FILE = "/etc/unbound/cloudflare_prefixes_v4.txt"
+CF_V6_FILE = "/etc/unbound/cloudflare_prefixes_v6.txt"
 ASN_CACHE_FILE = "/root/xpd-dns/scripts/asn_cache.json"
 SERVICES_HISTORY_FILE = "/root/xpd-dns/scripts/services_history.json"
 REDIRECTS_FILE = "/run/evade-proxy/redirects.txt"
 
 OUT_WEB = "/root/xpd-dns/web/blocked/data.json"
 OUT_WWW = "/var/www/xdp.es/blocked/data.json"
+
+HISTORY_SCHEMA_VERSION = 3
+MAX_INCIDENT_IPS = 12
+# Cloudflare "global CDN" incident only if the live block is more than leftover noise.
+# IPv6 OONI dump is shown in the table but does NOT open service incidents (stale).
+CF_MASS_V4_MIN = 8
+CF_MASS_V6_MIN = 16
+CF_MASS_SLASH24_MIN = 2
+ASN_LOOKUP_BUDGET = 8
+DNS_RESOLVERS = ("1.1.1.1", "8.8.8.8")
+PROBE_V6_FILE = "/etc/unbound/probe_blocked_ipv6.txt"
+
+LEGAL_BASIS = (
+    "Reglamento (UE) 2015/2120 art. 3 (acceso a internet abierta) y art. 3.3.a "
+    "(excepción de cumplimiento de resoluciones judiciales, sujeta a proporcionalidad). "
+    "Ley 11/2022 arts. 76 y 78."
+)
+
+CAUSE_ES = (
+    "Coincidencia entre las IPs resueltas de este servicio y la lista de direcciones "
+    "filtradas en operadoras españolas (hayahora.futbol y/o sonda residencial). "
+    "En jornadas deportivas esos filtros suelen ejecutarse al amparo de resoluciones "
+    "judiciales; esta ficha no identifica por sí sola al autor del bloqueo."
+)
+CAUSE_EN = (
+    "Resolved IPs for this service match the Spanish ISP blocklist (hayahora.futbol "
+    "and/or the residential probe). On match days those filters are typically applied "
+    "under court orders; this record does not by itself identify who ordered the block."
+)
 
 # 1. Load Cloudflare IPv4 Prefixes
 v4_intervals = []
@@ -41,8 +70,24 @@ if os.path.exists(CF_V4_FILE):
     except Exception as e:
         print("Error loading CF v4:", e, file=sys.stderr)
 
+cf_v6_nets = []
+if os.path.exists(CF_V6_FILE):
+    try:
+        with open(CF_V6_FILE) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    try:
+                        cf_v6_nets.append(ipaddress.ip_network(line, strict=False))
+                    except Exception:
+                        pass
+    except Exception as e:
+        print("Error loading CF v6:", e, file=sys.stderr)
+
+
 def find_cf_v4(ip_str):
-    if not v4_starts: return None
+    if not v4_starts:
+        return None
     try:
         ip_int = int(ipaddress.IPv4Address(ip_str))
         idx = bisect.bisect_right(v4_starts, ip_int) - 1
@@ -54,7 +99,18 @@ def find_cf_v4(ip_str):
     except Exception:
         return None
 
-# Load ASN Cache
+
+def find_cf_v6(ip_str):
+    try:
+        ip = ipaddress.IPv6Address(ip_str)
+    except Exception:
+        return None
+    for net in cf_v6_nets:
+        if ip in net:
+            return str(net)
+    return None
+
+
 def load_asn_cache():
     if os.path.exists(ASN_CACHE_FILE):
         try:
@@ -63,6 +119,7 @@ def load_asn_cache():
         except Exception:
             return {}
     return {}
+
 
 def get_origin_info(ip_str, cache):
     cached = cache.get(ip_str)
@@ -89,33 +146,35 @@ def get_origin_info(ip_str, cache):
         pass
     return None
 
-# Load blocked IPv4s
-blocked_v4 = []
-if os.path.exists(BLOCKED_V4_FILE):
-    with open(BLOCKED_V4_FILE) as f:
+
+def load_ip_list(path):
+    out = []
+    if not os.path.exists(path):
+        return out
+    with open(path) as f:
         for line in f:
             line = line.strip()
             if line and not line.startswith("#"):
-                blocked_v4.append(line)
+                out.append(line)
+    return out
 
+
+blocked_v4 = load_ip_list(BLOCKED_V4_FILE)
+blocked_v6 = load_ip_list(BLOCKED_V6_FILE)
 blocked_v4_set = set(blocked_v4)
-
-# Load blocked IPv6s
-blocked_v6 = []
-if os.path.exists(BLOCKED_V6_FILE):
-    with open(BLOCKED_V6_FILE) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith("#"):
-                blocked_v6.append(line)
-
 blocked_v6_set = set(blocked_v6)
+# High-confidence current IPv6 (residential probe). The OONI dump is static and noisy.
+probe_v6_set = set(load_ip_list(PROBE_V6_FILE))
+live_v6_set = probe_v6_set
 
 # Load active evade redirects
 active_redirects = {}
+now_utc = datetime.datetime.now(datetime.timezone.utc)
+now_ts = int(now_utc.timestamp())
+today_str = now_utc.strftime("%Y-%m-%d")
+
 if os.path.exists(REDIRECTS_FILE):
     try:
-        now_ts = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
         with open(REDIRECTS_FILE) as f:
             for line in f:
                 line = line.strip()
@@ -129,13 +188,14 @@ if os.path.exists(REDIRECTS_FILE):
     except Exception:
         pass
 
+
 # NOTA DE PARIDAD: este algoritmo replica 1:1 a `evasive_v4` del proxy Rust
 # (evade-proxy/src/main.rs). Si se cambia aquí, cambiar allí también — y viceversa.
 def get_evasive_v4(ip_str):
     cf = find_cf_v4(ip_str)
     if not cf:
         return ip_str, None, False
-    
+
     start_int, end_int, net_str = cf
     try:
         ip_int = int(ipaddress.IPv4Address(ip_str))
@@ -166,14 +226,20 @@ def get_evasive_v4(ip_str):
     except Exception:
         return ip_str, None, False
 
+
 entries = []
 origin_cache = load_asn_cache()
+asn_lookups_used = 0
 
-# Process IPv4 Only
 for ip in sorted(blocked_v4, key=lambda x: [int(p) for p in x.split('.') if p.isdigit()]):
     alt_ip, net_str, is_evaded = get_evasive_v4(ip)
     is_cf = net_str is not None
-    origin = None if is_cf else get_origin_info(ip, origin_cache)
+    origin = None
+    if not is_cf:
+        if ip in origin_cache or asn_lookups_used < ASN_LOOKUP_BUDGET:
+            if ip not in origin_cache:
+                asn_lookups_used += 1
+            origin = get_origin_info(ip, origin_cache)
     prefix = net_str
     if prefix is None and origin:
         prefix = origin.get("bgp_prefix")
@@ -182,6 +248,7 @@ for ip in sorted(blocked_v4, key=lambda x: [int(p) for p in x.split('.') if p.is
         "blocked_ip": ip,
         "type": "IPv4",
         "is_cloudflare": is_cf,
+        "list_source": "live",
         "prefix": prefix or "Otros",
         "alternative_ip": alt_ip,
         "status": "Evadida (Limpia)" if is_evaded else ("Otros (Intacta)" if not is_cf else "Sin alternativa disponible")
@@ -191,16 +258,49 @@ for ip in sorted(blocked_v4, key=lambda x: [int(p) for p in x.split('.') if p.is
         entry["org"] = origin.get("org")
     entries.append(entry)
 
+
+def v6_sort_key(ip_str):
+    try:
+        return int(ipaddress.IPv6Address(ip_str))
+    except Exception:
+        return 0
+
+
+for ip in sorted(blocked_v6, key=v6_sort_key):
+    net_str = find_cf_v6(ip)
+    is_cf = net_str is not None
+    entry = {
+        "blocked_ip": ip,
+        "type": "IPv6",
+        "is_cloudflare": is_cf,
+        "list_source": "probe" if ip in probe_v6_set else "ooni",
+        "prefix": net_str or "Otros",
+        "alternative_ip": ip,
+        "status": "Listada (IPv6)" if is_cf else "Otros (Intacta)"
+    }
+    entries.append(entry)
+
 total_blocked = len(entries)
 cf_blocked_count = sum(1 for e in entries if e["is_cloudflare"])
+cf_v4_blocked_count = sum(1 for e in entries if e["is_cloudflare"] and e["type"] == "IPv4")
+cf_v6_blocked_count = sum(1 for e in entries if e["is_cloudflare"] and e["type"] == "IPv6")
 evaded_count = sum(1 for e in entries if e["status"].startswith("Evadida"))
 
-now_utc = datetime.datetime.now(datetime.timezone.utc)
-now_ts = int(now_utc.timestamp())
-today_str = now_utc.strftime("%Y-%m-%d")
+cf_v4_slash24 = set()
+for e in entries:
+    if e["is_cloudflare"] and e["type"] == "IPv4":
+        parts = e["blocked_ip"].split(".")
+        if len(parts) == 4:
+            cf_v4_slash24.add(".".join(parts[:3]))
+
+probe_cf_v6_count = sum(1 for ip in live_v6_set if find_cf_v6(ip))
+cf_mass_block = (
+    cf_v4_blocked_count >= CF_MASS_V4_MIN
+    or probe_cf_v6_count >= CF_MASS_V6_MIN
+)
 
 # ==============================================================================
-# MONITORED SERVICES SPECIFICATION & TIME TRACKER
+# MONITORED SERVICES
 # ==============================================================================
 
 SERVICE_DEFINITIONS = [
@@ -210,16 +310,17 @@ SERVICE_DEFINITIONS = [
         "category_key": "blocked.category_dev",
         "default_category": "Desarrollo / DevOps",
         "icon": "docker",
+        "critical": True,
         "domains": [
             "production.cloudflare.docker.com",
             "hub.docker.com",
             "auth.docker.io"
         ],
         "strategy": "cf-anycast",
-        "impact_es": "Fallo en 'docker pull' y descarga de imágenes en Docker Hub por órdenes judiciales a operadoras.",
-        "impact_en": "Failed 'docker pull' and image downloads from Docker Hub due to ISP court-ordered blocking.",
+        "impact_es": "Fallo en 'docker pull' y descarga de imágenes en Docker Hub cuando las IPs anycast coinciden con la blocklist.",
+        "impact_en": "Failed 'docker pull' and Docker Hub image downloads when anycast IPs match the blocklist.",
         "mitigation_es": "Reescritura dinámica Anycast a IP limpia de la misma subred (TTL=0).",
-        "mitigation_en": "Dynamic Anycast rewrite to clean subnet IP with zero TTL."
+        "mitigation_en": "Dynamic Anycast rewrite to a clean subnet IP with zero TTL."
     },
     {
         "id": "github",
@@ -227,6 +328,7 @@ SERVICE_DEFINITIONS = [
         "category_key": "blocked.category_git",
         "default_category": "Git & Repositorios",
         "icon": "github",
+        "critical": True,
         "domains": [
             "github.com",
             "raw.githubusercontent.com",
@@ -234,57 +336,78 @@ SERVICE_DEFINITIONS = [
             "gist.githubusercontent.com"
         ],
         "strategy": "verified-pool",
-        "impact_es": "Caídas en git clone, descarga de raw assets y acceso a gists por bloqueos a CDN Fastly / GitHub frontend.",
-        "impact_en": "Git clone timeouts, raw assets and gist download failures from Fastly/GitHub frontend ISP filtering.",
+        "impact_es": "Caídas en git clone, raw assets y gists cuando el frontend (Fastly / GitHub) está en la blocklist o la sonda fuerza un redirect.",
+        "impact_en": "git clone, raw assets and gist failures when the frontend is on the blocklist or the probe installs a redirect.",
         "mitigation_es": "Redirección a pool de failover verificado desde sonda residencial.",
-        "mitigation_en": "Redirection to verified healthy frontend pool via residential probe."
+        "mitigation_en": "Redirection to a verified healthy frontend pool via residential probe."
     },
     {
-        "id": "steam",
-        "name": "Steam",
-        "category_key": "blocked.category_gaming",
-        "default_category": "Gaming & Tienda",
-        "icon": "steam",
+        "id": "gitlab",
+        "name": "GitLab",
+        "category_key": "blocked.category_git",
+        "default_category": "Git & Repositorios",
+        "icon": "gitlab",
+        "critical": True,
         "domains": [
-            "store.steampowered.com",
-            "steamcommunity.com"
+            "gitlab.com",
+            "registry.gitlab.com"
         ],
-        "strategy": "verified-pool",
-        "impact_es": "Problemas de acceso a la tienda Steam, descargas y foros comunitarios por bloqueos colaterales en Akamai.",
-        "impact_en": "Intermittent timeouts accessing Steam Store, downloads and community pages from Akamai edge blocks.",
-        "mitigation_es": "Sustitución transparente por edges Akamai comprobados y operativos.",
-        "mitigation_en": "Transparent redirection to verified operational Akamai edges."
+        "strategy": "cf-anycast",
+        "impact_es": "Interrupción de git, CI y registry de GitLab si sus IPs Cloudflare/Fastly coinciden con el filtro.",
+        "impact_en": "Git, CI and GitLab registry interruption if Cloudflare/Fastly IPs match the filter.",
+        "mitigation_es": "Evasión Anycast o redirect a IP verificada cuando la sonda lo confirma.",
+        "mitigation_en": "Anycast evasion or redirect to a verified IP when the probe confirms it."
     },
     {
-        "id": "twitch",
-        "name": "Twitch",
-        "category_key": "blocked.category_streaming",
-        "default_category": "Streaming & Vídeo",
-        "icon": "twitch",
+        "id": "npm",
+        "name": "npm registry",
+        "category_key": "blocked.category_pkg",
+        "default_category": "Paquetes / CI",
+        "icon": "npm",
+        "critical": True,
         "domains": [
-            "twitch.tv"
+            "registry.npmjs.org",
+            "npmjs.com"
         ],
-        "strategy": "verified-pool",
-        "impact_es": "Interrupción de directos y fallos de conexión por bloqueo en servidores de borde Fastly.",
-        "impact_en": "Live stream drops and connection failures due to collateral CDN edge filtering.",
-        "mitigation_es": "Conmutación automática a servidores de borde Fastly sin bloqueo.",
-        "mitigation_en": "Automatic switching to unblocked Fastly edge servers."
+        "strategy": "cf-anycast",
+        "impact_es": "Fallo de 'npm install' / 'yarn' / 'pnpm' en pipelines y estaciones de trabajo.",
+        "impact_en": "'npm install' / yarn / pnpm failures in pipelines and workstations.",
+        "mitigation_es": "Reescritura Anycast a IP Cloudflare no filtrada (TTL=0).",
+        "mitigation_en": "Anycast rewrite to an unfiltered Cloudflare IP (TTL=0)."
     },
     {
-        "id": "deepseek",
-        "name": "DeepSeek",
-        "category_key": "blocked.category_ai",
-        "default_category": "IA & APIs",
-        "icon": "deepseek",
+        "id": "pypi",
+        "name": "PyPI",
+        "category_key": "blocked.category_pkg",
+        "default_category": "Paquetes / CI",
+        "icon": "pypi",
+        "critical": True,
         "domains": [
-            "api-docs.deepseek.com",
-            "deepseek.com"
+            "pypi.org",
+            "files.pythonhosted.org"
         ],
         "strategy": "verified-pool",
-        "impact_es": "Bloqueos colaterales en endpoints de documentación técnica y llamadas API de desarrolladores.",
-        "impact_en": "Collateral ISP filtering impacting technical documentation and developer API requests.",
-        "mitigation_es": "Enrutamiento continuo a IPs de servicio verificadas y activas.",
-        "mitigation_en": "Continuous routing to verified active service IPs."
+        "impact_es": "Fallo de 'pip install' y descarga de wheels alojados en Fastly.",
+        "impact_en": "'pip install' and wheel download failures on Fastly-hosted PyPI.",
+        "mitigation_es": "Redirect a un edge Fastly no presente en la blocklist cuando la sonda lo verifica.",
+        "mitigation_en": "Redirect to a Fastly edge not present on the blocklist when the probe verifies it."
+    },
+    {
+        "id": "letsencrypt",
+        "name": "Let's Encrypt (ACME)",
+        "category_key": "blocked.category_pki",
+        "default_category": "Certificados TLS",
+        "icon": "letsencrypt",
+        "critical": True,
+        "domains": [
+            "acme-v02.api.letsencrypt.org",
+            "letsencrypt.org"
+        ],
+        "strategy": "cf-anycast",
+        "impact_es": "Fallo de emisión/renovación de certificados (HTTP-01 / ACME) si el API cae en IPs filtradas.",
+        "impact_en": "Certificate issuance/renewal failures (HTTP-01 / ACME) if the API lands on filtered IPs.",
+        "mitigation_es": "Reescritura Anycast del API ACME cuando su frontend Cloudflare está en la lista.",
+        "mitigation_en": "Anycast rewrite of the ACME API when its Cloudflare frontend is listed."
     },
     {
         "id": "cloudflare",
@@ -292,16 +415,51 @@ SERVICE_DEFINITIONS = [
         "category_key": "blocked.category_cdn",
         "default_category": "CDN Global Anycast",
         "icon": "cloudflare",
+        "critical": True,
         "domains": [
             "*.cloudflare.com"
         ],
         "strategy": "cf-anycast",
-        "impact_es": "Miles de páginas web, blogs y APIs legítimas caídas por bloqueos de subredes Anycast completas.",
-        "impact_en": "Thousands of innocent websites and APIs unreachable due to indiscriminate Anycast IP subnet bans.",
-        "mitigation_es": "Evasión ultrarrápida en memoria saltando a nodos BGP contiguos no bloqueados.",
-        "mitigation_en": "Ultra-fast in-memory evasion hopping to unblocked neighboring BGP nodes."
+        "impact_es": "Sitios y APIs ajenos al objeto del bloqueo quedan inalcanzables al filtrar IPs anycast compartidas.",
+        "impact_en": "Unrelated sites and APIs become unreachable when shared anycast IPs are filtered.",
+        "mitigation_es": "Sustitución en memoria por direcciones del mismo prefijo BGP no presentes en la blocklist.",
+        "mitigation_en": "In-memory replacement with same-BGP-prefix addresses not present on the blocklist."
+    },
+    {
+        "id": "steam",
+        "name": "Steam",
+        "category_key": "blocked.category_gaming",
+        "default_category": "Gaming & Tienda",
+        "icon": "steam",
+        "critical": False,
+        "domains": [
+            "store.steampowered.com",
+            "steamcommunity.com"
+        ],
+        "strategy": "verified-pool",
+        "impact_es": "Timeouts en tienda y comunidad Steam si los edges Akamai coinciden con la blocklist.",
+        "impact_en": "Steam Store and community timeouts if Akamai edges match the blocklist.",
+        "mitigation_es": "Sustitución por edges Akamai comprobados por la sonda.",
+        "mitigation_en": "Replacement with Akamai edges verified by the probe."
+    },
+    {
+        "id": "twitch",
+        "name": "Twitch",
+        "category_key": "blocked.category_streaming",
+        "default_category": "Streaming & Vídeo",
+        "icon": "twitch",
+        "critical": False,
+        "domains": [
+            "twitch.tv"
+        ],
+        "strategy": "verified-pool",
+        "impact_es": "Cortes de directos si el edge Fastly de Twitch está filtrado.",
+        "impact_en": "Live stream drops if Twitch's Fastly edge is filtered.",
+        "mitigation_es": "Conmutación a un edge Fastly no filtrado verificado por la sonda.",
+        "mitigation_en": "Failover to an unfiltered Fastly edge verified by the probe."
     }
 ]
+
 
 def format_duration(seconds):
     if seconds <= 0:
@@ -312,462 +470,354 @@ def format_duration(seconds):
         return f"{hours}h {minutes:02d}m"
     return f"{max(1, minutes)}m"
 
+
+MONTHS_ES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+MONTHS_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+
 def format_date_human(dt):
-    months_es = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
-    months_en = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     m_idx = dt.month - 1
-    es_str = f"{dt.day} {months_es[m_idx]} {dt.strftime('%H:%M')} UTC"
-    en_str = f"{months_en[m_idx]} {dt.day}, {dt.strftime('%H:%M')} UTC"
+    es_str = f"{dt.day} {MONTHS_ES[m_idx]} {dt.strftime('%H:%M')} UTC"
+    en_str = f"{MONTHS_EN[m_idx]} {dt.day}, {dt.strftime('%H:%M')} UTC"
     return {"es": es_str, "en": en_str}
 
+
+def format_date_only(dt):
+    m_idx = dt.month - 1
+    return {
+        "es": f"{dt.day} {MONTHS_ES[m_idx]} {dt.year}",
+        "en": f"{MONTHS_EN[m_idx]} {dt.day}, {dt.year}"
+    }
+
+
+def is_ip_literal(value):
+    try:
+        ipaddress.ip_address(value)
+        return True
+    except Exception:
+        return False
+
+
 dns_cache = {}
+
+
 def resolve_domain_ips(domain):
     if domain in dns_cache:
         return dns_cache[domain]
     if domain.startswith("*."):
+        dns_cache[domain] = []
         return []
-    try:
-        ips = socket.gethostbyname_ex(domain)[2]
-        dns_cache[domain] = ips
-        return ips
-    except Exception:
-        return []
+    found = []
+    for rtype in ("A", "AAAA"):
+        answers = []
+        for server in DNS_RESOLVERS:
+            try:
+                cmd = ["dig", f"@{server}", "+short", "+time=1", "+tries=1", rtype, domain]
+                out = subprocess.check_output(cmd, timeout=2.0).decode("utf-8", errors="replace")
+                for line in out.splitlines():
+                    token = line.strip().rstrip(".")
+                    if is_ip_literal(token):
+                        answers.append(token)
+                if answers:
+                    break
+            except Exception:
+                continue
+        found.extend(answers)
+    # unique, stable
+    seen = set()
+    ips = []
+    for ip_val in found:
+        if ip_val not in seen:
+            seen.add(ip_val)
+            ips.append(ip_val)
+    dns_cache[domain] = ips
+    return ips
 
-def is_service_blocked(svc):
+
+def clip_ips(ips):
+    unique = []
+    seen = set()
+    for ip_val in ips:
+        if ip_val not in seen:
+            seen.add(ip_val)
+            unique.append(ip_val)
+    return unique[:MAX_INCIDENT_IPS], len(unique)
+
+
+def inspect_service(svc):
+    """Return (is_blocked, matched_ips, matched_domains, sources)."""
+    matched_ips = []
+    matched_domains = []
+    sources = set()
+
     if svc["id"] == "cloudflare":
-        return cf_blocked_count > 0
+        if not cf_mass_block:
+            return False, [], [], set()
+        sources.add("blocklist")
+        cf_ips = [e["blocked_ip"] for e in entries if e["is_cloudflare"]]
+        return True, cf_ips, list(svc["domains"]), sources
 
     for dom in svc["domains"]:
         if dom in active_redirects:
-            return True
+            sources.add("probe")
+            matched_domains.append(dom)
+            target = active_redirects.get(dom)
+            if target:
+                matched_ips.append(target)
 
-    for dom in svc["domains"]:
-        ips = resolve_domain_ips(dom)
-        for ip_val in ips:
-            if ip_val in blocked_v4_set or ip_val in blocked_v6_set:
-                return True
+        for ip_val in resolve_domain_ips(dom):
+            try:
+                ver = ipaddress.ip_address(ip_val).version
+            except Exception:
+                continue
+            hit = False
+            if ver == 4 and ip_val in blocked_v4_set:
+                hit = True
+            elif ver == 6 and ip_val in live_v6_set:
+                hit = True
+            if hit:
+                sources.add("blocklist")
+                matched_ips.append(ip_val)
+                if dom not in matched_domains:
+                    matched_domains.append(dom)
 
-    return False
+    is_blocked = bool(sources)
+    return is_blocked, matched_ips, matched_domains or list(svc["domains"]), sources
 
-# ==============================================================================
-# HISTORICAL AUDIT LOG (PERICIAL / JUDICIAL EVIDENCE LOG)
-# ==============================================================================
 
-HISTORICAL_INCIDENTS_SEED = [
-    {
-        "id": "INC-20260830-01",
-        "service_id": "docker",
-        "service_name": "Docker / Docker Hub",
-        "status": "resolved",
-        "start_ts": 1788117000,
-        "end_ts": 1788124200,
-        "duration_seconds": 7200,
-        "duration_formatted": "2h 00m",
-        "date_es": "30 Ago 2026",
-        "date_en": "Aug 30, 2026",
-        "time_window_es": "18:30 – 20:30 UTC (20:30 – 22:30 CEST)",
-        "time_window_en": "18:30 – 20:30 UTC (20:30 – 22:30 CEST)",
-        "affected_targets": ["production.cloudflare.docker.com", "hub.docker.com", "auth.docker.io"],
-        "blocked_ips": ["104.16.97.215", "104.16.98.215", "104.18.43.187"],
-        "cause_es": "Bloqueo dinámico ordenado a operadoras por LaLiga durante la Jornada 3.",
-        "cause_en": "Dynamic block ordered to Spanish ISPs by LaLiga during Matchday 3.",
-        "impact_es": "Fallo completo de descargas 'docker pull' y timeout TLS en Docker Hub desde Movistar, Orange, Vodafone y Digi.",
-        "impact_en": "Complete 'docker pull' download failure and TLS timeout on Docker Hub from Spanish ISPs.",
-        "mitigation_es": "xdp.es DNS reescribió las consultas a IPs contiguas no censuradas con TTL=0.",
-        "mitigation_en": "xdp.es DNS rewrote queries to uncensored neighboring IPs with TTL=0.",
-        "legal_basis": "Reglamento (UE) 2015/2120 (Neutralidad de la Red) / Ley 11/2022 General de Telecomunicaciones."
-    },
-    {
-        "id": "INC-20260830-02",
-        "service_id": "github",
-        "service_name": "GitHub",
-        "status": "resolved",
-        "start_ts": 1788117000,
-        "end_ts": 1788122400,
-        "duration_seconds": 5400,
-        "duration_formatted": "1h 30m",
-        "date_es": "30 Ago 2026",
-        "date_en": "Aug 30, 2026",
-        "time_window_es": "18:30 – 20:00 UTC (20:30 – 22:00 CEST)",
-        "time_window_en": "18:30 – 20:00 UTC (20:30 – 22:00 CEST)",
-        "affected_targets": ["github.com", "raw.githubusercontent.com", "gist.github.com"],
-        "blocked_ips": ["140.82.121.4", "185.199.108.133"],
-        "cause_es": "Filtrado indiscriminado de frontend Fastly por orden judicial de bloqueo deportivo.",
-        "cause_en": "Indiscriminate Fastly frontend filtering under sports court block injunction.",
-        "impact_es": "Caída en operaciones 'git fetch/pull/clone' sobre repositorios públicos y descarga de assets crudos.",
-        "impact_en": "Interruption of 'git fetch/pull/clone' repository operations and raw asset downloads.",
-        "mitigation_es": "Conmutación mediante pool residencial verificado a IP sana de GitHub (140.82.112.3).",
-        "mitigation_en": "Failover to verified healthy GitHub edge IP (140.82.112.3) via residential probe.",
-        "legal_basis": "Reglamento (UE) 2015/2120 (Neutralidad de la Red) / Art. 1101 Código Civil (Daños colaterales)."
-    },
-    {
-        "id": "INC-20260830-03",
-        "service_id": "cloudflare",
-        "service_name": "Cloudflare CDN (Global)",
-        "status": "resolved",
-        "start_ts": 1788117000,
-        "end_ts": 1788124200,
-        "duration_seconds": 7200,
-        "duration_formatted": "2h 00m",
-        "date_es": "30 Ago 2026",
-        "date_en": "Aug 30, 2026",
-        "time_window_es": "18:30 – 20:30 UTC (20:30 – 22:30 CEST)",
-        "time_window_en": "18:30 – 20:30 UTC (20:30 – 22:30 CEST)",
-        "affected_targets": ["Subredes Anycast 104.16.0.0/13 y 104.24.0.0/14"],
-        "blocked_ips": ["104.21.66.156", "104.21.78.162", "172.67.140.88"],
-        "cause_es": "Bloqueo de rangos IP Anycast en operadoras españolas durante partidos de fútbol.",
-        "cause_en": "Anycast IP range blocks across Spanish ISPs during football matches.",
-        "impact_es": "Inaccesibilidad de miles de páginas web inocentes y APIs empresariales alojadas en Cloudflare.",
-        "impact_en": "Inaccessibility of thousands of innocent websites and enterprise APIs on Cloudflare.",
-        "mitigation_es": "Sustitución en memoria de IPs bloqueadas por direcciones IP limpias en la misma subred BGP.",
-        "mitigation_en": "In-memory DNS replacement of blocked IPs with clean addresses in the same BGP prefix.",
-        "legal_basis": "Reglamento (UE) 2015/2120 de Neutralidad de la Red / SETID Expedientes Sancionadores."
-    },
-    {
-        "id": "INC-20260830-04",
-        "service_id": "twitch",
-        "service_name": "Twitch",
-        "status": "resolved",
-        "start_ts": 1788117000,
-        "end_ts": 1788123000,
-        "duration_seconds": 6000,
-        "duration_formatted": "1h 40m",
-        "date_es": "30 Ago 2026",
-        "date_en": "Aug 30, 2026",
-        "time_window_es": "18:30 – 20:10 UTC (20:30 – 22:10 CEST)",
-        "time_window_en": "18:30 – 20:10 UTC (20:30 – 22:10 CEST)",
-        "affected_targets": ["twitch.tv"],
-        "blocked_ips": ["151.101.2.167"],
-        "cause_es": "Filtrado colateral en servidor de borde Fastly por coincidencia en streamings bloqueados.",
-        "cause_en": "Collateral filtering on Fastly edge server due to streaming block overlap.",
-        "impact_es": "Caída de directos y fallos en carga de streams de vídeo para espectadores en España.",
-        "impact_en": "Live stream drop and video playback errors for viewers in Spain.",
-        "mitigation_es": "Redirección en tiempo real a edge alternativo no bloqueado (151.101.66.167).",
-        "mitigation_en": "Real-time redirection to unblocked alternative edge (151.101.66.167).",
-        "legal_basis": "Reglamento (UE) 2015/2120 / Ley 11/2022 General de Telecomunicaciones."
-    },
-    {
-        "id": "INC-20260830-05",
-        "service_id": "steam",
-        "service_name": "Steam",
-        "status": "resolved",
-        "start_ts": 1788118800,
-        "end_ts": 1788123600,
-        "duration_seconds": 4800,
-        "duration_formatted": "1h 20m",
-        "date_es": "30 Ago 2026",
-        "date_en": "Aug 30, 2026",
-        "time_window_es": "19:00 – 20:20 UTC (21:00 – 22:20 CEST)",
-        "time_window_en": "19:00 – 20:20 UTC (21:00 – 22:20 CEST)",
-        "affected_targets": ["store.steampowered.com", "steamcommunity.com"],
-        "blocked_ips": ["23.46.85.17", "2.22.208.231"],
-        "cause_es": "Bloqueo en nodos de Akamai CDN por resoluciones judiciales cautelares.",
-        "cause_en": "Akamai CDN edge nodes blocked under preliminary court injunctions.",
-        "impact_es": "Timeouts en tienda Steam, autenticación comunitaria y descargas de parches.",
-        "impact_en": "Timeouts on Steam Store, community authentication and game patch downloads.",
-        "mitigation_es": "Sustitución en caliente por IP operativa verificada de Akamai.",
-        "mitigation_en": "Hot replacement with verified operational Akamai IP.",
-        "legal_basis": "Reglamento (UE) 2015/2120 / Directiva de Comercio Electrónico."
-    },
-    {
-        "id": "INC-20260829-01",
-        "service_id": "docker",
-        "service_name": "Docker / Docker Hub",
-        "status": "resolved",
-        "start_ts": 1788030600,
-        "end_ts": 1788037800,
-        "duration_seconds": 7200,
-        "duration_formatted": "2h 00m",
-        "date_es": "29 Ago 2026",
-        "date_en": "Aug 29, 2026",
-        "time_window_es": "19:00 – 21:00 UTC (21:00 – 23:00 CEST)",
-        "time_window_en": "19:00 – 21:00 UTC (21:00 – 23:00 CEST)",
-        "affected_targets": ["production.cloudflare.docker.com", "hub.docker.com"],
-        "blocked_ips": ["104.16.100.215", "104.18.43.178"],
-        "cause_es": "Bloqueo BGP de LaLiga en jornada de liga (Jornada 3).",
-        "cause_en": "LaLiga BGP block during league matchday (Matchday 3).",
-        "impact_es": "Interrupción de pipelines de integración continua (CI/CD) dependientes de Docker Hub.",
-        "impact_en": "Disruption of CI/CD pipelines dependent on Docker Hub downloads.",
-        "mitigation_es": "Evasión Anycast por IP limpia contigua (TTL=0).",
-        "mitigation_en": "Anycast evasion using clean adjacent IP (TTL=0).",
-        "legal_basis": "Reglamento (UE) 2015/2120 de Neutralidad de la Red."
-    },
-    {
-        "id": "INC-20260829-02",
-        "service_id": "deepseek",
-        "service_name": "DeepSeek",
-        "status": "resolved",
-        "start_ts": 1788034200,
-        "end_ts": 1788037800,
-        "duration_seconds": 3600,
-        "duration_formatted": "1h 00m",
-        "date_es": "29 Ago 2026",
-        "date_en": "Aug 29, 2026",
-        "time_window_es": "19:30 – 20:30 UTC (21:30 – 22:30 CEST)",
-        "time_window_en": "19:30 – 20:30 UTC (21:30 – 22:30 CEST)",
-        "affected_targets": ["api-docs.deepseek.com", "deepseek.com"],
-        "blocked_ips": ["43.174.109.86"],
-        "cause_es": "Filtrado erróneo de nodo CDN asiático en operadoras españolas.",
-        "cause_en": "Erroneous filtering of Asian CDN node across Spanish ISPs.",
-        "impact_es": "Bloqueo de llamadas a APIs de desarrolladores y consultas de documentación.",
-        "impact_en": "Blocked developer API calls and technical documentation queries.",
-        "mitigation_es": "Redirección inmediata a endpoint IP sano.",
-        "mitigation_en": "Immediate redirection to healthy IP endpoint.",
-        "legal_basis": "Reglamento (UE) 2015/2120 / Responsabilidad por daños a servicios TIC."
-    },
-    {
-        "id": "INC-20260823-01",
-        "service_id": "docker",
-        "service_name": "Docker / Docker Hub",
-        "status": "resolved",
-        "start_ts": 1787512200,
-        "end_ts": 1787519400,
-        "duration_seconds": 7200,
-        "duration_formatted": "2h 00m",
-        "date_es": "23 Ago 2026",
-        "date_en": "Aug 23, 2026",
-        "time_window_es": "18:30 – 20:30 UTC (20:30 – 22:30 CEST)",
-        "time_window_en": "18:30 – 20:30 UTC (20:30 – 22:30 CEST)",
-        "affected_targets": ["production.cloudflare.docker.com", "auth.docker.io"],
-        "blocked_ips": ["104.16.99.215", "172.64.144.78"],
-        "cause_es": "Bloqueo masivo de subredes Cloudflare durante la Jornada 2 de LaLiga.",
-        "cause_en": "Massive Cloudflare subnet block during LaLiga Matchday 2.",
-        "impact_es": "Imposibilidad de desplegar contenedores en servidores en España.",
-        "impact_en": "Inability to deploy Docker containers on servers across Spain.",
-        "mitigation_es": "Evasión automática Anycast con TTL=0.",
-        "mitigation_en": "Automatic Anycast evasion with zero TTL.",
-        "legal_basis": "Reglamento (UE) 2015/2120 de Neutralidad de la Red."
-    },
-    {
-        "id": "INC-20260823-02",
-        "service_id": "github",
-        "service_name": "GitHub",
-        "status": "resolved",
-        "start_ts": 1787512200,
-        "end_ts": 1787517600,
-        "duration_seconds": 5400,
-        "duration_formatted": "1h 30m",
-        "date_es": "23 Ago 2026",
-        "date_en": "Aug 23, 2026",
-        "time_window_es": "18:30 – 20:00 UTC (20:30 – 22:00 CEST)",
-        "time_window_en": "18:30 – 20:00 UTC (20:30 – 22:00 CEST)",
-        "affected_targets": ["raw.githubusercontent.com", "gist.github.com"],
-        "blocked_ips": ["185.199.110.133"],
-        "cause_es": "Filtrado Fastly colateral en Jornada 2 de fútbol.",
-        "cause_en": "Collateral Fastly filtering during Matchday 2.",
-        "impact_es": "Scripts de instalación (curl ... | bash) y raw snippets fallando con Connection Timeout.",
-        "impact_en": "Installation scripts and raw snippets failing with Connection Timeout.",
-        "mitigation_es": "Pool de failover residencial redirigiendo a IP operativa.",
-        "mitigation_en": "Residential failover pool redirecting to operational IP.",
-        "legal_basis": "Reglamento (UE) 2015/2120 / Reclamación ante SETID."
-    },
-    {
-        "id": "INC-20260816-01",
-        "service_id": "docker",
-        "service_name": "Docker / Docker Hub",
-        "status": "resolved",
-        "start_ts": 1786907400,
-        "end_ts": 1786914600,
-        "duration_seconds": 7200,
-        "duration_formatted": "2h 00m",
-        "date_es": "16 Ago 2026",
-        "date_en": "Aug 16, 2026",
-        "time_window_es": "18:30 – 20:30 UTC (20:30 – 22:30 CEST)",
-        "time_window_en": "18:30 – 20:30 UTC (20:30 – 22:30 CEST)",
-        "affected_targets": ["production.cloudflare.docker.com"],
-        "blocked_ips": ["104.16.97.215"],
-        "cause_es": "Primer bloqueo masivo de la temporada 2026/27 (Jornada 1).",
-        "cause_en": "First massive block of the 2026/27 season (Matchday 1).",
-        "impact_es": "Descarga de imágenes Docker detenida en cientos de empresas españolas.",
-        "impact_en": "Docker image pulling halted across hundreds of Spanish companies.",
-        "mitigation_es": "Reescritura dinámica de IP en memoria xdp.es.",
-        "mitigation_en": "Dynamic in-memory xdp.es DNS IP rewriting.",
-        "legal_basis": "Reglamento (UE) 2015/2120 / Ley General de Telecomunicaciones."
+def source_label(sources):
+    if sources >= {"blocklist", "probe"}:
+        return {
+            "id": "blocklist+probe",
+            "es": "Blocklist pública + sonda residencial",
+            "en": "Public blocklist + residential probe"
+        }
+    if "probe" in sources:
+        return {
+            "id": "probe",
+            "es": "Sonda residencial (redirect verificado)",
+            "en": "Residential probe (verified redirect)"
+        }
+    return {
+        "id": "blocklist",
+        "es": "Lista pública de IPs bloqueadas",
+        "en": "Public blocked-IP list"
     }
-]
+
+
+def empty_service_hist():
+    return {
+        "total_blocked_seconds": 0,
+        "current_incident_start": None,
+        "last_incident": None,
+        "daily_buckets": {}
+    }
+
+
+def empty_history():
+    return {
+        "schema_version": HISTORY_SCHEMA_VERSION,
+        "last_check_ts": now_ts,
+        "active_incidents": {},
+        "incidents": [],
+        "services": {}
+    }
+
+
+def is_measured_incident(inc):
+    src = inc.get("source") or inc.get("source_id")
+    return src in ("blocklist", "probe", "blocklist+probe")
+
+
+def last_incident_from(inc):
+    start_ts = inc.get("start_ts") or 0
+    start_dt = datetime.datetime.fromtimestamp(start_ts, datetime.timezone.utc) if start_ts else now_utc
+    formatted = format_date_human(start_dt)
+    return {
+        "start_ts": start_ts,
+        "end_ts": inc.get("end_ts"),
+        "duration_seconds": inc.get("duration_seconds", 0),
+        "date_str": formatted["es"],
+        "date_en": formatted["en"]
+    }
+
+
+def migrate_history(data):
+    measured = [inc for inc in data.get("incidents", []) if is_measured_incident(inc)]
+    old_services = data.get("services") or {}
+    new_services = {}
+
+    for svc in SERVICE_DEFINITIONS:
+        sid = svc["id"]
+        old = old_services.get(sid) or {}
+        start = old.get("current_incident_start")
+        keep_start = None
+        if isinstance(start, int) and start > 0 and (now_ts - start) < 48 * 3600:
+            keep_start = start
+
+        today_secs = 0
+        buckets = old.get("daily_buckets") or {}
+        if keep_start and today_str in buckets:
+            today_secs = int(buckets.get(today_str) or 0)
+
+        resolved = [i for i in measured if i.get("service_id") == sid and i.get("status") == "resolved"]
+        resolved.sort(key=lambda x: x.get("start_ts", 0), reverse=True)
+
+        total = sum(int(i.get("duration_seconds") or 0) for i in resolved)
+        if keep_start:
+            total += max(0, now_ts - keep_start)
+
+        last = last_incident_from(resolved[0]) if resolved else None
+        new_services[sid] = {
+            "total_blocked_seconds": total,
+            "current_incident_start": keep_start,
+            "last_incident": last,
+            "daily_buckets": {today_str: today_secs} if today_secs else {}
+        }
+
+    old_active = data.get("active_incidents") or {}
+    new_active = {}
+    for sid, inc in old_active.items():
+        if is_measured_incident(inc) or (isinstance(inc, dict) and inc.get("status") == "ongoing"):
+            if not inc.get("source"):
+                inc = dict(inc)
+                inc["source"] = "blocklist"
+                inc["source_es"] = "Lista pública de IPs bloqueadas"
+                inc["source_en"] = "Public blocked-IP list"
+            new_active[sid] = inc
+
+    return {
+        "schema_version": HISTORY_SCHEMA_VERSION,
+        "last_check_ts": data.get("last_check_ts", now_ts),
+        "active_incidents": new_active,
+        "incidents": measured,
+        "services": new_services
+    }
+
 
 def load_services_history():
     if os.path.exists(SERVICES_HISTORY_FILE):
         try:
             with open(SERVICES_HISTORY_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                if isinstance(data, dict) and "services" in data:
-                    if "incidents" not in data or not data["incidents"]:
-                        data["incidents"] = HISTORICAL_INCIDENTS_SEED
-                    if "active_incidents" not in data:
-                        data["active_incidents"] = {}
-                    return data
-        except Exception:
-            pass
+            if isinstance(data, dict) and "services" in data:
+                # v2 opened false Cloudflare/LE incidents from the static OONI IPv6 dump.
+                if data.get("schema_version", 1) < 3:
+                    return empty_history()
+                if data.get("schema_version", 1) < HISTORY_SCHEMA_VERSION:
+                    return migrate_history(data)
+                # Still strip leftover seed rows if a v2 file was edited by hand
+                data["incidents"] = [i for i in data.get("incidents", []) if is_measured_incident(i)]
+                data.setdefault("active_incidents", {})
+                return data
+        except Exception as e:
+            print("Error loading services history:", e, file=sys.stderr)
+    return empty_history()
 
-    default_history = {
-        "last_check_ts": now_ts,
-        "active_incidents": {},
-        "incidents": HISTORICAL_INCIDENTS_SEED,
-        "services": {
-            "docker": {
-                "total_blocked_seconds": 37800,
-                "current_incident_start": None,
-                "last_incident": {
-                    "start_ts": 1788117000,
-                    "end_ts": 1788124200,
-                    "duration_seconds": 7200,
-                    "date_str": "30 Ago 2026, 20:30 UTC",
-                    "date_en": "Aug 30, 2026 20:30 UTC"
-                },
-                "daily_buckets": {
-                    "2026-08-16": 7200,
-                    "2026-08-17": 5400,
-                    "2026-08-23": 7200,
-                    "2026-08-24": 3600,
-                    "2026-08-29": 7200,
-                    "2026-08-30": 7200
-                }
-            },
-            "github": {
-                "total_blocked_seconds": 22500,
-                "current_incident_start": None,
-                "last_incident": {
-                    "start_ts": 1788117000,
-                    "end_ts": 1788122400,
-                    "duration_seconds": 5400,
-                    "date_str": "30 Ago 2026, 20:30 UTC",
-                    "date_en": "Aug 30, 2026 20:30 UTC"
-                },
-                "daily_buckets": {
-                    "2026-08-16": 3600,
-                    "2026-08-23": 5400,
-                    "2026-08-24": 1800,
-                    "2026-08-29": 6300,
-                    "2026-08-30": 5400
-                }
-            },
-            "steam": {
-                "total_blocked_seconds": 15600,
-                "current_incident_start": None,
-                "last_incident": {
-                    "start_ts": 1788118800,
-                    "end_ts": 1788123600,
-                    "duration_seconds": 4800,
-                    "date_str": "30 Ago 2026, 21:00 UTC",
-                    "date_en": "Aug 30, 2026 21:00 UTC"
-                },
-                "daily_buckets": {
-                    "2026-08-17": 3600,
-                    "2026-08-23": 3600,
-                    "2026-08-29": 3600,
-                    "2026-08-30": 4800
-                }
-            },
-            "twitch": {
-                "total_blocked_seconds": 20700,
-                "current_incident_start": None,
-                "last_incident": {
-                    "start_ts": 1788117000,
-                    "end_ts": 1788123000,
-                    "duration_seconds": 6000,
-                    "date_str": "30 Ago 2026, 20:30 UTC",
-                    "date_en": "Aug 30, 2026 20:30 UTC"
-                },
-                "daily_buckets": {
-                    "2026-08-16": 3600,
-                    "2026-08-23": 5400,
-                    "2026-08-29": 5700,
-                    "2026-08-30": 6000
-                }
-            },
-            "deepseek": {
-                "total_blocked_seconds": 13800,
-                "current_incident_start": None,
-                "last_incident": {
-                    "start_ts": 1788034200,
-                    "end_ts": 1788037800,
-                    "duration_seconds": 3600,
-                    "date_str": "29 Ago 2026, 21:30 UTC",
-                    "date_en": "Aug 29, 2026 21:30 UTC"
-                },
-                "daily_buckets": {
-                    "2026-08-17": 3600,
-                    "2026-08-23": 3600,
-                    "2026-08-24": 3000,
-                    "2026-08-29": 3600
-                }
-            },
-            "cloudflare": {
-                "total_blocked_seconds": 51000,
-                "current_incident_start": None,
-                "last_incident": {
-                    "start_ts": 1788117000,
-                    "end_ts": 1788124200,
-                    "duration_seconds": 7200,
-                    "date_str": "30 Ago 2026, 20:30 UTC",
-                    "date_en": "Aug 30, 2026 20:30 UTC"
-                },
-                "daily_buckets": {
-                    "2026-08-16": 7200,
-                    "2026-08-17": 9000,
-                    "2026-08-23": 10800,
-                    "2026-08-24": 5400,
-                    "2026-08-29": 11400,
-                    "2026-08-30": 7200
-                }
-            }
-        }
+
+def build_incident(svc, start_ts, matched_ips, matched_domains, sources, status="ongoing"):
+    start_dt = datetime.datetime.fromtimestamp(start_ts, datetime.timezone.utc)
+    date_only = format_date_only(start_dt)
+    shown, total_ips = clip_ips(matched_ips)
+    src = source_label(sources)
+    payload = {
+        "id": f"INC-{start_dt.strftime('%Y%m%d')}-{svc['id'].upper()}-{start_dt.strftime('%H%M')}",
+        "service_id": svc["id"],
+        "service_name": svc["name"],
+        "status": status,
+        "start_ts": start_ts,
+        "end_ts": None,
+        "date_es": date_only["es"],
+        "date_en": date_only["en"],
+        "time_window_es": f"{start_dt.strftime('%H:%M')} UTC – En curso",
+        "time_window_en": f"{start_dt.strftime('%H:%M')} UTC – Ongoing",
+        "affected_targets": matched_domains or list(svc["domains"]),
+        "blocked_ips": shown,
+        "blocked_ips_total": total_ips,
+        "cause_es": CAUSE_ES,
+        "cause_en": CAUSE_EN,
+        "impact_es": svc["impact_es"],
+        "impact_en": svc["impact_en"],
+        "mitigation_es": svc["mitigation_es"],
+        "mitigation_en": svc["mitigation_en"],
+        "legal_basis": LEGAL_BASIS,
+        "source": src["id"],
+        "source_es": src["es"],
+        "source_en": src["en"]
     }
-    return default_history
+    if svc["id"] == "cloudflare":
+        payload["cause_es"] = (
+            f"Lista en vivo con {cf_v4_blocked_count} IPv4 Cloudflare "
+            f"(umbral de incidencia: ≥{CF_MASS_V4_MIN} IPv4 o ≥{CF_MASS_V6_MIN} IPv6 de sonda). "
+            "Las IPv6 OONI se listan en la tabla pero no abren por sí solas esta incidencia. "
+            "No se atribuye el autor más allá de la coincidencia con la lista pública / sonda."
+        )
+        payload["cause_en"] = (
+            f"Live list contains {cf_v4_blocked_count} Cloudflare IPv4 addresses "
+            f"(incident threshold: ≥{CF_MASS_V4_MIN} IPv4 or ≥{CF_MASS_V6_MIN} probe IPv6). "
+            "OONI IPv6 rows are shown in the table but do not open this incident by themselves. "
+            "This record does not by itself identify who ordered the block."
+        )
+        payload["impact_es"] = (
+            f"{cf_v4_blocked_count} IPv4 y {cf_v6_blocked_count} IPv6 anycast de Cloudflare en la lista; "
+            "cualquier sitio que resuelva a esas IPs queda cortado en las operadoras que aplican el filtro."
+        )
+        payload["impact_en"] = (
+            f"{cf_v4_blocked_count} IPv4 and {cf_v6_blocked_count} IPv6 Cloudflare anycast addresses listed; "
+            "any site resolving to those IPs is cut off on ISPs applying the filter."
+        )
+    return payload
+
 
 history_data = load_services_history()
 last_check_ts = history_data.get("last_check_ts", now_ts)
-elapsed_s = max(0, min(120, now_ts - last_check_ts))
+elapsed_s = max(0, min(180, now_ts - last_check_ts))
 
 active_inc_map = history_data.setdefault("active_incidents", {})
 all_incidents_list = history_data.setdefault("incidents", [])
+history_data.setdefault("services", {})
 
 services_output = []
+inspections = {}
+
+for svc in SERVICE_DEFINITIONS:
+    inspections[svc["id"]] = inspect_service(svc)
 
 for svc in SERVICE_DEFINITIONS:
     svc_id = svc["id"]
-    svc_hist = history_data["services"].setdefault(svc_id, {
-        "total_blocked_seconds": 0,
-        "current_incident_start": None,
-        "last_incident": None,
-        "daily_buckets": {}
-    })
-
-    is_curr_blocked = is_service_blocked(svc)
+    svc_hist = history_data["services"].setdefault(svc_id, empty_service_hist())
+    is_curr_blocked, matched_ips, matched_domains, sources = inspections[svc_id]
 
     if is_curr_blocked:
         if elapsed_s > 0:
-            svc_hist["total_blocked_seconds"] += elapsed_s
-            curr_val = svc_hist["daily_buckets"].get(today_str, 0)
-            svc_hist["daily_buckets"][today_str] = curr_val + elapsed_s
+            svc_hist["total_blocked_seconds"] = int(svc_hist.get("total_blocked_seconds") or 0) + elapsed_s
+            buckets = svc_hist.setdefault("daily_buckets", {})
+            buckets[today_str] = int(buckets.get(today_str, 0)) + elapsed_s
 
         if svc_hist.get("current_incident_start") is None:
             svc_hist["current_incident_start"] = now_ts
-            # Create active incident
-            inc_id = f"INC-{now_utc.strftime('%Y%m%d')}-{svc_id.upper()}"
-            sample_ips = list(blocked_v4_set)[:6]
-            active_inc_map[svc_id] = {
-                "id": inc_id,
-                "service_id": svc_id,
-                "service_name": svc["name"],
-                "status": "ongoing",
-                "start_ts": now_ts,
-                "end_ts": None,
-                "date_es": now_utc.strftime("%d %b %Y"),
-                "date_en": now_utc.strftime("%b %d, %Y"),
-                "time_window_es": f"{now_utc.strftime('%H:%M')} UTC – En curso",
-                "time_window_en": f"{now_utc.strftime('%H:%M')} UTC – Ongoing",
-                "affected_targets": svc["domains"],
-                "blocked_ips": sample_ips,
-                "cause_es": "Bloqueo dinámico ordenado por LaLiga a operadoras en España.",
-                "cause_en": "Dynamic block ordered by LaLiga across Spanish ISPs.",
-                "impact_es": svc["impact_es"],
-                "impact_en": svc["impact_en"],
-                "mitigation_es": svc["mitigation_es"],
-                "mitigation_en": svc["mitigation_en"],
-                "legal_basis": "Reglamento (UE) 2015/2120 de Neutralidad de la Red / Ley General de Telecomunicaciones."
-            }
+
+        start_ts = svc_hist["current_incident_start"]
+        if svc_id not in active_inc_map:
+            active_inc_map[svc_id] = build_incident(
+                svc, start_ts, matched_ips, matched_domains, sources, status="ongoing"
+            )
+        else:
+            act = active_inc_map[svc_id]
+            shown, total_ips = clip_ips(matched_ips)
+            src = source_label(sources)
+            act["blocked_ips"] = shown
+            act["blocked_ips_total"] = total_ips
+            act["affected_targets"] = matched_domains or act.get("affected_targets") or list(svc["domains"])
+            act["source"] = src["id"]
+            act["source_es"] = src["es"]
+            act["source_en"] = src["en"]
+            act["status"] = "ongoing"
+            start_dt = datetime.datetime.fromtimestamp(act.get("start_ts") or start_ts, datetime.timezone.utc)
+            act["time_window_es"] = f"{start_dt.strftime('%H:%M')} UTC – En curso"
+            act["time_window_en"] = f"{start_dt.strftime('%H:%M')} UTC – Ongoing"
+            if not act.get("legal_basis"):
+                act["legal_basis"] = LEGAL_BASIS
     else:
         if svc_hist.get("current_incident_start") is not None:
             inc_start = svc_hist["current_incident_start"]
@@ -783,7 +833,6 @@ for svc in SERVICE_DEFINITIONS:
             }
             svc_hist["current_incident_start"] = None
 
-            # Resolve active incident and push to completed list
             if svc_id in active_inc_map:
                 act = active_inc_map.pop(svc_id)
                 act["status"] = "resolved"
@@ -792,10 +841,15 @@ for svc in SERVICE_DEFINITIONS:
                 act["duration_formatted"] = format_duration(inc_dur)
                 act["time_window_es"] = f"{inc_dt.strftime('%H:%M')} – {now_utc.strftime('%H:%M')} UTC"
                 act["time_window_en"] = f"{inc_dt.strftime('%H:%M')} – {now_utc.strftime('%H:%M')} UTC"
+                if not is_measured_incident(act):
+                    src = source_label(sources or {"blocklist"})
+                    act["source"] = src["id"]
+                    act["source_es"] = src["es"]
+                    act["source_en"] = src["en"]
                 all_incidents_list.insert(0, act)
 
     daily_buckets = svc_hist.get("daily_buckets", {})
-    blocked_today_s = daily_buckets.get(today_str, 0)
+    blocked_today_s = int(daily_buckets.get(today_str, 0) or 0)
     blocked_7d_s = 0
     blocked_30d_s = 0
 
@@ -803,10 +857,10 @@ for svc in SERVICE_DEFINITIONS:
         try:
             d_obj = datetime.date.fromisoformat(d_str)
             days_ago = (now_utc.date() - d_obj).days
-            if 0 <= days_ago <= 7:
-                blocked_7d_s += secs
+            if 0 <= days_ago < 7:
+                blocked_7d_s += int(secs or 0)
             if 0 <= days_ago <= 30:
-                blocked_30d_s += secs
+                blocked_30d_s += int(secs or 0)
             if days_ago > 90:
                 del daily_buckets[d_str]
         except Exception:
@@ -837,6 +891,7 @@ for svc in SERVICE_DEFINITIONS:
         "category_key": svc["category_key"],
         "category_default": svc["default_category"],
         "icon": svc["icon"],
+        "critical": svc.get("critical", False),
         "strategy": svc["strategy"],
         "status": "evaded" if is_curr_blocked else "operational",
         "is_affected": is_curr_blocked,
@@ -848,8 +903,8 @@ for svc in SERVICE_DEFINITIONS:
         "time_blocked_7d_formatted": format_duration(blocked_7d_s),
         "time_blocked_30d_s": blocked_30d_s,
         "time_blocked_30d_formatted": format_duration(blocked_30d_s),
-        "total_blocked_s": svc_hist.get("total_blocked_seconds", 0),
-        "total_blocked_formatted": format_duration(svc_hist.get("total_blocked_seconds", 0)),
+        "total_blocked_s": int(svc_hist.get("total_blocked_seconds", 0) or 0),
+        "total_blocked_formatted": format_duration(int(svc_hist.get("total_blocked_seconds", 0) or 0)),
         "domains": svc["domains"],
         "impact_es": svc["impact_es"],
         "impact_en": svc["impact_en"],
@@ -857,10 +912,9 @@ for svc in SERVICE_DEFINITIONS:
         "mitigation_en": svc["mitigation_en"]
     })
 
-# Format all active and completed incidents
 display_incidents = []
 for act in active_inc_map.values():
-    dur = max(0, now_ts - act["start_ts"])
+    dur = max(0, now_ts - int(act.get("start_ts") or now_ts))
     display_incidents.append({
         **act,
         "duration_seconds": dur,
@@ -868,12 +922,14 @@ for act in active_inc_map.values():
     })
 
 for inc in all_incidents_list:
-    display_incidents.append(inc)
+    if is_measured_incident(inc):
+        display_incidents.append(inc)
 
-# Sort display incidents newest start_ts first
 display_incidents.sort(key=lambda x: x.get("start_ts", 0), reverse=True)
 
+history_data["schema_version"] = HISTORY_SCHEMA_VERSION
 history_data["last_check_ts"] = now_ts
+history_data["incidents"] = [i for i in all_incidents_list if is_measured_incident(i)]
 try:
     os.makedirs(os.path.dirname(SERVICES_HISTORY_FILE), exist_ok=True)
     temp_hist = SERVICES_HISTORY_FILE + ".tmp"
@@ -884,7 +940,7 @@ try:
 except Exception as e:
     print("Error saving services history:", e, file=sys.stderr)
 
-total_incident_duration_s = sum(inc.get("duration_seconds", 0) for inc in display_incidents)
+total_incident_duration_s = sum(int(inc.get("duration_seconds") or 0) for inc in display_incidents)
 
 data = {
     "last_updated": now_utc.strftime("%Y-%m-%d %H:%M:%S UTC"),
@@ -892,7 +948,10 @@ data = {
     "evasion_active": total_blocked > 0,
     "total_blocked": total_blocked,
     "cf_blocked_count": cf_blocked_count,
+    "cf_v4_blocked_count": cf_v4_blocked_count,
+    "cf_v6_blocked_count": cf_v6_blocked_count,
     "evaded_count": evaded_count,
+    "cf_mass_block": cf_mass_block,
     "services_affected_count": sum(1 for s in services_output if s["is_affected"]),
     "services_total_count": len(services_output),
     "services": services_output,
@@ -900,7 +959,7 @@ data = {
         "total_incidents": len(display_incidents),
         "total_duration_seconds": total_incident_duration_s,
         "total_duration_formatted": format_duration(total_incident_duration_s),
-        "affected_services_count": len(set(inc["service_id"] for inc in display_incidents))
+        "affected_services_count": len(set(inc.get("service_id") for inc in display_incidents))
     },
     "incidents": display_incidents,
     "entries": entries
@@ -914,4 +973,8 @@ for out_path in [OUT_WEB, OUT_WWW]:
     os.chmod(temp, 0o644)
     os.replace(temp, out_path)
 
-print(f"Blocked dashboard JSON: {total_blocked} IPs, {len(services_output)} services, {len(display_incidents)} audit log incidents.")
+print(
+    f"Blocked dashboard JSON: {total_blocked} IPs "
+    f"(CF v4={cf_v4_blocked_count} v6={cf_v6_blocked_count}, mass={cf_mass_block}), "
+    f"{len(services_output)} services, {len(display_incidents)} measured incidents."
+)

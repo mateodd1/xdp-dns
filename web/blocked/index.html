@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="blocked.page_title">Monitor de Evasión de Bloqueos | xdp.es DNS</title>
-    <meta name="description" content="Monitor interno de IPs bloqueadas, servicios afectados y registro histórico de cortes para reclamaciones judiciales.">
+    <meta name="description" content="Monitor interno de IPs bloqueadas (IPv4 e IPv6), servicios críticos afectados y registro medido de duración de cada corte.">
     <meta name="robots" content="noindex, nofollow, noarchive">
 
     <!-- Critical Anti-FOUC Background Style -->
@@ -515,6 +515,57 @@
 
         .legal-guide-content p:last-child {
             margin: 0;
+        }
+
+        .legal-guide-warn {
+            background: rgba(249, 115, 22, 0.08);
+            border: 1px solid rgba(249, 115, 22, 0.25);
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .legal-guide-content h3 {
+            margin: 12px 0 4px 0;
+            font-size: 0.86rem;
+            font-weight: 800;
+            color: var(--text-heading);
+        }
+
+        .legal-guide-content a {
+            color: var(--accent);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .critical-chip {
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 1px 6px;
+            border-radius: 9999px;
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.28);
+        }
+
+        .badge-family {
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            padding: 1px 5px;
+            border-radius: 4px;
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .source-badge {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-muted);
         }
 
         /* Incident List & Cards */
@@ -1095,8 +1146,8 @@
                 <h1 class="hero-title" data-i18n="blocked.title" style="font-size: 2rem; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.02em; color: var(--text-heading);">
                     Monitor de Evasión de Bloqueos
                 </h1>
-                <p data-i18n="blocked.subtitle" style="color: var(--text-muted); max-width: 680px; margin: 0 auto; font-size: 0.9rem; line-height: 1.45;">
-                    Seguimiento en tiempo real de IPs Anycast de Cloudflare bloqueadas y sus rutas alternativas limpias.
+                <p data-i18n="blocked.subtitle" style="color: var(--text-muted); max-width: 720px; margin: 0 auto; font-size: 0.9rem; line-height: 1.45;">
+                    Seguimiento en tiempo real de IPs bloqueadas (IPv4 e IPv6), servicios críticos afectados y tiempo medido de cada corte.
                 </p>
             </div>
 
@@ -1124,10 +1175,10 @@
             <div class="section-header">
                 <h2 class="section-title">
                     <span aria-hidden="true">🛡️</span>
-                    <span data-i18n="blocked.services_title">Servicios Principales Afectados</span>
+                    <span data-i18n="blocked.services_title">Servicios críticos monitorizados</span>
                 </h2>
                 <p class="section-subtitle" data-i18n="blocked.services_subtitle">
-                    Monitorización de servicios esenciales afectados por bloqueos indiscriminados y tiempo acumulado de afectación mitigada.
+                    Tiempo de afectación medido cuando las IPs resueltas del servicio coinciden con la blocklist o la sonda residencial instala un redirect. Cloudflare solo cuenta como incidencia si el bloqueo supera un umbral (no 1–2 IPs residuales).
                 </p>
             </div>
 
@@ -1142,14 +1193,14 @@
                     <div>
                         <h2 class="section-title">
                             <span aria-hidden="true">📜</span>
-                            <span data-i18n="blocked.history_title">Registro Histórico de Incidencias para Reclamaciones</span>
+                            <span data-i18n="blocked.history_title">Registro histórico de incidencias</span>
                         </h2>
                         <p class="section-subtitle" data-i18n="blocked.history_subtitle">
-                            Historial cronológico verificable de cortes, horas de afectación e IPs censuradas para su uso en reclamaciones judiciales y administrativas.
+                            Solo cortes medidos por este monitor (blocklist pública y sonda residencial). No es un dictamen pericial.
                         </p>
                     </div>
                     <button type="button" class="btn-copy-report" id="btn-copy-all-reports" style="padding: 8px 14px; font-size: 0.8rem;">
-                        <span data-i18n="blocked.history_export_all">📋 Copiar Informe Pericial (Todas)</span>
+                        <span data-i18n="blocked.history_export_all">📋 Copiar informe técnico (todas)</span>
                     </button>
                 </div>
             </div>
@@ -1157,11 +1208,11 @@
             <!-- History Stats Bar -->
             <div class="history-stats-bar">
                 <div class="history-stat-box">
-                    <span class="history-stat-title" data-i18n="blocked.history_stat_incidents">Incidencias Totales</span>
+                    <span class="history-stat-title" data-i18n="blocked.history_stat_incidents">Incidencias medidas</span>
                     <span class="history-stat-val mono" id="hist-stat-incidents" style="color: var(--accent);">-</span>
                 </div>
                 <div class="history-stat-box">
-                    <span class="history-stat-title" data-i18n="blocked.history_stat_hours">Horas Totales Afectadas</span>
+                    <span class="history-stat-title" data-i18n="blocked.history_stat_hours">Tiempo acumulado</span>
                     <span class="history-stat-val mono" id="hist-stat-hours" style="color: #f97316;">-</span>
                 </div>
                 <div class="history-stat-box">
@@ -1173,15 +1224,24 @@
             <!-- Legal Claim Explanatory Guide Box -->
             <details class="legal-guide-details">
                 <summary data-i18n="blocked.history_legal_guide_btn">
-                    ⚖️ Guía para Reclamaciones Judiciales y SETID
+                    Cómo reclamar (operador, SETID/OAUT, CNMC, vía civil)
                 </summary>
                 <div class="legal-guide-content">
-                    <p data-i18n="blocked.history_legal_guide_p1">
-                        Este registro pericial recopila marcas de tiempo UTC exactas, direcciones IP bloqueadas y dominios afectados comprobados diferencialmente mediante monitorización Anycast y sonda residencial en España.
+                    <p class="legal-guide-warn" data-i18n="blocked.legal_warn">
+                        Este registro es un informe técnico de parte generado por xdp.es. Recoge timestamps UTC, IPs de la blocklist y dominios cuya resolución coincide con esas IPs o con un redirect de la sonda. No es un dictamen pericial: un juzgado puede exigir que un perito lo ratifique. Los recortes anteriores al arranque de este medidor no aparecen.
                     </p>
-                    <p data-i18n="blocked.history_legal_guide_p2">
-                        Puedes adjuntar este informe técnico pericial en reclamaciones ante la Secretaría de Estado de Telecomunicaciones e Infraestructuras Digitales (SETID), la Oficina de Atención al Usuario de Telecomunicaciones (OAUT), o en demandas civiles por daños, perjuicios y lucro cesante al amparo del Reglamento (UE) 2015/2120 de Neutralidad de la Red (Art. 3) y los Arts. 1101 y 1902 del Código Civil.
-                    </p>
+                    <h3 data-i18n="blocked.legal_s1_title">1. Reclama primero a tu operador</h3>
+                    <p data-i18n-html="blocked.legal_s1_html">Para la <strong>OAUT</strong> es obligatorio haber reclamado antes al servicio de atención de tu ISP y conservar el <strong>número de reclamación interna</strong>. Sin ese paso, la oficina inadmite. Espera respuesta o 1 mes de silencio.</p>
+                    <h3 data-i18n="blocked.legal_s2_title">2. SETID / OAUT — calidad e interrupción del servicio</h3>
+                    <p data-i18n-html="blocked.legal_s2_html">La <strong>Oficina de Atención al Usuario de Telecomunicaciones</strong> (dependiente de la SETID) tramita controversias de factura, portabilidad, contrato, averías e <strong>interrupción del servicio de acceso a internet</strong> (Ley 11/2022, art. 78). Web: <a href="https://usuariosteleco.digital.gob.es/" target="_blank" rel="noopener noreferrer">usuariosteleco.digital.gob.es</a>. Legitimados: personas físicas, autónomos y microempresas. Plazo: 3 meses desde la respuesta o el silencio del operador. La resolución vincula a usuario y operador; <strong>no es un expediente sancionador contra LaLiga</strong> ni un procedimiento de neutralidad de red.</p>
+                    <h3 data-i18n="blocked.legal_s3_title">3. CNMC — internet abierta / sobrebloqueo</h3>
+                    <p data-i18n-html="blocked.legal_s3_html">La autoridad del <strong>Reglamento (UE) 2015/2120</strong> en España es la <strong>CNMC</strong>, no la SETID (Ley 11/2022, art. 76). Sede: <a href="https://sede.cnmc.gob.es/" target="_blank" rel="noopener noreferrer">sede.cnmc.gob.es</a>. El argumento sólido no es «todo bloqueo es ilegal», sino la <strong>falta de proporcionalidad</strong> al filtrar IPs anycast compartidas que cortan servicios lícitos (Docker, GitHub, npm, Let's Encrypt, etc.).</p>
+                    <h3 data-i18n="blocked.legal_s4_title">4. Comisión Europea y Defensor del Pueblo</h3>
+                    <p data-i18n-html="blocked.legal_s4_html">Denuncia de infracción de Derecho de la UE: <a href="https://commission.europa.eu/about-european-commission/contact/problems-and-complaints/complaints-about-breaches-eu-law-member-states_es" target="_blank" rel="noopener noreferrer">formulario de la Comisión Europea</a>. El Defensor del Pueblo puede recabar información de la Administración si hay inacción reiterada.</p>
+                    <h3 data-i18n="blocked.legal_s5_title">5. Vía civil (daños)</h3>
+                    <p data-i18n-html="blocked.legal_s5_html"><strong>Art. 1101 del Código Civil</strong>: responsabilidad contractual frente a <em>tu operador</em> por el servicio de acceso contratado. <strong>Art. 1902</strong>: extra-contractual (daños a terceros); es más difícil si el filtro se ampara en un auto judicial. Este JSON/informe se puede adjuntar como <strong>prueba documental de parte</strong>, no como pericial.</p>
+                    <h3 data-i18n="blocked.legal_s6_title">Norma de fondo (no citar al revés)</h3>
+                    <p data-i18n-html="blocked.legal_s6_html">El art. 3.1–3 del Reglamento 2015/2120 obliga a tratar el tráfico de forma equitativa. El <strong>art. 3.3.a</strong> permite a las operadoras cumplir sentencias y órdenes de autoridad; el debate es si bloquear una IP compartida de CDN es <strong>necesario y proporcionado</strong> (considerando 13). Adjunta IDs de incidencia, ventanas UTC, IPs y dominios de este registro.</p>
                 </div>
             </details>
 
@@ -1196,10 +1256,13 @@
                     <button class="filter-btn active" data-inc-filter="all" aria-pressed="true" data-i18n="blocked.history_filter_all">Todos los servicios</button>
                     <button class="filter-btn" data-inc-filter="docker" aria-pressed="false">Docker</button>
                     <button class="filter-btn" data-inc-filter="github" aria-pressed="false">GitHub</button>
+                    <button class="filter-btn" data-inc-filter="gitlab" aria-pressed="false">GitLab</button>
+                    <button class="filter-btn" data-inc-filter="npm" aria-pressed="false">npm</button>
+                    <button class="filter-btn" data-inc-filter="pypi" aria-pressed="false">PyPI</button>
+                    <button class="filter-btn" data-inc-filter="letsencrypt" aria-pressed="false">Let's Encrypt</button>
+                    <button class="filter-btn" data-inc-filter="cloudflare" aria-pressed="false">Cloudflare</button>
                     <button class="filter-btn" data-inc-filter="steam" aria-pressed="false">Steam</button>
                     <button class="filter-btn" data-inc-filter="twitch" aria-pressed="false">Twitch</button>
-                    <button class="filter-btn" data-inc-filter="deepseek" aria-pressed="false">DeepSeek</button>
-                    <button class="filter-btn" data-inc-filter="cloudflare" aria-pressed="false">Cloudflare</button>
                 </div>
             </div>
 
@@ -1227,6 +1290,8 @@
                     <button class="filter-btn active" data-filter="all" aria-pressed="true" data-i18n="blocked.filter_all">Todas</button>
                     <button class="filter-btn" data-filter="cf" aria-pressed="false" data-i18n="blocked.filter_cf">Cloudflare</button>
                     <button class="filter-btn" data-filter="other" aria-pressed="false" data-i18n="blocked.filter_other">Otras CDN</button>
+                    <button class="filter-btn" data-filter="v4" aria-pressed="false" data-i18n="blocked.filter_v4">IPv4</button>
+                    <button class="filter-btn" data-filter="v6" aria-pressed="false" data-i18n="blocked.filter_v6">IPv6</button>
                 </div>
                 <button class="refresh-btn" id="refresh-btn">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
@@ -1290,7 +1355,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=4.8"></script>
+    <script src="/i18n.js?v=4.9"></script>
     <script src="/theme.js?v=4.2"></script>
     <script>
         let allEntries = [];
@@ -1369,6 +1434,14 @@
                     return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="2" fill="#3b82f6"/></svg>`;
                 case 'cloudflare':
                     return `<svg width="22" height="22" viewBox="0 0 24 24" fill="#f97316" aria-hidden="true"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>`;
+                case 'gitlab':
+                    return `<svg width="22" height="22" viewBox="0 0 24 24" fill="#e24329" aria-hidden="true"><path d="M22.65 14.39L12 22.13 1.35 14.39a.84.84 0 01-.3-.94l1.22-3.78 2.44-7.51A.42.42 0 015.5 2a.43.43 0 01.4.26L8.22 9.9h7.56l2.32-7.64a.42.42 0 01.4-.26.42.42 0 01.41.26l2.44 7.51 1.22 3.78a.84.84 0 01-.32.94z"/></svg>`;
+                case 'npm':
+                    return `<svg width="22" height="22" viewBox="0 0 24 24" fill="#cb3837" aria-hidden="true"><path d="M0 7.334v8h6.666v1.332H12v-1.332h12v-8H0zm6.666 6.664H5.334v-4H3.999v4H1.335V8.667h5.331v5.331zm4 0v1.336H8.001V8.667h5.334v5.332h-2.669v-.001zm12.001 0h-1.33v-4h-1.336v4h-1.335v-4h-1.33v4h-2.671V8.667h8.002v5.331zM16.001 11H10.667V8.667h5.334V11z"/></svg>`;
+                case 'pypi':
+                    return `<svg width="22" height="22" viewBox="0 0 24 24" fill="#3775a9" aria-hidden="true"><path d="M12 0C5.5 0 5.07 2.8 5.07 2.8l.01 2.9h7.04v.87H3.6S0 5.9 0 12s3.31 5.99 3.31 5.99h3.94v-2.87s-.21-3.31 3.25-3.31h5.61s3.14.05 3.14-3.03V3.28S19.8 0 12 0zm-1.86 1.76a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4zM12 24c6.5 0 6.93-2.8 6.93-2.8l-.01-2.9H11.88v-.87h8.52S24 18.1 24 12s-3.31-5.99-3.31-5.99h-3.94v2.87s.21 3.31-3.25 3.31H7.89s-3.14-.05-3.14 3.03v6.5S4.2 24 12 24zm1.86-1.76a1.2 1.2 0 110-2.4 1.2 1.2 0 010 2.4z"/></svg>`;
+                case 'letsencrypt':
+                    return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d8c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>`;
                 default:
                     return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
             }
@@ -1396,6 +1469,7 @@
             const noRecentLabel = t('blocked.no_recent_incidents', 'Sin incidencias recientes');
             const mitigationTitle = t('blocked.mitigation_title', 'Mitigación XDP:');
             const domainsLabel = t('blocked.monitored_domains_label', 'Dominios:');
+            const criticalLabel = t('blocked.service_critical', 'Crítico');
 
             let html = '';
 
@@ -1433,7 +1507,7 @@
                                     ${getServiceIconSvg(svc.icon)}
                                 </div>
                                 <div class="service-name-wrap">
-                                    <span class="service-name">${esc(svc.name)}</span>
+                                    <span class="service-name">${esc(svc.name)}${svc.critical ? ` <span class="critical-chip">${criticalLabel}</span>` : ''}</span>
                                     <span class="service-cat-badge">${esc(catName)}</span>
                                 </div>
                             </div>
@@ -1497,83 +1571,93 @@
             const durStr = incident.duration_formatted || "N/A";
             const domains = (incident.affected_targets || []).map(d => `  - ${d}`).join("\n");
             const ips = (incident.blocked_ips || []).map(ip => `  - ${ip}`).join("\n");
+            const extraIps = Math.max(0, (incident.blocked_ips_total || 0) - (incident.blocked_ips || []).length);
+            const ipsExtra = extraIps > 0 ? (isSpanish ? `  - (+${extraIps} más en la blocklist)` : `  - (+${extraIps} more on the blocklist)`) : "";
             const cause = isSpanish ? (incident.cause_es || "") : (incident.cause_en || "");
             const impact = isSpanish ? (incident.impact_es || "") : (incident.impact_en || "");
             const mitigation = isSpanish ? (incident.mitigation_es || "") : (incident.mitigation_en || "");
-            const legal = incident.legal_basis || "Reglamento (UE) 2015/2120 de Neutralidad de la Red";
+            const legal = incident.legal_basis || "Reglamento (UE) 2015/2120 art. 3 y art. 3.3.a; Ley 11/2022 arts. 76 y 78.";
+            const source = isSpanish ? (incident.source_es || incident.source || "") : (incident.source_en || incident.source || "");
 
             if (isSpanish) {
                 return `${divider}
-INFORME TÉCNICO PERICIAL DE AFECTACIÓN POR BLOQUEO INDISCRIMINADO
-Fuente: Registro de Evasión y Monitorización DNS xdp.es
+INFORME TÉCNICO DE PARTE — MONITOR DE BLOQUEOS xdp.es
+(No es un dictamen pericial. Puede usarse como prueba documental.)
 Fecha de generación: ${new Date().toISOString()}
 ${divider}
 ID INCIDENCIA: ${incId}
 SERVICIO AFECTADO: ${svcName}
 FECHA DEL CORTE: ${dateStr}
 VENTANA HORARIA: ${timeWin}
-DURACIÓN TOTAL REGISTRADA: ${durStr}
-ESTADO: ${incident.status === 'ongoing' ? 'EN CURSO (Actualmente afectado)' : 'FINALIZADO Y MITIGADO'}
+DURACIÓN MEDIDA: ${durStr}
+ESTADO: ${incident.status === 'ongoing' ? 'EN CURSO' : 'CERRADO'}
+FUENTE DE LA MEDIDA: ${source || 'Lista pública de IPs bloqueadas'}
 
-DOMINIOS / HOSTNAMES AFECTADOS:
+DOMINIOS / HOSTNAMES:
 ${domains || '  - No especificados'}
 
-DIRECCIONES IP / PREFIJOS OBJETO DE BLOQUEO:
+IPS COINCIDENTES CON LA BLOCKLIST:
 ${ips || '  - No especificadas'}
+${ipsExtra}
 
-CAUSA Y PROCEDIMIENTO DEL BLOQUEO:
+QUÉ SE HA MEDIDO:
 ${cause}
 
-IMPACTO TÉCNICO Y PERJUICIO PRODUCIDO:
+IMPACTO TÉCNICO:
 ${impact}
 
-MITIGACIÓN Y PROTECCIÓN APLICADA POR XDP.ES:
+MITIGACIÓN APLICADA POR XDP.ES:
 ${mitigation}
 
-FUNDAMENTO JURÍDICO / NORMATIVA APLICABLE:
+NORMA DE REFERENCIA:
 - ${legal}
-- Ley 11/2022, General de Telecomunicaciones (Garantía de continuidad y proporcionalidad).
-- Artículos 1101 y 1902 del Código Civil (Responsabilidad por daños y perjuicios derivados de bloqueo indiscriminado).
+- Art. 1101 CC: contractual frente al operador. Art. 1902 CC: extra-contractual.
+- El art. 3.3.a del Reglamento 2015/2120 permite cumplir resoluciones judiciales;
+  la cuestión es la proporcionalidad del bloqueo de IPs anycast compartidas.
 
-MÉTODO DE COMPROBACIÓN:
-Monitorización continua de latencia y encaminamiento Anycast combinada con sonda
-residencial física en España (Movistar / AS3352).
+MÉTODO:
+Coincidencia entre resolución A/AAAA (consulta a 1.1.1.1 / 8.8.8.8, no al DNS
+evasivo local) y la blocklist pública, o redirect instalado por sonda residencial.
 ${divider}`;
             } else {
                 return `${divider}
-FORENSIC TECHNICAL REPORT OF INDISCRIMINATE ISP BLOCKING
-Source: xdp.es DNS Evasion & Real-Time Monitoring System
+PARTY TECHNICAL REPORT — xdp.es BLOCK MONITOR
+(Not a court-appointed expert opinion. May be used as documentary evidence.)
 Generated on: ${new Date().toISOString()}
 ${divider}
 INCIDENT ID: ${incId}
 IMPACTED SERVICE: ${svcName}
 INCIDENT DATE: ${dateStr}
 TIME WINDOW: ${timeWin}
-TOTAL IMPACT DURATION: ${durStr}
-STATUS: ${incident.status === 'ongoing' ? 'ONGOING' : 'RESOLVED / MITIGATED'}
+MEASURED DURATION: ${durStr}
+STATUS: ${incident.status === 'ongoing' ? 'ONGOING' : 'CLOSED'}
+MEASUREMENT SOURCE: ${source || 'Public blocked-IP list'}
 
-IMPACTED DOMAINS / HOSTNAMES:
+DOMAINS / HOSTNAMES:
 ${domains || '  - None specified'}
 
-CENSORED IP ADDRESSES / PREFIXES:
+IPS MATCHING THE BLOCKLIST:
 ${ips || '  - None specified'}
+${ipsExtra}
 
-BLOCKING CAUSE & ISP INJUNCTION:
+WHAT WAS MEASURED:
 ${cause}
 
-TECHNICAL IMPACT & COLLATERAL DAMAGE:
+TECHNICAL IMPACT:
 ${impact}
 
 XDP.ES DNS MITIGATION APPLIED:
 ${mitigation}
 
-LEGAL GROUNDS:
-- Regulation (EU) 2015/2120 (Open Internet Access / Net Neutrality, Article 3).
-- Spanish General Telecommunications Act 11/2022.
-- Articles 1101 & 1902 Spanish Civil Code (Liability for collateral damage and service disruption).
+LEGAL REFERENCE:
+- ${legal}
+- Civil Code art. 1101: contractual vs your ISP. Art. 1902: extra-contractual.
+- Art. 3(3)(a) of Regulation 2015/2120 lets ISPs comply with court orders;
+  the issue is proportionality of blocking shared anycast IPs.
 
-VERIFICATION METHOD:
-Continuous Anycast telemetry combined with active differential residential probe in Spain.
+METHOD:
+A/AAAA resolution against 1.1.1.1 / 8.8.8.8 (not the local evasive DNS)
+intersected with the public blocklist, or a residential-probe redirect.
 ${divider}`;
             }
         }
@@ -1610,8 +1694,11 @@ ${divider}`;
             if (!container) return;
 
             if (filteredIncidents.length === 0) {
-                const noMsg = t('blocked.incident_no_results', 'No se encontraron incidencias que coincidan con la búsqueda.');
-                container.innerHTML = `<div class="empty-state">${noMsg}</div>`;
+                const emptyKey = allIncidents.length === 0 ? 'blocked.incident_empty' : 'blocked.incident_no_results';
+                const emptyFallback = allIncidents.length === 0
+                    ? 'Aún no hay incidencias medidas. El registro empieza a contar cuando el monitor detecta un corte real (blocklist o sonda), no hay datos de relleno.'
+                    : 'No se encontraron incidencias que coincidan con la búsqueda.';
+                container.innerHTML = `<div class="empty-state">${t(emptyKey, emptyFallback)}</div>`;
                 return;
             }
 
@@ -1628,7 +1715,8 @@ ${divider}`;
             const impactLabel = t('blocked.incident_impact', 'Impacto técnico:');
             const mitigationLabel = t('blocked.incident_mitigation', 'Evasión XDP:');
             const legalBasisLabel = t('blocked.incident_legal_basis', 'Fundamento legal:');
-            const copyReportLabel = t('blocked.incident_copy_report', '📋 Copiar Informe Pericial');
+            const copyReportLabel = t('blocked.incident_copy_report', '📋 Copiar informe técnico');
+            const sourceLabel = t('blocked.incident_source', 'Fuente de la medida:');
 
             let html = '';
 
@@ -1646,6 +1734,11 @@ ${divider}`;
 
                 const targetsList = inc.affected_targets || [];
                 const ipsList = inc.blocked_ips || [];
+                const extraIps = Math.max(0, (inc.blocked_ips_total || 0) - ipsList.length);
+                const extraIpsLabel = extraIps > 0
+                    ? t('blocked.incident_more_ips', '+{count} más').replace('{count}', String(extraIps))
+                    : '';
+                const sourceText = isSpanish ? (inc.source_es || inc.source || '') : (inc.source_en || inc.source || '');
 
                 html += `
                     <div class="incident-card ${isOngoing ? 'is-ongoing' : ''}" data-incident-id="${esc(inc.id)}">
@@ -1692,6 +1785,7 @@ ${divider}`;
                                                 <button type="button" class="copy-btn-touch" data-copy="${esc(ip)}" style="padding: 1px 4px; font-size: 0.65rem;" title="Copiar IP">📋</button>
                                             </span>
                                         `).join(' ')}
+                                        ${extraIpsLabel ? `<span class="source-badge">${esc(extraIpsLabel)}</span>` : ''}
                                     </div>
                                 </div>
                             ` : ''}
@@ -1712,8 +1806,15 @@ ${divider}`;
                             </div>
                         </div>
 
+                        ${sourceText ? `
+                            <div class="incident-field-row">
+                                <span class="incident-field-label">${sourceLabel}</span>
+                                <span class="source-badge">${esc(sourceText)}</span>
+                            </div>
+                        ` : ''}
+
                         <div class="incident-card-actions">
-                            <span class="incident-legal-ref">${legalBasisLabel} ${esc(inc.legal_basis || 'Reglamento UE 2015/2120')}</span>
+                            <span class="incident-legal-ref">${legalBasisLabel} ${esc(inc.legal_basis || 'Reglamento (UE) 2015/2120 art. 3 y 3.3.a / Ley 11/2022 arts. 76 y 78')}</span>
                             <button type="button" class="btn-copy-report btn-copy-single-report" data-incident-id="${esc(inc.id)}">
                                 ${copyReportLabel}
                             </button>
@@ -1733,6 +1834,8 @@ ${divider}`;
             filteredEntries = allEntries.filter(item => {
                 if (currentFilter === 'cf' && !item.is_cloudflare) return false;
                 if (currentFilter === 'other' && item.is_cloudflare) return false;
+                if (currentFilter === 'v4' && item.type !== 'IPv4') return false;
+                if (currentFilter === 'v6' && item.type !== 'IPv6') return false;
 
                 if (currentSearch) {
                     const q = currentSearch.toLowerCase();
@@ -1796,7 +1899,9 @@ ${divider}`;
                 desktopHtml += `
                     <tr>
                         <td>
-                            <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <span class="badge-family">${esc(item.type || 'IPv4')}</span>
+                                ${item.list_source === 'ooni' ? `<span class="badge-family" title="Lista OONI (estática)">${t('blocked.list_ooni', 'OONI')}</span>` : ''}
                                 <span class="ip-banned mono">${esc(item.blocked_ip)}</span>
                                 <button type="button" class="copy-btn-touch" data-copy="${esc(item.blocked_ip)}" title="${copyLabel}" aria-label="${copyLabel} ${esc(item.blocked_ip)}">📋</button>
                             </div>
@@ -1824,7 +1929,7 @@ ${divider}`;
                     <div class="blocked-card">
                         <div class="card-header-row">
                             <span class="card-meta-row" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: #ef4444;">
-                                ${cardBannedLabel}
+                                ${cardBannedLabel} <span class="badge-family">${esc(item.type || 'IPv4')}</span>${item.list_source === 'ooni' ? ` <span class="badge-family">${t('blocked.list_ooni', 'OONI')}</span>` : ''}
                             </span>
                             ${cfBadge}
                         </div>
