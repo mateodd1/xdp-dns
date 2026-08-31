@@ -123,6 +123,7 @@ CUSTOM_ASN_NAMES = {
     '12946': 'R Cable y Telecable',
     '12334': 'R Cable y Telecable',
     '12715': 'Jazztel',
+    '41368': 'Populoos',
     '202513': 'Fibritel',
     '202673': 'Ohz Digital',
     '203600': 'VIVAFIBRA',

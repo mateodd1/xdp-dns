@@ -1340,7 +1340,7 @@
             if (/\bas57269\b/.test(lower) || /\bdigi\b/.test(lower)) {
                 return { src: '/stats/img/digi.png', alt: 'Digi' };
             }
-            if (/\bas15704\b/.test(lower) || lower.includes('masmovil') || lower.includes('másmóvil') || lower.includes('yoigo') || lower.includes('pepephone') || lower.includes('xtra')) {
+            if (/\bas(15704|41368)\b/.test(lower) || lower.includes('masmovil') || lower.includes('másmóvil') || lower.includes('yoigo') || lower.includes('pepephone') || lower.includes('xtra') || lower.includes('populoos') || lower.includes('tvalmansa')) {
                 return { src: '/stats/img/masmovil.svg', alt: 'MásMóvil' };
             }
             if (/\bas12338\b/.test(lower) || lower.includes('euskaltel')) {
@@ -1405,7 +1405,7 @@
             {
                 id: 'masorange',
                 name: 'MásOrange',
-                asns: ['12479', '15704', '12338', '12946', '12334', '12715'],
+                asns: ['12479', '15704', '12338', '12946', '12334', '12715', '41368'],
                 logo: { src: '/stats/img/masorange.svg', alt: 'MásOrange', className: 'isp-logo-masorange' },
                 alwaysGroup: true
             },
