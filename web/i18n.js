@@ -117,6 +117,9 @@ const translations = {
         "stats.no_data": "Sin consultas.",
         "stats.rate_suffix": "bloqueadas",
         "stats.evaded_suffix": "reemplazadas",
+        "stats.of_group": "del grupo",
+        "stats.of_total": "total",
+        "stats.asns_count": "{count} ASNs",
 
         // Connection Card
         "conn.title": "Tu Conexión",
@@ -341,6 +344,9 @@ const translations = {
         "stats.no_data": "No queries.",
         "stats.rate_suffix": "blocked",
         "stats.evaded_suffix": "replaced",
+        "stats.of_group": "of group",
+        "stats.of_total": "total",
+        "stats.asns_count": "{count} ASNs",
 
         // Connection Card
         "conn.title": "Your Connection",

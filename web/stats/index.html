@@ -597,6 +597,114 @@
             content: url('/stats/img/cdn77-dark.svg');
         }
 
+        [data-theme="dark"] .isp-logo-masorange,
+        [data-theme="oled"] .isp-logo-masorange {
+            content: url('/stats/img/masorange-dark.svg');
+        }
+
+        /* Grouped ASN Rows & Accordion Drawers */
+        .stats-row-item.stats-row-group {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .stats-row-item.stats-row-group:hover {
+            border-color: var(--accent);
+        }
+
+        .asn-group-badge {
+            font-size: 0.65rem;
+            padding: 1px 6px;
+            border-radius: 999px;
+            background-color: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid rgba(0, 210, 255, 0.25);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+            margin-left: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        .asn-expand-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.60rem;
+            color: var(--text-muted);
+            margin-left: 8px;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+        }
+
+        .stats-row-item.stats-row-group.open .asn-expand-icon {
+            transform: rotate(180deg);
+            color: var(--accent);
+        }
+
+        .asn-group-drawer {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            padding: 4px 0 6px 14px;
+            border-left: 2px solid var(--accent);
+            margin-left: 14px;
+            margin-top: -2px;
+            margin-bottom: 4px;
+        }
+
+        .asn-group-drawer.open {
+            display: flex;
+            animation: fadeInDrawer 0.22s ease-out;
+        }
+
+        @keyframes fadeInDrawer {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .asn-sub-item {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 10px;
+            border-radius: 5px;
+            font-size: 0.78rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .asn-sub-item:hover {
+            border-color: var(--border-hover);
+            background-color: var(--bg-card-hover);
+        }
+
+        .asn-sub-bg-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background-color: var(--accent-dim);
+            opacity: 0.45;
+            z-index: 1;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .asn-sub-item .item-name {
+            font-size: 0.78rem;
+        }
+
+        .asn-sub-item .item-sub {
+            font-size: 0.70rem;
+        }
+
+        .asn-sub-item .item-count {
+            font-size: 0.75rem;
+        }
+
         .conn-isp-logo-main {
             width: 24px;
             height: 24px;
@@ -1182,7 +1290,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/i18n.js?v=4.5"></script>
+    <script src="/i18n.js?v=4.6"></script>
     <script src="/theme.js?v=4.2" defer></script>
     <script>
         // Tab Switching
@@ -1202,6 +1310,9 @@
         function getIspLogo(name) {
             if (!name) return null;
             const lower = name.toLowerCase();
+            if (lower.includes('masorange') || lower.includes('másorange')) {
+                return { src: '/stats/img/masorange.svg', alt: 'MásOrange', className: 'isp-logo-masorange' };
+            }
             if (/\bas3352\b/.test(lower) || lower.includes('telefonica') || lower.includes('movistar')) {
                 return { src: '/stats/img/movistar.svg', alt: 'Telefónica / Movistar' };
             }
@@ -1254,6 +1365,169 @@
                 return { src: '/stats/img/ohz.svg', alt: 'Ohz Digital' };
             }
             return null;
+        }
+
+        // Telecommunications & Datacenter Groups Definition for ASN Fusion
+        const ASN_GROUPS_DEF = [
+            {
+                id: 'masorange',
+                name: 'MásOrange',
+                asns: ['12479', '15704', '12338', '12946', '12334', '12715'],
+                logo: { src: '/stats/img/masorange.svg', alt: 'MásOrange', className: 'isp-logo-masorange' }
+            },
+            {
+                id: 'vodafone',
+                name: 'Vodafone',
+                asns: ['12430', '6739'],
+                logo: { src: '/stats/img/vodafone.svg', alt: 'Vodafone' }
+            },
+            {
+                id: 'telefonica',
+                name: 'Telefónica de España',
+                asns: ['3352'],
+                logo: { src: '/stats/img/movistar.svg', alt: 'Telefónica de España' }
+            },
+            {
+                id: 'digi',
+                name: 'Digi Spain',
+                asns: ['57269'],
+                logo: { src: '/stats/img/digi.png', alt: 'Digi Spain' }
+            },
+            {
+                id: 'adamo',
+                name: 'Adamo Telecom',
+                asns: ['35699'],
+                logo: { src: '/stats/img/adamo.svg', alt: 'Adamo Telecom', className: 'isp-logo-adaptive' }
+            },
+            {
+                id: 'datacamp',
+                name: 'Datacamp / CDN77',
+                asns: ['212238', '60068'],
+                logo: { src: '/stats/img/cdn77.svg', alt: 'Datacamp / CDN77', className: 'isp-logo-cdn77' }
+            },
+            {
+                id: 'airenetworks',
+                name: 'Aire Networks',
+                asns: ['29119', '43590'],
+                logo: null
+            },
+            {
+                id: 'starlink',
+                name: 'SpaceX Starlink',
+                asns: ['14593', '27277', '397446'],
+                logo: null
+            }
+        ];
+
+        function extractAsnNumber(name) {
+            if (!name) return '';
+            const m = name.match(/AS(\d+)/i);
+            return m ? m[1] : '';
+        }
+
+        function groupAsnItems(rawItems, totalQueriesOverall) {
+            if (!rawItems || rawItems.length === 0) return [];
+
+            const groupedList = [];
+            const processedAsns = new Set();
+            const rawItemsByAsn = new Map();
+
+            rawItems.forEach(item => {
+                const asnNum = extractAsnNumber(item.name);
+                if (asnNum) {
+                    rawItemsByAsn.set(asnNum, item);
+                }
+            });
+
+            // 1. Process Predefined Groups
+            ASN_GROUPS_DEF.forEach(grp => {
+                const matchingChildren = [];
+                let groupCount = 0;
+                let groupV4Count = 0;
+                let groupV6Count = 0;
+
+                grp.asns.forEach(asnNum => {
+                    const found = rawItemsByAsn.get(asnNum);
+                    if (found) {
+                        matchingChildren.push(found);
+                        groupCount += (found.count || 0);
+                        groupV4Count += (found.ipv4_count || 0);
+                        groupV6Count += (found.ipv6_count || 0);
+                        processedAsns.add(asnNum);
+                    }
+                });
+
+                if (matchingChildren.length > 0) {
+                    matchingChildren.sort((a, b) => (b.count || 0) - (a.count || 0));
+
+                    const groupPct = totalQueriesOverall > 0 ? ((groupCount / totalQueriesOverall) * 100) : 0;
+                    const v4Pct = groupCount > 0 ? ((groupV4Count / groupCount) * 100) : 0;
+                    const v6Pct = groupCount > 0 ? ((groupV6Count / groupCount) * 100) : 0;
+
+                    const enrichedChildren = matchingChildren.map(child => {
+                        const childGroupPct = groupCount > 0 ? ((child.count / groupCount) * 100) : 0;
+                        return {
+                            ...child,
+                            percentOfGroup: Number(childGroupPct.toFixed(1)),
+                            logo: getIspLogo(child.name)
+                        };
+                    });
+
+                    groupedList.push({
+                        id: grp.id,
+                        name: grp.name,
+                        count: groupCount,
+                        percent: Number(groupPct.toFixed(1)),
+                        ipv4_percent: Number(v4Pct.toFixed(1)),
+                        ipv6_percent: Number(v6Pct.toFixed(1)),
+                        logo: grp.logo,
+                        isGroup: matchingChildren.length > 1,
+                        children: enrichedChildren
+                    });
+                }
+            });
+
+            // 2. Add remaining standalone ASNs
+            rawItems.forEach(item => {
+                const asnNum = extractAsnNumber(item.name);
+                if (asnNum && processedAsns.has(asnNum)) return;
+
+                const pct = totalQueriesOverall > 0 ? ((item.count / totalQueriesOverall) * 100) : (item.percent || 0);
+                groupedList.push({
+                    id: 'asn-' + (asnNum || Math.random().toString(36).substring(7)),
+                    name: item.name,
+                    count: item.count,
+                    percent: Number(pct.toFixed(1)),
+                    ipv4_percent: item.ipv4_percent,
+                    ipv6_percent: item.ipv6_percent,
+                    logo: getIspLogo(item.name),
+                    isGroup: false,
+                    children: [ item ]
+                });
+            });
+
+            // 3. Sort all groups & standalone by count descending
+            groupedList.sort((a, b) => (b.count || 0) - (a.count || 0));
+
+            return groupedList;
+        }
+
+        const expandedGroupIds = new Set();
+
+        function toggleAsnGroup(groupId, rowEl, drawerEl) {
+            if (!drawerEl || !rowEl) return;
+            const isCurrentlyOpen = rowEl.classList.contains('open');
+            if (isCurrentlyOpen) {
+                rowEl.classList.remove('open');
+                rowEl.setAttribute('aria-expanded', 'false');
+                drawerEl.classList.remove('open');
+                expandedGroupIds.delete(groupId);
+            } else {
+                rowEl.classList.add('open');
+                rowEl.setAttribute('aria-expanded', 'true');
+                drawerEl.classList.add('open');
+                expandedGroupIds.add(groupId);
+            }
         }
 
         // Helper to create a stat row element
@@ -1340,6 +1614,156 @@
             return row;
         }
 
+        // Helper to create an ASN row with expandable sub-ASN support
+        function createAsnRow(groupItem, maxCount) {
+            const percent = maxCount > 0 ? (groupItem.count / maxCount) * 100 : 0;
+            const row = document.createElement('div');
+            row.className = 'stats-row-item';
+
+            const bgBar = document.createElement('div');
+            bgBar.className = 'row-bg-bar';
+            bgBar.style.width = '0%';
+            bgBar.setAttribute('data-target-width', `${percent}%`);
+            row.appendChild(bgBar);
+
+            const itemLeft = document.createElement('div');
+            itemLeft.className = 'item-left';
+
+            const nameRow = document.createElement('div');
+            nameRow.className = 'item-name-row';
+
+            const logo = groupItem.logo || getIspLogo(groupItem.name);
+            if (logo) {
+                const img = document.createElement('img');
+                img.className = 'isp-logo' + (logo.className ? ' ' + logo.className : '');
+                img.src = logo.src || logo;
+                img.alt = logo.alt || '';
+                img.loading = 'lazy';
+                nameRow.appendChild(img);
+            }
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'item-name';
+            nameSpan.innerText = groupItem.name;
+            nameRow.appendChild(nameSpan);
+
+            if (groupItem.isGroup && groupItem.children && groupItem.children.length > 1) {
+                const badge = document.createElement('span');
+                badge.className = 'asn-group-badge';
+                badge.innerText = `${groupItem.children.length} ASNs`;
+                nameRow.appendChild(badge);
+            }
+
+            itemLeft.appendChild(nameRow);
+
+            if (groupItem.ipv4_percent !== undefined && groupItem.ipv6_percent !== undefined) {
+                const subSpan = document.createElement('span');
+                subSpan.className = 'item-sub';
+                subSpan.innerText = `IPv4: ${groupItem.ipv4_percent}% • IPv6: ${groupItem.ipv6_percent}%`;
+                itemLeft.appendChild(subSpan);
+            }
+
+            row.appendChild(itemLeft);
+
+            const countSpan = document.createElement('span');
+            countSpan.className = 'item-count';
+
+            const countText = groupItem.percent !== undefined
+                ? `${groupItem.percent}% (${Number(groupItem.count).toLocaleString()})`
+                : Number(groupItem.count).toLocaleString();
+
+            if (groupItem.isGroup && groupItem.children && groupItem.children.length > 1) {
+                countSpan.innerHTML = `${countText} <span class="asn-expand-icon">▼</span>`;
+            } else {
+                countSpan.innerText = countText;
+            }
+            row.appendChild(countSpan);
+
+            setTimeout(() => {
+                bgBar.style.width = `${percent}%`;
+            }, 50);
+
+            // If it is a group with multiple children, create drawer and wire up toggle
+            let drawer = null;
+            if (groupItem.isGroup && groupItem.children && groupItem.children.length > 1) {
+                row.classList.add('stats-row-group');
+                row.setAttribute('role', 'button');
+                row.setAttribute('tabindex', '0');
+                row.setAttribute('aria-expanded', expandedGroupIds.has(groupItem.id) ? 'true' : 'false');
+                if (expandedGroupIds.has(groupItem.id)) {
+                    row.classList.add('open');
+                }
+
+                drawer = document.createElement('div');
+                drawer.className = 'asn-group-drawer';
+                drawer.id = `drawer-${groupItem.id}`;
+                if (expandedGroupIds.has(groupItem.id)) {
+                    drawer.classList.add('open');
+                }
+
+                const ofGroupText = (window.i18n && window.i18n.t('stats.of_group')) || 'del grupo';
+                const totalText = (window.i18n && window.i18n.t('stats.of_total')) || 'total';
+
+                groupItem.children.forEach(child => {
+                    const subItem = document.createElement('div');
+                    subItem.className = 'asn-sub-item';
+
+                    const subBgBar = document.createElement('div');
+                    subBgBar.className = 'asn-sub-bg-bar';
+                    subBgBar.style.width = `${child.percentOfGroup || 0}%`;
+                    subItem.appendChild(subBgBar);
+
+                    const subLeft = document.createElement('div');
+                    subLeft.className = 'item-left';
+
+                    const subNameRow = document.createElement('div');
+                    subNameRow.className = 'item-name-row';
+
+                    const childLogo = child.logo || getIspLogo(child.name);
+                    if (childLogo) {
+                        const cImg = document.createElement('img');
+                        cImg.className = 'isp-logo' + (childLogo.className ? ' ' + childLogo.className : '');
+                        cImg.src = childLogo.src || childLogo;
+                        cImg.alt = childLogo.alt || '';
+                        cImg.loading = 'lazy';
+                        subNameRow.appendChild(cImg);
+                    }
+
+                    const cName = document.createElement('span');
+                    cName.className = 'item-name';
+                    cName.innerText = child.name;
+                    subNameRow.appendChild(cName);
+                    subLeft.appendChild(subNameRow);
+
+                    if (child.ipv4_percent !== undefined && child.ipv6_percent !== undefined) {
+                        const cSub = document.createElement('span');
+                        cSub.className = 'item-sub';
+                        cSub.innerText = `IPv4: ${child.ipv4_percent}% • IPv6: ${child.ipv6_percent}%`;
+                        subLeft.appendChild(cSub);
+                    }
+                    subItem.appendChild(subLeft);
+
+                    const subCount = document.createElement('span');
+                    subCount.className = 'item-count';
+                    subCount.innerText = `${Number(child.count).toLocaleString()} (${child.percentOfGroup}% ${ofGroupText} • ${child.percent}% ${totalText})`;
+                    subItem.appendChild(subCount);
+
+                    drawer.appendChild(subItem);
+                });
+
+                const clickHandler = () => toggleAsnGroup(groupItem.id, row, drawer);
+                row.onclick = clickHandler;
+                row.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        clickHandler();
+                    }
+                };
+            }
+
+            return { row, drawer };
+        }
+
         // Render standard stats list (filtering out ANY query type).
         // maxItems: hard cap (0 = unlimited). Entries beyond the cap are never rendered.
         function renderStatsList(elementId, items, isAsn = false, maxItems = 0) {
@@ -1392,32 +1816,42 @@
             container.innerHTML = '';
 
             const isIsp = category === 'isp';
-            const ispItems = statsObj.top_asns_isp && statsObj.top_asns_isp.length > 0 ? statsObj.top_asns_isp : (statsObj.top_asns || []);
-            const dcItems = statsObj.top_asns_datacenter || [];
-            const otherItems = isIsp ? dcItems : ispItems;
-            const currentItems = (isIsp ? ispItems : dcItems).slice(0, otherItems.length > 0 ? 9 : 10);
+            const ispRaw = statsObj.top_asns_isp && statsObj.top_asns_isp.length > 0 ? statsObj.top_asns_isp : (statsObj.top_asns || []);
+            const dcRaw = statsObj.top_asns_datacenter || [];
 
-            if (!currentItems || currentItems.length === 0) {
+            const totalQueries = statsObj.total || 0;
+            const ispGroups = groupAsnItems(ispRaw, totalQueries);
+            const dcGroups = groupAsnItems(dcRaw, totalQueries);
+
+            const currentGroups = isIsp ? ispGroups : dcGroups;
+            const otherGroups = isIsp ? dcGroups : ispGroups;
+
+            const displayGroups = currentGroups.slice(0, otherGroups.length > 0 ? 9 : 10);
+
+            if (!displayGroups || displayGroups.length === 0) {
                 const noDataText = (window.i18n && window.i18n.t('stats.no_data')) || 'Sin consultas registradas.';
                 container.innerHTML = `<div class="empty-msg">${noDataText}</div>`;
                 return;
             }
 
-            const otherTotal = otherItems.reduce((acc, curr) => acc + (curr.count || 0), 0);
-            const allItemsForMax = [...currentItems];
+            const otherTotal = otherGroups.reduce((acc, curr) => acc + (curr.count || 0), 0);
+            const allItemsForMax = [...displayGroups];
             if (otherTotal > 0) {
                 allItemsForMax.push({ count: otherTotal });
             }
             const maxCount = Math.max(...allItemsForMax.map(i => i.count), 1);
 
-            // 1. Render Top 9 current items
-            currentItems.forEach(item => {
-                const row = createStatRow(item, maxCount, true);
+            // 1. Render Top 9 grouped items
+            displayGroups.forEach(grp => {
+                const { row, drawer } = createAsnRow(grp, maxCount);
                 container.appendChild(row);
+                if (drawer) {
+                    container.appendChild(drawer);
+                }
             });
 
             // 2. Render 10th item: Toggle card with identical layout and count
-            if (otherItems.length > 0) {
+            if (otherGroups.length > 0) {
                 const targetCategory = isIsp ? 'datacenter' : 'isp';
                 const nameKey = isIsp ? 'stats.asn_toggle_to_dc' : 'stats.asn_toggle_to_isp';
                 const subKey = isIsp ? 'stats.asn_toggle_to_dc_sub' : 'stats.asn_toggle_to_isp_sub';

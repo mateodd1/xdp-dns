@@ -1,0 +1,10 @@
+<svg id="masorange_logo_dark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80">
+  <defs>
+    <style>
+      .cls-plus { fill: #ffffff; }
+      .cls-circle { stroke: #ff7900; }
+    </style>
+  </defs>
+  <path class="cls-plus" d="M24 16h10v18h18v10H34v18H24V44H6V34h18V16z"/>
+  <circle class="cls-circle" cx="72" cy="39" r="18" fill="none" stroke-width="10"/>
+</svg>
