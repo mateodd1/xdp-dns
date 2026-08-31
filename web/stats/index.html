@@ -1364,7 +1364,7 @@
             if (/\bas202673\b/.test(lower) || lower.includes('ohz')) {
                 return { src: '/stats/img/ohz.svg', alt: 'Ohz Digital' };
             }
-            if (/\bas(200845|201337|202583|44188|50977|59631|60675|3348|39744)\b/.test(lower) || lower.includes('avatel')) {
+            if (/\bas(200845|199952|203936|16030|198411|199841|200290|201337|202169|202583|207030|207923|212941|3348|35404|39281|39744|40996|41418|41531|44188|49000|50977|59631|60675)\b/.test(lower) || lower.includes('avatel') || lower.includes('mismenet') || lower.includes('torrevieja')) {
                 return { src: '/stats/img/avatel.svg', alt: 'Avatel Telecom' };
             }
             return null;
@@ -1389,7 +1389,12 @@
             {
                 id: 'avatel',
                 name: 'Avatel Telecom',
-                asns: ['200845', '201337', '202583', '44188', '50977', '59631', '60675', '3348', '39744', '39281', '41531', '199952', '200290'],
+                asns: [
+                    '200845', '199952', '203936', '16030', '198411', '199841', '200290',
+                    '201337', '202169', '202583', '207030', '207923', '212941', '3348',
+                    '35404', '39281', '39744', '40996', '41418', '41531', '44188',
+                    '49000', '50977', '59631', '60675'
+                ],
                 logo: { src: '/stats/img/avatel.svg', alt: 'Avatel Telecom' },
                 alwaysGroup: true
             },
