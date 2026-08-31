@@ -1,0 +1,19 @@
+[Unit]
+Description=xdp.es DNS cache warmer (Tranco top-N contra Unbound)
+After=network-online.target unbound.service unbound-lite.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/xpd-dns/scripts/cache-warmer.py
+Environment=WARMER_TOP=20000
+Environment=WARMER_QPS=200
+StateDirectory=xdp-cache-warmer
+Environment=WARMER_STATE_DIR=/var/lib/xdp-cache-warmer
+Nice=19
+IOSchedulingClass=idle
+TimeoutStartSec=45min
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only

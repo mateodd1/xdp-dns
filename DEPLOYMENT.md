@@ -21,6 +21,7 @@
    - [5.2 Sincronización de Prefijos Cloudflare AS13335](#52-sincronización-de-prefijos-cloudflare-as13335)
    - [5.3 Motor de Estadísticas y ASNs (Cada 30 seg)](#53-motor-de-estadísticas-y-asns-cada-30-seg)
    - [5.4 Panel Interno de Bloqueos (/blocked)](#54-panel-interno-de-bloqueos-blocked)
+   - [5.5 Calentador de Caché DNS (Cada 2 h)](#55-calentador-de-caché-dns-cada-2-h)
 6. [Seguridad y Optimización del Sistema (Kernel y Firewall)](#6-seguridad-y-optimización-del-sistema)
 7. [Guía de Comandos de Gestión y Mantenimiento](#7-guía-de-comandos-de-gestión-y-mantenimiento)
 8. [Mapa de Archivos y Directorios](#8-mapa-de-archivos-y-directorios)
@@ -134,6 +135,7 @@
   3. Comprueba por búsqueda binaria de intervalos `O(log N)` en 0.001 µs si la IP del registro `A` o `AAAA` está en la lista de bloqueo **Y** pertenece a Cloudflare.
   4. Si cumple ambas condiciones, busca en el mismo prefijo una IP contigua que **NO esté en la lista de bloqueos**.
   5. Si la IP pertenece a otro proveedor (Google, AWS, etc.), **NO se modifica**.
+  6. Las respuestas reescritas salen con TTL `EVADE_REWRITE_TTL` (30 s por defecto, antes 0) para que el cliente las cachee brevemente sin perder reactividad ante cambios en la lista de bloqueos (recarga cada 5 s).
 
 ### 4.5 Unbound (Resolver Recursivo Puro)
 * **Archivo de configuración**: `/etc/unbound/unbound.conf` (respaldado en `/root/xpd-dns/unbound/unbound.conf`)
@@ -163,7 +165,7 @@
   2. Compara atómicamente con `/etc/unbound/blocked_ips.txt`.
   3. Si hay cambios:
      * Actualiza el archivo de bloqueos.
-     * **Purga automáticamente las cachés** de Blocky (`blocky cache flush --apiPort 4000/4001`) y Unbound (`unbound-control flush_zone .`).
+     * **No purga cachés**: el evade-proxy recarga las listas cada 5 s y reescribe cada respuesta al vuelo, así que la caché de Unbound (con las IPs originales) sigue siendo válida.
      * Ejecuta `generate-blocked-json.py` para refrescar el panel interno `/blocked`.
   4. Si no hay cambios, no realiza escrituras en disco.
 
@@ -188,6 +190,15 @@
   * Acceso privado sin enlaces en navegación pública.
   * `Disallow: /blocked` y `noindex` para buscadores.
   * Visualización en vivo de cada IP baneada, su prefijo BGP y la IP alternativa asignada.
+
+### 5.5 Calentador de Caché DNS (Cada 2 h)
+* **Script**: `/root/xpd-dns/scripts/cache-warmer.py`
+* **Servicio & Timer**: `xdp-cache-warmer.service` / `xdp-cache-warmer.timer` (`OnUnitActiveSec=2h`, `OnBootSec=5min`)
+* **Lógica**:
+  1. Descarga la lista Tranco (`top-1m.csv.zip`) una vez al día a `/var/lib/xdp-cache-warmer/`.
+  2. Resuelve los `WARMER_TOP` (20 000) dominios más populares en `A`, `AAAA` y `HTTPS` directamente contra los dos Unbound (`5336` principal y `5338` lite), a `WARMER_QPS` (200) consultas/s.
+  3. Junto con `prefetch: yes` y `serve-expired` (con `serve-expired-client-timeout: 100`), mantiene calientes los dominios populares y sus delegaciones, de modo que la primera consulta de un usuario ya es un acierto de caché.
+* **Comprobación**: `journalctl -u xdp-cache-warmer -o cat | tail -2` muestra consultas, aciertos (<5 ms) y RTT medio de cada pasada.
 
 ---
 
@@ -289,6 +300,7 @@ curl -s -H "accept: application/dns-message" "https://dns.xdp.es/dns-query?dns=A
 │   ├── update-blocked-ips.sh           # Script de sincronización de bloqueos cada 1 min
 │   ├── update-cloudflare-prefixes.py   # Script de actualización de prefijos Cloudflare
 │   ├── update-stats.py                 # Scraper y agregador de estadísticas de Prometheus
+│   ├── cache-warmer.py                 # Calentador de caché (Tranco top-N contra Unbound)
 │   ├── generate-blocked-json.py        # Generador de datos JSON para /blocked
 │   ├── history.json                    # Historial persistente horario de métricas
 │   └── asn_cache.json                  # Caché local de resoluciones de ASN
@@ -296,7 +308,9 @@ curl -s -H "accept: application/dns-message" "https://dns.xdp.es/dns-query?dns=A
 │   ├── update-blocked-ips.service      # Servicio oneshot para sincronización de bloqueos
 │   ├── update-blocked-ips.timer        # Timer cada 1 minuto para update-blocked-ips
 │   ├── update-stats.service            # Servicio oneshot para estadísticas
-│   └── update-stats.timer              # Timer cada 30 segundos para update-stats
+│   ├── update-stats.timer              # Timer cada 30 segundos para update-stats
+│   ├── xdp-cache-warmer.service        # Servicio oneshot del calentador de caché
+│   └── xdp-cache-warmer.timer          # Timer cada 2 horas para xdp-cache-warmer
 └── web/
     ├── index.html                      # Landing page principal
     ├── stats/index.html                # Panel de estadísticas públicas en vivo

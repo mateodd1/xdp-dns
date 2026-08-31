@@ -7,8 +7,9 @@ listeners DNS UDP/TCP `5335 -> 5336` y `5337 -> 5338`, las métricas HTTP en
 
 El proxy modifica los RDATA A/AAAA directamente sobre el paquete DNS. Así evita
 reconstruir el mensaje completo y conserva nombres comprimidos, flags y orden de
-registros. Cuando reemplaza al menos una dirección pone a cero el TTL de todos
-los resource records, igual que el servicio Python.
+registros. Cuando reemplaza al menos una dirección fija el TTL de todos los
+resource records a `EVADE_REWRITE_TTL` segundos (30 por defecto; `0` reproduce
+el comportamiento antiguo del servicio Python, sin caché en el cliente).
 
 ## Compilar e instalar
 
@@ -32,7 +33,8 @@ y consultar `http://127.0.0.1:5339/metrics`.
 
 Las rutas compatibles se usan por defecto. Para pruebas pueden sobrescribirse
 mediante `EVADE_BLOCKED_IPV4_FILE`, `EVADE_BLOCKED_IPV6_FILE`,
-`EVADE_CF_IPV4_FILE`, `EVADE_CF_IPV6_FILE` y `EVADE_STATS_FILE`.
+`EVADE_CF_IPV4_FILE`, `EVADE_CF_IPV6_FILE`, `EVADE_STATS_FILE` y
+`EVADE_REWRITE_TTL`.
 
 ## Modo de prueba y redirecciones
 
