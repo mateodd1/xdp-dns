@@ -612,6 +612,11 @@
             content: url('/stats/img/fibritel-dark.svg');
         }
 
+        [data-theme="dark"] .isp-logo-olin,
+        [data-theme="oled"] .isp-logo-olin {
+            content: url('/stats/img/olin-dark.svg');
+        }
+
         /* Grouped ASN Rows & Accordion Drawers */
         .stats-row-item.stats-row-group {
             cursor: pointer;
@@ -1388,6 +1393,9 @@
             }
             if (/\bas208909\b/.test(lower) || lower.includes('vera') || lower.includes('gurbtec') || lower.includes('iguana telecom')) {
                 return { src: '/stats/img/vera.svg', alt: 'Vera' };
+            }
+            if (/\bas201746\b/.test(lower) || lower.includes('olin') || lower.includes('olivenet')) {
+                return { src: '/stats/img/olin.svg', alt: 'Olin', className: 'isp-logo-olin' };
             }
             return null;
         }
