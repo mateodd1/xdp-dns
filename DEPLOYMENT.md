@@ -140,6 +140,11 @@
 ### 4.5 Unbound (Resolver Recursivo Puro)
 * **Archivo de configuración**: `/etc/unbound/unbound.conf` (respaldado en `/root/xpd-dns/unbound/unbound.conf`)
 * **Servicio Systemd**: `unbound.service`
+* **Ajustes de latencia** (aplicables en caliente con `unbound-control set_option`, salvo la zona raíz que requiere `reload_keep_cache`):
+  * `prefer-ip4: yes`: desde este host IPv6 hacia los autoritativos sale por rutas peores (`.es`: 0-2 ms por IPv4 frente a 32-46 ms por IPv6).
+  * `fast-server-num: 1`: el 90 % de las consultas van al servidor autoritativo con menor RTT medido (con 3, `.es` caía la mitad de las veces en `h.nic.es` a 68 ms).
+  * `serve-expired-client-timeout: 100`: una entrada caducada se sirve tras 100 ms como máximo mientras se refresca en segundo plano.
+  * `auth-zone "."` (RFC 8806): copia local de la zona raíz por AXFR desde c/f/k/b/d/g-root e ICANN (`/var/lib/unbound/root.zone`, `root-lite.zone` para el lite). Consultas a la raíz a 0 ms y TLD inexistentes al instante; `fallback-enabled: yes` recurre a la raíz real si la transferencia falla. Comprobar con `unbound-control list_auth_zones`.
 * **Puerto de escucha**: `127.0.0.1:5336` y `::1:5336`.
 * **Características**:
   * `num-threads: 8` con slabs de memoria (`so-reuseport: yes`, buffers de 16MB).
