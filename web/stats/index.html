@@ -1051,6 +1051,43 @@
                 border-top: 1px solid var(--border);
                 padding-top: 10px;
             }
+
+            /* Keep expanded ASN groups within the viewport.  The per-ASN
+               breakdown has a longer count label than the parent row, so it
+               needs its own vertical layout on narrow screens. */
+            .stats-row-item,
+            .asn-sub-item {
+                min-width: 0;
+            }
+
+            .item-left,
+            .item-name-row,
+            .item-name {
+                min-width: 0;
+            }
+
+            .item-left {
+                flex: 1 1 auto;
+            }
+
+            .asn-group-drawer {
+                margin-left: 8px;
+                padding-left: 10px;
+            }
+
+            .asn-sub-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 5px;
+            }
+
+            .asn-sub-item .item-count {
+                align-self: center;
+                max-width: 100%;
+                white-space: normal;
+                text-align: center;
+                line-height: 1.3;
+            }
         }
 
         /* Site Footer */
@@ -1521,7 +1558,10 @@
                         };
                     });
 
-                    const isMulti = grp.alwaysGroup || matchingChildren.length > 1;
+                    // A drawer is useful only when there is more than one
+                    // ASN to inspect.  Keep a lone ASN as a normal row even
+                    // when it belongs to a predefined operator group.
+                    const isMulti = matchingChildren.length > 1;
                     const displayName = isMulti ? grp.name : matchingChildren[0].name;
 
                     groupedList.push({
