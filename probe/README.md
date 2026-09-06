@@ -29,11 +29,14 @@ no desde casa**, con histéresis (3 rondas) para evitar falsos positivos.
 - **cf-blocklist** (Cloudflare anycast: `sc.ohz.ovh`, `turgame.com`, `descargasdd.org`):
   la IP bloqueada se añade a `/etc/unbound/probe_blocked_ipv6.txt`, `update-blocked-ips.sh`
   la une a `blocked_ipv6.txt` y el evade-proxy salta al vecino del prefijo (seguro en CF).
-- **verified-pool** (CDN NO anycast — GitHub, Fastly y Akamai/GeoDNS: `github.com`,
-  `gist.github.com`, `gist.githubusercontent.com`, `raw.githubusercontent.com`,
-  `twitch.tv`, `steamcommunity.com`, `store.steampowered.com`): NO se puede saltar a
-  ciegas (una IP vecina puede estar muerta o servir otro sitio — los edges de Akamai
-  **no** son intercambiables), así que se fija un `redirect` a una IP del pool
+- **verified-pool** (CDN NO anycast — GitHub, Fastly, CloudFront y Akamai/GeoDNS:
+  `github.com`, `gist.github.com`, `gist.githubusercontent.com`,
+  `raw.githubusercontent.com`, Twitch web+CDN (`twitch.tv`, `gql.twitch.tv`,
+  `usher.ttvnw.net`, `static.twitchcdn.net`, …), `steamcommunity.com`,
+  `store.steampowered.com`, Redsys (`sis.redsys.es`, `www.redsys.es`,
+  `pagosonline.redsys.es`)): NO se puede saltar a ciegas (una IP vecina puede
+  estar muerta o servir otro sitio — los edges de Akamai **no** son
+  intercambiables), así que se fija un `redirect` a una IP del pool
   **verificada sirviendo** desde casa Y desde el servidor (con su SNI y cert válido),
   en `/run/evade-proxy/redirects.txt`. Si ninguna candidata sirve, no se toca nada.
 
@@ -47,10 +50,13 @@ no desde casa**, con histéresis (3 rondas) para evitar falsos positivos.
 
 `extra_candidates` da un pool de failover a dominios con una sola IP en DNS
 (github.com / gist.github.com traen las IPs-frontend de GitHub verificadas;
-Steam trae edges Akamai verificados sirviendo cada hostname; Twitch, las 4 IPs
-Fastly). `turgame.com` no publica AAAA ahora mismo: queda configurado y empezará
-a sondearse en cuanto tenga registro IPv6. Steam y Twitch solo publican A (sin
-AAAA), por eso van en `families: [4]`.
+Steam trae edges Akamai verificados sirviendo cada hostname; Twitch Fastly las
+IPs 151.101.{2,66,130,194,134}.{167,214}, Twitch CloudFront usher/static/API, y
+Redsys los edges Akamai de `sis.redsys.es` más los orígenes 195.76.9.x /
+193.16.243.x). `turgame.com` no publica AAAA ahora mismo: queda configurado y
+empezará a sondearse en cuanto tenga registro IPv6. Steam, Redsys y la web
+Fastly de Twitch solo publican A (sin AAAA), por eso van en `families: [4]`;
+`usher.ttvnw.net` y `static.twitchcdn.net` sí tienen AAAA y se sondean en v4+v6.
 
 ## Servidor (ya desplegado)
 

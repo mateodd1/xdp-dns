@@ -450,13 +450,39 @@ SERVICE_DEFINITIONS = [
         "icon": "twitch",
         "critical": False,
         "domains": [
-            "twitch.tv"
+            "twitch.tv",
+            "www.twitch.tv",
+            "gql.twitch.tv",
+            "assets.twitch.tv",
+            "player.twitch.tv",
+            "static-cdn.jtvnw.net",
+            "usher.ttvnw.net",
+            "static.twitchcdn.net",
+            "api.twitch.tv"
         ],
         "strategy": "verified-pool",
-        "impact_es": "Cortes de directos si el edge Fastly de Twitch está filtrado.",
-        "impact_en": "Live stream drops if Twitch's Fastly edge is filtered.",
-        "mitigation_es": "Conmutación a un edge Fastly no filtrado verificado por la sonda.",
-        "mitigation_en": "Failover to an unfiltered Fastly edge verified by the probe."
+        "impact_es": "Cortes de web, API, assets y directos si los edges Fastly o CloudFront (usher/CDN) están filtrados.",
+        "impact_en": "Website, API, assets and live-stream drops if Fastly or CloudFront (usher/CDN) edges are filtered.",
+        "mitigation_es": "Conmutación a un edge Fastly/CloudFront no filtrado verificado por la sonda.",
+        "mitigation_en": "Failover to an unfiltered Fastly/CloudFront edge verified by the probe."
+    },
+    {
+        "id": "redsys",
+        "name": "Redsys (TPV)",
+        "category_key": "blocked.category_payments",
+        "default_category": "Pagos / TPV",
+        "icon": "redsys",
+        "critical": True,
+        "domains": [
+            "sis.redsys.es",
+            "www.redsys.es",
+            "pagosonline.redsys.es"
+        ],
+        "strategy": "verified-pool",
+        "impact_es": "Fallo del TPV y del checkout en comercios si el edge Akamai de sis.redsys.es o los orígenes de pagos coinciden con la blocklist.",
+        "impact_en": "TPV and checkout failures if the Akamai edge for sis.redsys.es or payment origins match the blocklist.",
+        "mitigation_es": "Sustitución por un edge Akamai u origen Redsys verificado por la sonda.",
+        "mitigation_en": "Replacement with an Akamai edge or Redsys origin verified by the probe."
     }
 ]
 
