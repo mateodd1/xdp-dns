@@ -1434,6 +1434,9 @@
             if (/\bas201746\b/.test(lower) || lower.includes('olin') || lower.includes('olivenet')) {
                 return { src: '/stats/img/olin.svg', alt: 'Olin', className: 'isp-logo-olin' };
             }
+            if (/\bas(12322|51207)\b/.test(lower) || lower.includes('free sas') || lower.includes('free mobile') || lower.includes('proxad')) {
+                return { src: '/stats/img/free.svg', alt: 'Free SAS' };
+            }
             return null;
         }
 
