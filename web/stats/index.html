@@ -1590,10 +1590,8 @@
                         };
                     });
 
-                    // A drawer is useful only when there is more than one
-                    // ASN to inspect.  Keep a lone ASN as a normal row even
-                    // when it belongs to a predefined operator group.
-                    const isMulti = matchingChildren.length > 1;
+                    // Check if group should always render as an accordion group or only when multi-ASN
+                    const isMulti = matchingChildren.length > 1 || Boolean(grp.alwaysGroup);
                     const displayName = isMulti ? grp.name : matchingChildren[0].name;
 
                     groupedList.push({
