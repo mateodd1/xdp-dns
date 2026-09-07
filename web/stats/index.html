@@ -1453,6 +1453,9 @@
             if (/\bas(14593|27277|397446)\b/.test(lower) || lower.includes('starlink') || lower.includes('spacex')) {
                 return { src: '/stats/img/starlink.svg', alt: 'Starlink', className: 'isp-logo-starlink' };
             }
+            if (/\bas(15557|21502|8228|12760|31529|20766|15600|5605|25215|28885|44177)\b/.test(lower) || lower.includes('sfr') || lower.includes('radiotelephone')) {
+                return { src: '/stats/img/sfr.svg', alt: 'SFR SA' };
+            }
             return null;
         }
 
@@ -1489,6 +1492,16 @@
                 name: 'Datacamp / CDN77',
                 asns: ['212238', '60068'],
                 logo: { src: '/stats/img/cdn77.svg', alt: 'Datacamp / CDN77', className: 'isp-logo-cdn77' },
+                alwaysGroup: true
+            },
+            {
+                id: 'sfr',
+                name: 'SFR SA',
+                asns: [
+                    '15557', '21502', '8228', '12760', '31529',
+                    '20766', '15600', '5605', '25215', '28885', '44177'
+                ],
+                logo: { src: '/stats/img/sfr.svg', alt: 'SFR SA' },
                 alwaysGroup: true
             },
             {

@@ -168,6 +168,19 @@ CUSTOM_ASN_NAMES = {
     '27277': 'Starlink',
     '397446': 'Starlink',
 
+    # SFR Altice France
+    '15557': 'SFR SA',
+    '21502': 'SFR Fibre (SFR)',
+    '8228': 'Numericable (SFR)',
+    '12760': 'Cegetel (SFR)',
+    '31529': 'SFR Group',
+    '20766': 'SFR Business',
+    '15600': 'SFR SA',
+    '5605': 'Neuf Cegetel (SFR)',
+    '25215': 'SFR SA',
+    '28885': 'SFR SA',
+    '44177': 'SFR Business',
+
     # Datacenters
     '212238': 'Datacamp/CDN77',
     '60068': 'Datacamp/CDN77',
