@@ -164,7 +164,9 @@ CUSTOM_ASN_NAMES = {
 
     '29119': 'Aire Networks',
     '43590': 'Aire Networks',
-    '14593': 'SpaceX Starlink',
+    '14593': 'Starlink',
+    '27277': 'Starlink',
+    '397446': 'Starlink',
 
     # Datacenters
     '212238': 'Datacamp/CDN77',
