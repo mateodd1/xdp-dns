@@ -1450,7 +1450,7 @@
             if (/\bas49635\b/.test(lower) || lower.includes('cloudi')) {
                 return { src: '/stats/img/cloudi.svg', alt: 'Cloudi Nextgen', className: 'isp-logo-cloudi' };
             }
-            if (/\bas(14593|27277|397446)\b/.test(lower) || lower.includes('starlink') || lower.includes('spacex')) {
+            if (/\bas(14593|27277)\b/.test(lower) || lower.includes('starlink') || lower.includes('spacex')) {
                 return { src: '/stats/img/starlink.svg', alt: 'Starlink', className: 'isp-logo-starlink' };
             }
             if (/\bas(15557|21502|8228|12760|31529|20766|15600|5605|25215|28885|44177)\b/.test(lower) || lower.includes('sfr') || lower.includes('radiotelephone')) {
@@ -1531,8 +1531,8 @@
             {
                 id: 'starlink',
                 name: 'SpaceX Starlink',
-                asns: ['14593', '27277', '397446'],
-                logo: null
+                asns: ['14593', '27277'],
+                logo: { src: '/stats/img/starlink.svg', alt: 'Starlink', className: 'isp-logo-starlink' }
             }
         ];
 
@@ -2094,7 +2094,7 @@
             const isOrange = lowerAS.includes('as12479') || lowerISP.includes('orange') || lowerORG.includes('orange');
             const isDigi = lowerAS.includes('as57269') || lowerISP.includes('digi') || lowerORG.includes('digi');
             const isMasmovil = lowerAS.includes('as15704') || lowerAS.includes('as210344') || lowerAS.includes('as15954') || lowerAS.includes('as56645') || lowerISP.includes('yoigo') || lowerISP.includes('masmovil') || lowerISP.includes('másmóvil') || lowerISP.includes('xfera') || lowerISP.includes('pepephone') || lowerISP.includes('euskaltel') || lowerORG.includes('yoigo') || lowerORG.includes('masmovil') || lowerORG.includes('másmóvil') || lowerORG.includes('xfera') || lowerORG.includes('pepephone') || lowerORG.includes('euskaltel');
-            const isStarlink = lowerAS.includes('as14593') || lowerAS.includes('as27277') || lowerAS.includes('as397446') || lowerISP.includes('starlink') || lowerISP.includes('spacex') || lowerORG.includes('starlink') || lowerORG.includes('spacex');
+            const isStarlink = lowerAS.includes('as14593') || lowerAS.includes('as27277') || lowerISP.includes('starlink') || lowerISP.includes('spacex') || lowerORG.includes('starlink') || lowerORG.includes('spacex');
 
             if (isVodafone) {
                 logoHtml = `<div class="connection-icon-wrapper"><img src="/stats/img/vodafone.svg" alt="Vodafone" style="width: 24px; height: 24px;" /></div>`;
