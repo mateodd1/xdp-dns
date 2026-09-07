@@ -162,6 +162,10 @@ CUSTOM_ASN_NAMES = {
     '12322': 'Free SAS',
     '51207': 'Free Mobile SAS',
 
+    '29119': 'Aire Networks',
+    '43590': 'Aire Networks',
+    '14593': 'SpaceX Starlink',
+
     # Datacenters
     '212238': 'Datacamp/CDN77',
     '60068': 'Datacamp/CDN77',
@@ -172,6 +176,8 @@ CUSTOM_ASN_NAMES = {
     '15169': 'Google',
     '19281': 'Quad9',
     '49635': 'Cloudi Nextgen',
+    '9009': 'M247 Europe',
+    '31898': 'Oracle Cloud',
 }
 
 def normalize_cached_asns(cache_dict):
@@ -673,8 +679,12 @@ def build_window_stats(history, window_seconds):
         is_ipv6 = ":" in ip
         asn_type = classify_asn(asn_name, asn_num, country)
 
-        if asn_name not in asn_data:
-            asn_data[asn_name] = {
+        asn_key = str(asn_num).strip().upper().replace('AS', '')
+        if not asn_key or asn_key == "0":
+            asn_key = asn_name
+
+        if asn_key not in asn_data:
+            asn_data[asn_key] = {
                 "name": asn_name,
                 "count": 0,
                 "ipv4_count": 0,
@@ -682,19 +692,20 @@ def build_window_stats(history, window_seconds):
                 "type": asn_type
             }
 
-        asn_data[asn_name]["count"] += int(cnt)
+        asn_data[asn_key]["count"] += int(cnt)
         total_asn_queries += int(cnt)
 
         if is_ipv6:
-            asn_data[asn_name]["ipv6_count"] += int(cnt)
+            asn_data[asn_key]["ipv6_count"] += int(cnt)
         else:
-            asn_data[asn_name]["ipv4_count"] += int(cnt)
+            asn_data[asn_key]["ipv4_count"] += int(cnt)
 
     top_asns_isp = []
     top_asns_datacenter = []
 
     # Sort ASNs by query volume
-    for name, item in sorted(asn_data.items(), key=lambda x: x[1]["count"], reverse=True):
+    for key, item in sorted(asn_data.items(), key=lambda x: x[1]["count"], reverse=True):
+        name = item["name"]
         c = item["count"]
         pct = round((c / total_asn_queries * 100), 1) if total_asn_queries > 0 else 0.0
         v4_c = item["ipv4_count"]
