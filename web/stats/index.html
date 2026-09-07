@@ -617,6 +617,11 @@
             content: url('/stats/img/olin-dark.svg');
         }
 
+        [data-theme="dark"] .isp-logo-cloudi,
+        [data-theme="oled"] .isp-logo-cloudi {
+            content: url('/stats/img/cloudi-dark.svg');
+        }
+
         /* Grouped ASN Rows & Accordion Drawers */
         .stats-row-item.stats-row-group {
             cursor: pointer;
@@ -1436,6 +1441,9 @@
             }
             if (/\bas(12322|51207)\b/.test(lower) || lower.includes('free sas') || lower.includes('free mobile') || lower.includes('proxad')) {
                 return { src: '/stats/img/free.svg', alt: 'Free SAS' };
+            }
+            if (/\bas49635\b/.test(lower) || lower.includes('cloudi')) {
+                return { src: '/stats/img/cloudi.svg', alt: 'Cloudi Nextgen', className: 'isp-logo-cloudi' };
             }
             return null;
         }

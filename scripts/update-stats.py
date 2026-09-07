@@ -171,6 +171,7 @@ CUSTOM_ASN_NAMES = {
     '13335': 'Cloudflare',
     '15169': 'Google',
     '19281': 'Quad9',
+    '49635': 'Cloudi Nextgen',
 }
 
 def normalize_cached_asns(cache_dict):
@@ -270,12 +271,10 @@ def resolve_asn(ip_str):
         return fallback, "0", ""
 
 KNOWN_ISP_ASNS = {
-    # Spanish National and Regional ISPs & Operators + Satellite / Starlink Residential + Major European Consumer ISPs
+    # Spanish National and Regional ISPs & Operators + Satellite / Starlink Residential
     '3352', '6739', '12430', '57269', '15704', '12479', '12338', '35699', '12946', '12334', '12715',
     '29119', '43590', '200845', '34977', '41368', '50392', '20743', '200543', '208272',
-    '202513', '202673', '203600', '208909', '201746', '14593', '27277', '397446',
-    '5410', '25543', '29074', '43389',
-    '12322', '51207'
+    '202513', '202673', '203600', '208909', '201746', '14593', '27277', '397446'
 }
 
 KNOWN_DC_ASNS = {
