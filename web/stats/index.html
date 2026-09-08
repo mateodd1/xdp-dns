@@ -1435,7 +1435,7 @@
             if (/\bas202513\b/.test(lower) || lower.includes('fibritel')) {
                 return { src: '/stats/img/fibritel.svg', alt: 'Fibritel', className: 'isp-logo-fibritel' };
             }
-            if (/\bas(5410|25543|29074|43389)\b/.test(lower) || lower.includes('bouygues')) {
+            if (/\bas(5410|12844|21093)\b/.test(lower) || lower.includes('bouygues')) {
                 return { src: '/stats/img/bouygues.svg', alt: 'Bouygues Telecom SA' };
             }
             if (/\bas208909\b/.test(lower) || lower.includes('vera') || lower.includes('gurbtec') || lower.includes('iguana telecom')) {
@@ -1453,7 +1453,7 @@
             if (/\bas(14593|27277)\b/.test(lower) || lower.includes('starlink') || lower.includes('spacex')) {
                 return { src: '/stats/img/starlink.svg', alt: 'Starlink', className: 'isp-logo-starlink' };
             }
-            if (/\bas(15557|21502|8228|12760|31529|20766|15600|5605|25215|28885|44177)\b/.test(lower) || lower.includes('sfr') || lower.includes('radiotelephone')) {
+            if (/\bas(15557|21502|8228|49112)\b/.test(lower) || lower.includes('sfr') || lower.includes('numericable') || lower.includes('cegetel')) {
                 return { src: '/stats/img/sfr.svg', alt: 'SFR SA' };
             }
             return null;
@@ -1497,24 +1497,21 @@
             {
                 id: 'sfr',
                 name: 'SFR SA',
-                asns: [
-                    '15557', '21502', '8228', '12760', '31529',
-                    '20766', '15600', '5605', '25215', '28885', '44177'
-                ],
+                asns: ['15557', '21502', '8228', '49112'],
                 logo: { src: '/stats/img/sfr.svg', alt: 'SFR SA' },
                 alwaysGroup: true
             },
             {
                 id: 'free',
                 name: 'Free SAS',
-                asns: ['12322', '51207', '31580', '197207'],
+                asns: ['12322', '51207'],
                 logo: { src: '/stats/img/free.svg', alt: 'Free SAS' },
                 alwaysGroup: true
             },
             {
                 id: 'bouygues',
                 name: 'Bouygues Telecom SA',
-                asns: ['5410', '25543', '29074', '43389', '35625', '48821'],
+                asns: ['5410', '12844', '21093'],
                 logo: { src: '/stats/img/bouygues.svg', alt: 'Bouygues Telecom SA' },
                 alwaysGroup: true
             },

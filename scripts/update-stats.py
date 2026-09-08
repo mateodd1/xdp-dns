@@ -137,7 +137,7 @@ CUSTOM_ASN_NAMES = {
     '201337': 'IngerTV (Avatel)',
     '202169': 'Scansat (Avatel)',
     '202583': 'Avatel Telecom',
-    '207030': 'AS1607 (Avatel)',
+    '207030': 'Avatel Telecom',
     '207923': 'Aireon (Avatel)',
     '212941': 'Telecastro (Avatel)',
     '3348': 'Avatel Telecom',
@@ -154,35 +154,23 @@ CUSTOM_ASN_NAMES = {
     '60675': 'Fonored (Avatel)',
     '34977': 'PTV Telecom',
     '5410': 'Bouygues Telecom SA',
-    '25543': 'Bouygues Telecom SA',
-    '29074': 'Bouygues Telecom SA',
-    '43389': 'Bouygues Telecom SA',
-    '35625': 'Bouygues Telecom SA',
-    '48821': 'Bouygues Telecom SA',
+    '12844': 'Bouygues Telecom SA',
+    '21093': 'Bouygues Telecom SA',
     '208909': 'Vera',
     '201746': 'Olin',
     '12322': 'Free SAS',
     '51207': 'Free Mobile SAS',
-    '31580': 'Free SAS',
-    '197207': 'Free Mobile',
 
     '29119': 'Aire Networks',
     '43590': 'Aire Networks',
     '14593': 'Starlink',
     '27277': 'Starlink',
 
-    # SFR Altice France
+    # SFR Altice France — only ASNs that actually belong to SFR SA
     '15557': 'SFR SA',
-    '21502': 'SFR Fibre (SFR)',
-    '8228': 'Numericable (SFR)',
-    '12760': 'Cegetel (SFR)',
-    '31529': 'SFR Group',
-    '20766': 'SFR Business',
-    '15600': 'SFR SA',
-    '5605': 'Neuf Cegetel (SFR)',
-    '25215': 'SFR SA',
-    '28885': 'SFR SA',
-    '44177': 'SFR Business',
+    '21502': 'Numericable (SFR)',
+    '8228': 'Cegetel (SFR)',
+    '49112': 'SFR SA',
 
     # Datacenters
     '212238': 'Datacamp/CDN77',
@@ -198,10 +186,30 @@ CUSTOM_ASN_NAMES = {
     '31898': 'Oracle Cloud',
 }
 
+# Force real org names for ASNs previously aliased to Free/SFR/Bouygues
+# so a stale asn_cache.json cannot resurrect those labels.
+ASN_NAME_CORRECTIONS = {
+    '197207': 'Mobile Communication Company of Iran PLC',
+    '31580': 'Moldtelecom SA',
+    '25543': 'ONATEL (Office National des Telecommunications, PTT)',
+    '29074': 'FAUST ISP LTD.',
+    '35625': 'Eurofiber France SAS',
+    '48821': 'Mauve Mailorder Software Verwaltung GmbH',
+    '31529': 'DENIC eG',
+    '20766': 'Association Gitoyen',
+    '15600': 'Quickline AG',
+    '5605': 'NetUSE AG',
+    '25215': 'BNP PARIBAS S.A.',
+    '28885': 'Oman Telecommunications Company (S.A.O.G)',
+    '44177': 'INBW Infrastruktur und Netzwerk Baden-Wuertemberg GmbH',
+}
+
 def normalize_cached_asns(cache_dict):
     for ip, data in list(cache_dict.items()):
         c_asn = str(data.get("asn", "")).strip().upper().replace('AS', '')
-        if c_asn in CUSTOM_ASN_NAMES:
+        if c_asn in ASN_NAME_CORRECTIONS:
+            data["name"] = f"AS{c_asn} ({ASN_NAME_CORRECTIONS[c_asn]})"
+        elif c_asn in CUSTOM_ASN_NAMES:
             data["name"] = f"AS{c_asn} ({CUSTOM_ASN_NAMES[c_asn]})"
         elif data.get("name", ""):
             data["name"] = re.sub(r'\((AS\s*[-–]\s*|[-–]\s*)', '(', data["name"], flags=re.IGNORECASE)
@@ -236,7 +244,9 @@ def resolve_asn(ip_str):
     if ip_str in asn_cache:
         cached = asn_cache[ip_str]
         c_asn = str(cached.get("asn", "0")).strip().upper().replace('AS', '')
-        if c_asn in CUSTOM_ASN_NAMES:
+        if c_asn in ASN_NAME_CORRECTIONS:
+            cached["name"] = f"AS{c_asn} ({ASN_NAME_CORRECTIONS[c_asn]})"
+        elif c_asn in CUSTOM_ASN_NAMES:
             cached["name"] = f"AS{c_asn} ({CUSTOM_ASN_NAMES[c_asn]})"
         return cached.get("name"), cached.get("asn", "0"), cached.get("country", "")
 
@@ -273,7 +283,9 @@ def resolve_asn(ip_str):
         raw_name = parts[-1].strip() if len(parts) >= 5 else f"AS{asn}"
         
         asn_clean_key = str(asn).strip().upper().replace('AS', '')
-        if asn_clean_key in CUSTOM_ASN_NAMES:
+        if asn_clean_key in ASN_NAME_CORRECTIONS:
+            clean_name = ASN_NAME_CORRECTIONS[asn_clean_key]
+        elif asn_clean_key in CUSTOM_ASN_NAMES:
             clean_name = CUSTOM_ASN_NAMES[asn_clean_key]
         else:
             if "-" in raw_name:
