@@ -1485,43 +1485,37 @@
                 id: 'masorange',
                 name: 'MásOrange',
                 asns: ['12479', '15704', '12338', '12946', '12334', '12715', '41368'],
-                logo: { src: '/stats/img/masorange.svg', alt: 'MásOrange', className: 'isp-logo-masorange' },
-                alwaysGroup: true
+                logo: { src: '/stats/img/masorange.svg', alt: 'MásOrange', className: 'isp-logo-masorange' }
             },
             {
                 id: 'vodafone',
                 name: 'Vodafone',
                 asns: ['12430', '6739'],
-                logo: { src: '/stats/img/vodafone.svg', alt: 'Vodafone' },
-                alwaysGroup: true
+                logo: { src: '/stats/img/vodafone.svg', alt: 'Vodafone' }
             },
             {
                 id: 'datacamp',
                 name: 'Datacamp / CDN77',
                 asns: ['212238', '60068'],
-                logo: { src: '/stats/img/cdn77.svg', alt: 'Datacamp / CDN77', className: 'isp-logo-cdn77' },
-                alwaysGroup: true
+                logo: { src: '/stats/img/cdn77.svg', alt: 'Datacamp / CDN77', className: 'isp-logo-cdn77' }
             },
             {
                 id: 'sfr',
                 name: 'SFR SA',
                 asns: ['15557', '21502', '8228', '49112'],
-                logo: { src: '/stats/img/sfr.svg', alt: 'SFR SA' },
-                alwaysGroup: true
+                logo: { src: '/stats/img/sfr.svg', alt: 'SFR SA' }
             },
             {
                 id: 'free',
                 name: 'Free SAS',
                 asns: ['12322', '51207'],
-                logo: { src: '/stats/img/free.svg', alt: 'Free SAS' },
-                alwaysGroup: true
+                logo: { src: '/stats/img/free.svg', alt: 'Free SAS' }
             },
             {
                 id: 'bouygues',
                 name: 'Bouygues Telecom SA',
                 asns: ['5410', '12844', '21093'],
-                logo: { src: '/stats/img/bouygues.svg', alt: 'Bouygues Telecom SA' },
-                alwaysGroup: true
+                logo: { src: '/stats/img/bouygues.svg', alt: 'Bouygues Telecom SA' }
             },
             {
                 id: 'telefonica',
@@ -1609,8 +1603,8 @@
                         };
                     });
 
-                    // Check if group should always render as an accordion group or only when multi-ASN
-                    const isMulti = matchingChildren.length > 1 || Boolean(grp.alwaysGroup);
+                    // Only render an accordion when at least two ASNs are present.
+                    const isMulti = matchingChildren.length > 1;
                     const displayName = isMulti ? grp.name : matchingChildren[0].name;
 
                     groupedList.push({
