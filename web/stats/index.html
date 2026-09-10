@@ -691,9 +691,10 @@
         .asn-sub-item {
             position: relative;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 7px 10px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+            padding: 9px 10px 8px;
             border-radius: 5px;
             font-size: 0.78rem;
             background-color: var(--bg-card);
@@ -720,14 +721,37 @@
 
         .asn-sub-item .item-name {
             font-size: 0.78rem;
+            word-break: normal;
+            overflow-wrap: anywhere;
         }
 
         .asn-sub-item .item-sub {
             font-size: 0.70rem;
         }
 
-        .asn-sub-item .item-count {
+        .asn-sub-usage {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+            padding-top: 6px;
+            border-top: 1px solid var(--border);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .asn-sub-query-count,
+        .asn-sub-percentages {
             font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-heading);
+        }
+
+        .asn-sub-percentages {
+            min-width: 0;
+            color: var(--text-secondary);
+            text-align: right;
         }
 
         .conn-isp-logo-main {
@@ -1085,17 +1109,13 @@
                 padding-left: 10px;
             }
 
-            .asn-sub-item {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 5px;
+            .asn-sub-usage {
+                align-items: flex-start;
+                flex-wrap: wrap;
             }
 
-            .asn-sub-item .item-count {
-                align-self: center;
-                max-width: 100%;
-                white-space: normal;
-                text-align: center;
+            .asn-sub-percentages {
+                margin-left: auto;
                 line-height: 1.3;
             }
         }
@@ -1875,10 +1895,20 @@
                     }
                     subItem.appendChild(subLeft);
 
+                    const subUsage = document.createElement('div');
+                    subUsage.className = 'asn-sub-usage';
+
                     const subCount = document.createElement('span');
-                    subCount.className = 'item-count';
-                    subCount.innerText = `${Number(child.count).toLocaleString()} (${child.percentOfGroup}% ${ofGroupText} • ${child.percent}% ${totalText})`;
-                    subItem.appendChild(subCount);
+                    subCount.className = 'asn-sub-query-count';
+                    subCount.innerText = Number(child.count).toLocaleString();
+                    subUsage.appendChild(subCount);
+
+                    const subPercentages = document.createElement('span');
+                    subPercentages.className = 'asn-sub-percentages';
+                    subPercentages.innerText = `${child.percentOfGroup}% ${ofGroupText} • ${child.percent}% ${totalText}`;
+                    subUsage.appendChild(subPercentages);
+
+                    subItem.appendChild(subUsage);
 
                     drawer.appendChild(subItem);
                 });

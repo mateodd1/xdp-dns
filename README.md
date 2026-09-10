@@ -118,17 +118,14 @@ el perfil de bloqueo y solo entonces entrega la consulta al proxy Rust.
   * `853` (TCP): DoT nativo con el certificado activo en `/etc/xdp-tls/` (IPs + dns/lite, o wildcard de fallback).
   * `127.0.0.1:4000` (HTTP): Endpoint `/dns-query` para DoH y `/metrics` para Prometheus.
 * **Listas de Bloqueo Activas**:
-  * Hagezi Multi PRO (`https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro.txt`)
-  * StevenBlack Unified Hosts (`https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts`)
-  * OISD Small (`https://small.oisd.nl`)
-  * URLhaus Malware (`https://urlhaus.abuse.ch/downloads/hostfile/`)
+  * HaGeZi Multi NORMAL (`https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/multi.txt`)
 * **Upstream**: Reenvía a `tcp+udp:127.0.0.1:5335` (Proxy de Evasión).
 
 ### 4.3 Blocky OTA (Instancia Apple OTA)
 * **Archivo de configuración**: `/root/xpd-dns/blocky/config-ota.yml`
 * **Servicio Systemd**: `blocky-ota.service`
 * **Puertos**: `127.0.0.1:5354` (DNS) y `127.0.0.1:4001` (HTTP DoH).
-* **Bloqueo añadido**: Lista `/root/xpd-dns/blocky/apple-ota.txt` con dominios como `mesu.apple.com`, `appldnld.apple.com`, `gdmf.apple.com`, `updates-http.apple.com` para evitar actualizaciones forzadas de iOS/macOS.
+* **Bloqueo añadido**: HaGeZi Multi NORMAL más la lista `/root/xpd-dns/blocky/apple-ota.txt`, con dominios como `mesu.apple.com`, `appldnld.apple.com`, `gdmf.apple.com`, `updates-http.apple.com`, para evitar actualizaciones forzadas de iOS/macOS.
 
 ### 4.4 Proxy de Evasión de Bloqueos (Rust)
 * **Código fuente**: `/root/xpd-dns/evade-proxy/`

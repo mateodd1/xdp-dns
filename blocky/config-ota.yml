@@ -22,12 +22,12 @@ caching:
   maxItemsCount: 0
 
 blocking:
+  allowlists:
+    ads:
+      - s.click.aliexpress.com
   denylists:
     ads:
-      - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro.txt
-      - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-      - https://small.oisd.nl
-      - https://urlhaus.abuse.ch/downloads/hostfile/
+      - https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/multi.txt
     apple_ota:
       - /root/xpd-dns/blocky/apple-ota.txt
   clientGroupsBlock:

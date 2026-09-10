@@ -1,23 +1,15 @@
 blocking:
+  allowlists:
+    ads:
+    - s.click.aliexpress.com
   blockTTL: 1m
   blockType: zeroIp
   clientGroupsBlock:
-    block-ota:
-    - ads
-    - apple_ota
     default:
     - ads
-    ota:
-    - ads
-    - apple_ota
   denylists:
     ads:
-    - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro.txt
-    - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-    - https://small.oisd.nl
-    - https://urlhaus.abuse.ch/downloads/hostfile/
-    apple_ota:
-    - /root/xpd-dns/blocky/apple-ota.txt
+    - https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/multi.txt
   loading:
     downloads:
       attempts: 3
