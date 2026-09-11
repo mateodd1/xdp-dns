@@ -1,7 +1,8 @@
 blocking:
   allowlists:
     ads:
-    - s.click.aliexpress.com
+    - |
+      s.click.aliexpress.com
   blockTTL: 1m
   blockType: zeroIp
   clientGroupsBlock:
@@ -12,13 +13,17 @@ blocking:
     - https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/multi.txt
   loading:
     downloads:
-      attempts: 3
-      cooldown: 10s
-      timeout: 60s
+      attempts: 2
+      cooldown: 2s
+      timeout: 15s
+      cachePath: /var/cache/blocky/lists
+    # Open DNS/DoT/DoH listeners immediately. Lists are loaded asynchronously
+    # and the on-disk cache is used whenever the CDN is unavailable.
+    strategy: fast
     refreshPeriod: 24h
 bootstrapDns:
-- 127.0.0.1:5335
-- 1.1.1.1
+- 127.0.0.1:5337
+- 8.8.8.8
 caching:
   maxItemsCount: 0
   maxTime: -1m
@@ -56,9 +61,21 @@ prometheus:
   path: /metrics
 queryLog:
   type: none
+rateLimit:
+  enable: true
+  rate: 50
+  burst: 100
+  ipv4Prefix: 32
+  ipv6Prefix: 64
+  allowlist:
+  - 127.0.0.1
+  - ::1
 upstreams:
   groups:
     default:
+    # Keep dns.xdp.es recursion on the .51 egress. If that path times out,
+    # strict strategy automatically falls back to the independent .52 path.
     - tcp+udp:127.0.0.1:5335
+    - tcp+udp:127.0.0.1:5337
   strategy: strict
-  timeout: 4s
+  timeout: 2s

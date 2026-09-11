@@ -9,12 +9,14 @@ import os
 import sys
 import datetime
 import subprocess
+import sqlite3
 
 BLOCKED_V4_FILE = "/etc/unbound/blocked_ips.txt"
 BLOCKED_V6_FILE = "/etc/unbound/blocked_ipv6.txt"
 CF_V4_FILE = "/etc/unbound/cloudflare_prefixes_v4.txt"
 CF_V6_FILE = "/etc/unbound/cloudflare_prefixes_v6.txt"
 ASN_CACHE_FILE = "/root/xpd-dns/scripts/asn_cache.json"
+ASN_CACHE_DB_FILE = "/root/xpd-dns/scripts/asn_cache.sqlite3"
 SERVICES_HISTORY_FILE = "/root/xpd-dns/scripts/services_history.json"
 REDIRECTS_FILE = "/run/evade-proxy/redirects.txt"
 
@@ -111,11 +113,44 @@ def find_cf_v6(ip_str):
     return None
 
 
-def load_asn_cache():
+def load_asn_cache(target_ips=None):
+    # Query only the blocked addresses needed for this snapshot. Loading the
+    # complete legacy JSON every 15 seconds caused avoidable disk reads and the
+    # file is no longer updated after the SQLite migration.
+    if os.path.exists(ASN_CACHE_DB_FILE):
+        cache = {}
+        targets = list(dict.fromkeys(target_ips or []))
+        try:
+            conn = sqlite3.connect(
+                f"file:{ASN_CACHE_DB_FILE}?mode=ro", uri=True, timeout=5
+            )
+            for offset in range(0, len(targets), 900):
+                chunk = targets[offset:offset + 900]
+                placeholders = ",".join("?" for _ in chunk)
+                if not placeholders:
+                    continue
+                for ip, name, asn, country in conn.execute(
+                    f"SELECT ip, name, asn, country FROM asn_cache "
+                    f"WHERE ip IN ({placeholders})",
+                    chunk,
+                ):
+                    cache[ip] = {
+                        "name": name,
+                        "asn": asn,
+                        "country": country,
+                    }
+            conn.close()
+            return cache
+        except Exception as e:
+            print("Error loading SQLite ASN cache:", e, file=sys.stderr)
+
     if os.path.exists(ASN_CACHE_FILE):
         try:
             with open(ASN_CACHE_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
+                cache = json.load(f)
+                if target_ips is not None:
+                    return {ip: cache[ip] for ip in target_ips if ip in cache}
+                return cache
         except Exception:
             return {}
     return {}
@@ -228,7 +263,7 @@ def get_evasive_v4(ip_str):
 
 
 entries = []
-origin_cache = load_asn_cache()
+origin_cache = load_asn_cache(blocked_v4)
 asn_lookups_used = 0
 
 for ip in sorted(blocked_v4, key=lambda x: [int(p) for p in x.split('.') if p.isdigit()]):

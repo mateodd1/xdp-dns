@@ -33,9 +33,16 @@ prometheus:
   path: /metrics
 queryLog:
   type: none
+rateLimit:
+  enable: true
+  rate: 50
+  burst: 100
+  ipv4Prefix: 32
+  ipv6Prefix: 64
 upstreams:
   groups:
     default:
     - tcp+udp:127.0.0.1:5337
+    - tcp+udp:127.0.0.1:5335
   strategy: strict
-  timeout: 4s
+  timeout: 2s

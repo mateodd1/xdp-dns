@@ -15,6 +15,7 @@ import ipaddress
 import subprocess
 import time
 import re
+import sqlite3
 
 METRICS_URLS = (
     "http://127.0.0.1:4000/metrics",  # Adblock
@@ -30,7 +31,9 @@ STATS_FILES = [
 ]
 
 ASN_CACHE_FILE = "/root/xpd-dns/scripts/asn_cache.json"
+ASN_CACHE_DB_FILE = "/root/xpd-dns/scripts/asn_cache.sqlite3"
 HISTORY_FILE = "/root/xpd-dns/scripts/history.json"
+HISTORY_DB_FILE = "/root/xpd-dns/scripts/history.sqlite3"
 EVADE_STATS_FILE = "/root/xpd-dns/scripts/evade_stats.json"
 EVADE_METRICS_URL = "http://127.0.0.1:5339/stats"
 CACHE_COUNTER_SOURCE = "unbound-v1"
@@ -103,7 +106,9 @@ def save_json(filepath, data):
         if dirname and not os.path.exists(dirname):
             os.makedirs(dirname, exist_ok=True)
         with tempfile.NamedTemporaryFile("w", dir=dirname, delete=False, encoding="utf-8") as tf:
-            json.dump(data, tf, indent=2, ensure_ascii=False)
+            # Compact JSON avoids multiplying persistence writes. These files
+            # are consumed by code and do not need pretty-print indentation.
+            json.dump(data, tf, ensure_ascii=False, separators=(",", ":"))
             temp_name = tf.name
         os.chmod(temp_name, 0o644)
         os.replace(temp_name, filepath)
@@ -214,8 +219,90 @@ def normalize_cached_asns(cache_dict):
         elif data.get("name", ""):
             data["name"] = re.sub(r'\((AS\s*[-–]\s*|[-–]\s*)', '(', data["name"], flags=re.IGNORECASE)
 
-asn_cache = load_json(ASN_CACHE_FILE, {})
-normalize_cached_asns(asn_cache)
+def initialize_asn_cache():
+    """Load the ASN cache and migrate the legacy JSON to SQLite once.
+
+    The in-memory dictionary keeps lookups fast while SQLite lets us persist
+    only new IPs instead of rewriting the complete multi-megabyte cache.
+    """
+    conn = sqlite3.connect(ASN_CACHE_DB_FILE, timeout=15)
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA synchronous=NORMAL")
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS asn_cache (
+               ip TEXT PRIMARY KEY,
+               name TEXT NOT NULL,
+               asn TEXT NOT NULL,
+               country TEXT NOT NULL,
+               created_at INTEGER NOT NULL
+           )"""
+    )
+
+    # The large legacy JSON is read only for the one-time import. Normal runs
+    # go straight to SQLite and no longer parse or rewrite that file.
+    if conn.execute("SELECT 1 FROM asn_cache LIMIT 1").fetchone() is None:
+        legacy_cache = load_json(ASN_CACHE_FILE, {})
+        normalize_cached_asns(legacy_cache)
+        if legacy_cache:
+            migrated_at = int(time.time())
+            conn.executemany(
+                "INSERT OR IGNORE INTO asn_cache(ip, name, asn, country, created_at) VALUES(?,?,?,?,?)",
+                (
+                    (
+                        ip,
+                        str(data.get("name", "")),
+                        str(data.get("asn", "0")),
+                        str(data.get("country", "")),
+                        migrated_at,
+                    )
+                    for ip, data in legacy_cache.items()
+                ),
+            )
+            conn.commit()
+
+    cache = {
+        ip: {"name": name, "asn": asn, "country": country}
+        for ip, name, asn, country in conn.execute(
+            "SELECT ip, name, asn, country FROM asn_cache"
+        )
+    }
+    normalize_cached_asns(cache)
+    return conn, cache
+
+
+asn_cache_db, asn_cache = initialize_asn_cache()
+asn_cache_dirty = {}
+
+
+def cache_asn(ip_str, data):
+    asn_cache[ip_str] = data
+    asn_cache_dirty[ip_str] = data
+
+
+def flush_asn_cache():
+    if not asn_cache_dirty:
+        return
+    created_at = int(time.time())
+    asn_cache_db.executemany(
+        """INSERT INTO asn_cache(ip, name, asn, country, created_at)
+           VALUES(?,?,?,?,?)
+           ON CONFLICT(ip) DO UPDATE SET
+             name=excluded.name,
+             asn=excluded.asn,
+             country=excluded.country""",
+        (
+            (
+                ip,
+                str(data.get("name", "")),
+                str(data.get("asn", "0")),
+                str(data.get("country", "")),
+                created_at,
+            )
+            for ip, data in asn_cache_dirty.items()
+        ),
+    )
+    asn_cache_db.commit()
+    asn_cache_dirty.clear()
 
 SERVER_IPS_AND_HOSTS = {
     "85.208.114.51", "85.208.114.52", "85.208.114.53", "85.208.114.54",
@@ -266,7 +353,7 @@ def resolve_asn(ip_str):
         ).strip().strip('"')
 
         if not res:
-            asn_cache[ip_str] = {"name": f"IP ({ip_str})", "asn": "0", "country": ""}
+            cache_asn(ip_str, {"name": f"IP ({ip_str})", "asn": "0", "country": ""})
             return asn_cache[ip_str]["name"], "0", ""
 
         asn = res.split("|")[0].strip()
@@ -298,12 +385,12 @@ def resolve_asn(ip_str):
             
         formatted_name = f"AS{asn} ({clean_name})"
 
-        asn_cache[ip_str] = {"name": formatted_name, "asn": asn, "country": country}
+        cache_asn(ip_str, {"name": formatted_name, "asn": asn, "country": country})
         return formatted_name, asn, country
 
     except Exception:
         fallback = f"AS-Unknown ({ip_str})"
-        asn_cache[ip_str] = {"name": fallback, "asn": "0", "country": ""}
+        cache_asn(ip_str, {"name": fallback, "asn": "0", "country": ""})
         return fallback, "0", ""
 
 KNOWN_ISP_ASNS = {
@@ -487,14 +574,226 @@ def parse_raw_metrics(raw_text):
         "client_ips": client_ips
     }
 
+
+def merge_asn_entry(target, asn_key, source):
+    """Merge an already-resolved ASN counter into a compact aggregate."""
+    if not isinstance(source, dict):
+        return
+
+    if asn_key not in target:
+        target[asn_key] = {
+            "name": source.get("name", f"AS{asn_key}"),
+            "count": 0,
+            "ipv4_count": 0,
+            "ipv6_count": 0,
+            "type": source.get("type", "datacenter"),
+        }
+
+    entry = target[asn_key]
+    entry["count"] += int(source.get("count", 0))
+    entry["ipv4_count"] += int(source.get("ipv4_count", 0))
+    entry["ipv6_count"] += int(source.get("ipv6_count", 0))
+
+
+def aggregate_client_asns(client_ips, allow_lookup=True):
+    """Collapse per-client counters to ASN counters before persistence."""
+    aggregated = {}
+    for ip, count in client_ips.items():
+        if is_local_ip(ip) or count <= 0:
+            continue
+
+        if allow_lookup:
+            asn_name, asn_num, country = resolve_asn(ip)
+        else:
+            cached = asn_cache.get(ip)
+            if not cached:
+                continue
+            asn_name = cached.get("name")
+            asn_num = cached.get("asn", "0")
+            country = cached.get("country", "")
+
+        if (
+            not asn_name
+            or str(asn_num) == "0"
+            or asn_name.startswith("AS-Unknown")
+            or asn_name.startswith("IP (")
+        ):
+            continue
+
+        asn_key = str(asn_num).strip().upper().replace("AS", "")
+        if not asn_key or asn_key == "0":
+            continue
+
+        count = int(count)
+        merge_asn_entry(
+            aggregated,
+            asn_key,
+            {
+                "name": asn_name,
+                "count": count,
+                "ipv4_count": 0 if ":" in ip else count,
+                "ipv6_count": count if ":" in ip else 0,
+                "type": classify_asn(asn_name, asn_num, country),
+            },
+        )
+
+    return aggregated
+
+
+def migrate_history_to_asns(history):
+    """One-time in-memory migration from per-IP history to per-ASN history.
+
+    Historical rows only use cached resolutions, so migration cannot create a
+    DNS burst. Unknown legacy clients are omitted from the ASN breakdown while
+    the query totals remain untouched.
+    """
+    if history.get("schema_version", 1) >= 2:
+        return
+
+    migrated_clients = 0
+    for bucket in history.get("hourly_buckets", {}).values():
+        client_ips = bucket.pop("client_ips", {})
+        migrated_clients += len(client_ips)
+        asns = bucket.setdefault("asns", {})
+        for asn_key, item in aggregate_client_asns(
+            client_ips, allow_lookup=False
+        ).items():
+            merge_asn_entry(asns, asn_key, item)
+
+    raw_last = history.get("raw_last", {})
+    last_clients = raw_last.pop("client_ips", {})
+    migrated_clients += len(last_clients)
+    last_asns = raw_last.setdefault("asns", {})
+    for asn_key, item in aggregate_client_asns(
+        last_clients, allow_lookup=False
+    ).items():
+        merge_asn_entry(last_asns, asn_key, item)
+
+    history["schema_version"] = 2
+    print(f"History migrated to per-ASN buckets ({migrated_clients} client rows)")
+
+
+history_db = None
+
+
+def get_history_db():
+    global history_db
+    if history_db is not None:
+        return history_db
+
+    history_db = sqlite3.connect(HISTORY_DB_FILE, timeout=15)
+    history_db.execute("PRAGMA journal_mode=WAL")
+    history_db.execute("PRAGMA synchronous=NORMAL")
+    history_db.execute(
+        "CREATE TABLE IF NOT EXISTS hourly_buckets "
+        "(hour INTEGER PRIMARY KEY, payload TEXT NOT NULL)"
+    )
+    history_db.execute(
+        "CREATE TABLE IF NOT EXISTS metadata "
+        "(key TEXT PRIMARY KEY, payload TEXT NOT NULL)"
+    )
+    return history_db
+
+
+def load_persistent_history():
+    """Load history from SQLite, importing the legacy JSON exactly once."""
+    conn = get_history_db()
+    initialized = conn.execute(
+        "SELECT 1 FROM metadata WHERE key='initialized'"
+    ).fetchone()
+
+    if not initialized:
+        history = load_json(HISTORY_FILE, {})
+        history.setdefault("hourly_buckets", {})
+        migrate_history_to_asns(history)
+
+        conn.executemany(
+            "INSERT OR REPLACE INTO hourly_buckets(hour, payload) VALUES(?,?)",
+            (
+                (int(hour), json.dumps(bucket, ensure_ascii=False, separators=(",", ":")))
+                for hour, bucket in history["hourly_buckets"].items()
+            ),
+        )
+        metadata = {
+            key: value for key, value in history.items()
+            if key != "hourly_buckets"
+        }
+        metadata["initialized"] = True
+        conn.executemany(
+            "INSERT OR REPLACE INTO metadata(key, payload) VALUES(?,?)",
+            (
+                (key, json.dumps(value, ensure_ascii=False, separators=(",", ":")))
+                for key, value in metadata.items()
+            ),
+        )
+        conn.commit()
+        print(f"History imported into SQLite ({len(history['hourly_buckets'])} buckets)")
+        return history, True
+
+    history = {
+        "hourly_buckets": {
+            str(hour): json.loads(payload)
+            for hour, payload in conn.execute(
+                "SELECT hour, payload FROM hourly_buckets"
+            )
+        }
+    }
+    for key, payload in conn.execute(
+        "SELECT key, payload FROM metadata WHERE key != 'initialized'"
+    ):
+        history[key] = json.loads(payload)
+    return history, False
+
+
+def persist_history(history, current_hour_key, rewrite_all=False):
+    """Persist only the bucket that changed plus the small counter baseline."""
+    conn = get_history_db()
+    if rewrite_all:
+        conn.executemany(
+            "INSERT OR REPLACE INTO hourly_buckets(hour, payload) VALUES(?,?)",
+            (
+                (int(hour), json.dumps(bucket, ensure_ascii=False, separators=(",", ":")))
+                for hour, bucket in history["hourly_buckets"].items()
+            ),
+        )
+    else:
+        current_bucket = history["hourly_buckets"].get(current_hour_key)
+        if current_bucket is not None:
+            conn.execute(
+                "INSERT OR REPLACE INTO hourly_buckets(hour, payload) VALUES(?,?)",
+                (
+                    int(current_hour_key),
+                    json.dumps(current_bucket, ensure_ascii=False, separators=(",", ":")),
+                ),
+            )
+
+    oldest_hour = min((int(hour) for hour in history["hourly_buckets"]), default=0)
+    if oldest_hour:
+        conn.execute("DELETE FROM hourly_buckets WHERE hour < ?", (oldest_hour,))
+
+    metadata = {
+        key: value for key, value in history.items()
+        if key != "hourly_buckets"
+    }
+    conn.executemany(
+        "INSERT OR REPLACE INTO metadata(key, payload) VALUES(?,?)",
+        (
+            (key, json.dumps(value, ensure_ascii=False, separators=(",", ":")))
+            for key, value in metadata.items()
+        ),
+    )
+    conn.commit()
+
 def update_persistent_history(raw_now):
-    history = load_json(HISTORY_FILE, {})
+    history, needs_full_write = load_persistent_history()
     now = time.time()
     current_hour_key = str(int(now // 3600 * 3600))
 
     # Migration / Initial baseline setup
     if "hourly_buckets" not in history:
         history["hourly_buckets"] = {}
+
+    migrate_history_to_asns(history)
     
     # Historical base counts preserved
     base_total = int(history.get("total_30d", 2162))
@@ -521,7 +820,7 @@ def update_persistent_history(raw_now):
     last_d_sum = float(raw_last.get("duration_sum", 0.0))
     last_d_cnt = float(raw_last.get("duration_count", 0.0))
     last_qtypes = raw_last.get("query_types", {})
-    last_clients = raw_last.get("client_ips", {})
+    last_asns = raw_last.get("asns", {})
 
     # Compute deltas (detecting process restarts where current < last)
     cur_total = raw_now["total"]
@@ -587,16 +886,23 @@ def update_persistent_history(raw_now):
         if delta > 0:
             d_qtypes[qtype] = delta
 
-    # Delta for client IPs
-    d_clients = {}
-    for ip, cnt in raw_now["client_ips"].items():
-        prev = float(last_clients.get(ip, 0.0))
-        if cnt >= prev and prev > 0:
-            delta = cnt - prev
-        else:
-            delta = cnt
-        if delta > 0:
-            d_clients[ip] = delta
+    # Delta for compact ASN counters. Client IPs never reach persistent JSON.
+    d_asns = {}
+    for asn_key, current in raw_now.get("asns", {}).items():
+        previous = last_asns.get(asn_key, {})
+        delta_entry = {
+            "name": current.get("name", f"AS{asn_key}"),
+            "type": current.get("type", "datacenter"),
+        }
+        for field in ("count", "ipv4_count", "ipv6_count"):
+            current_value = int(current.get(field, 0))
+            previous_value = int(previous.get(field, 0))
+            if current_value >= previous_value and previous_value > 0:
+                delta_entry[field] = current_value - previous_value
+            else:
+                delta_entry[field] = current_value
+        if delta_entry["count"] > 0:
+            d_asns[asn_key] = delta_entry
 
     # Ensure baseline bucket exists so history before system update is retained
     if not history["hourly_buckets"]:
@@ -609,7 +915,7 @@ def update_persistent_history(raw_now):
             "duration_sum": base_total * 0.002,
             "duration_count": base_total,
             "query_types": {"DS": int(base_total * 0.45), "A": int(base_total * 0.25), "AAAA": int(base_total * 0.15), "HTTPS": int(base_total * 0.10), "PTR": int(base_total * 0.05)},
-            "client_ips": {}
+            "asns": {}
         }
 
     # Add deltas to current hour bucket
@@ -622,7 +928,7 @@ def update_persistent_history(raw_now):
             "duration_sum": 0.0,
             "duration_count": 0,
             "query_types": {},
-            "client_ips": {}
+            "asns": {}
         }
 
     bucket = history["hourly_buckets"][current_hour_key]
@@ -636,8 +942,9 @@ def update_persistent_history(raw_now):
     for qtype, cnt in d_qtypes.items():
         bucket["query_types"][qtype] = bucket["query_types"].get(qtype, 0) + int(cnt)
 
-    for ip, cnt in d_clients.items():
-        bucket["client_ips"][ip] = bucket["client_ips"].get(ip, 0) + int(cnt)
+    bucket_asns = bucket.setdefault("asns", {})
+    for asn_key, item in d_asns.items():
+        merge_asn_entry(bucket_asns, asn_key, item)
 
     # Save raw_last for next iteration
     history["raw_last"] = raw_now
@@ -651,8 +958,11 @@ def update_persistent_history(raw_now):
         if int(k) >= cutoff_prune
     }
 
-    save_json(HISTORY_FILE, history)
-    save_json(ASN_CACHE_FILE, asn_cache)
+    persist_history(
+        history,
+        current_hour_key,
+        rewrite_all=needs_full_write or cache_source_changed,
+    )
     return history
 
 def build_window_stats(history, window_seconds):
@@ -667,7 +977,7 @@ def build_window_stats(history, window_seconds):
     duration_count = 0
 
     query_types = {}
-    client_ips = {}
+    asn_data = {}
 
     for hour_str, b in history.get("hourly_buckets", {}).items():
         try:
@@ -686,49 +996,16 @@ def build_window_stats(history, window_seconds):
                 if qt and qt.upper() != "ANY":
                     query_types[qt] = query_types.get(qt, 0) + c
 
-            for ip, c in b.get("client_ips", {}).items():
-                client_ips[ip] = client_ips.get(ip, 0) + c
+            for asn_key, item in b.get("asns", {}).items():
+                merge_asn_entry(asn_data, asn_key, item)
 
     blocked_pct = round((blocked_queries / total_queries * 100), 1) if total_queries > 0 else 0.0
     cached_pct = round((cached_queries / total_queries * 100), 1) if total_queries > 0 else 0.0
     evaded_pct = round((evaded_queries / total_queries * 100), 2) if total_queries > 0 else 0.0
     avg_latency = round((duration_sum / duration_count * 1000), 1) if duration_count > 0 else 2.1
 
-    # Process ASNs
-    asn_data = {}
-    total_asn_queries = 0
-
-    for ip, cnt in client_ips.items():
-        if is_local_ip(ip) or cnt <= 0:
-            continue
-
-        asn_name, asn_num, country = resolve_asn(ip)
-        if not asn_name or str(asn_num) == "0" or asn_name.startswith("AS-Unknown") or asn_name.startswith("IP ("):
-            continue
-
-        is_ipv6 = ":" in ip
-        asn_type = classify_asn(asn_name, asn_num, country)
-
-        asn_key = str(asn_num).strip().upper().replace('AS', '')
-        if not asn_key or asn_key == "0":
-            asn_key = asn_name
-
-        if asn_key not in asn_data:
-            asn_data[asn_key] = {
-                "name": asn_name,
-                "count": 0,
-                "ipv4_count": 0,
-                "ipv6_count": 0,
-                "type": asn_type
-            }
-
-        asn_data[asn_key]["count"] += int(cnt)
-        total_asn_queries += int(cnt)
-
-        if is_ipv6:
-            asn_data[asn_key]["ipv6_count"] += int(cnt)
-        else:
-            asn_data[asn_key]["ipv4_count"] += int(cnt)
+    # ASN data is already compacted in each hourly bucket.
+    total_asn_queries = sum(item["count"] for item in asn_data.values())
 
     top_asns_isp = []
     top_asns_datacenter = []
@@ -882,6 +1159,10 @@ def main():
     raw_now["cached"] = float(sum(cache_counters.values()))
     raw_now["cache_counters"] = cache_counters
     raw_now["cache_counter_source"] = CACHE_COUNTER_SOURCE
+    raw_now["asns"] = aggregate_client_asns(
+        raw_now.pop("client_ips", {}), allow_lookup=True
+    )
+    flush_asn_cache()
 
     history = update_persistent_history(raw_now)
 
@@ -895,8 +1176,6 @@ def main():
 
     for target in STATS_FILES:
         save_json(target, data)
-
-    save_json(ASN_CACHE_FILE, asn_cache)
 
     print(f"Stats updated: 24h={stats_24h['total']} queries (blocked {stats_24h['blocked']}, evaded {stats_24h['evaded']}), 30d={stats_30d['total']} queries (evaded {stats_30d['evaded']})")
 

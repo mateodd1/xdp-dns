@@ -5,3 +5,9 @@ After=blocky.service blocky-lite.service unbound.service unbound-lite.service
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/python3 /root/xpd-dns/scripts/update-stats.py
+Nice=10
+IOSchedulingClass=idle
+CPUWeight=10
+IOWeight=10
+IOAccounting=yes
+TimeoutStartSec=2min

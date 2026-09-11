@@ -5,6 +5,9 @@
 scripts/history.json
 scripts/services_history.json
 scripts/asn_cache.json
+scripts/*.sqlite3
+scripts/*.sqlite3-shm
+scripts/*.sqlite3-wal
 scripts/evade_stats.json
 web/stats.json
 web/stats/stats.json
