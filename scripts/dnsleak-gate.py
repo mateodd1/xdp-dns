@@ -3,10 +3,11 @@
 Escucha DNS (UDP+TCP) en GATE_IP:53 y expone API HTTP en 127.0.0.1:8088.
 Las observaciones (token, ip_origen) viven <=120 s EN MEMORIA. Sin disco, sin logs.
 Enriquecimiento opcional: ASN/organización del resolver vía Team Cymru (con caché)."""
-import socket, struct, threading, time, re, json, subprocess
+import socket, struct, threading, time, re, json, subprocess, sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 GATE_IP   = "85.208.114.54"        # gate dns-leak (IPv4 pública dedicada)
+GATE_IP6  = "2a0e:97c0:c40::54"     # gate dns-leak (IPv6 dedicada; ns-check publica A+AAAA)
 ZONE      = "_check.xdp.es"
 TOKEN_RE  = re.compile(r"^[0-9a-f]{6,32}$")
 OBS_TTL   = 120                     # vida de una observación (segundos)
@@ -107,17 +108,29 @@ def enc_name(name):
         out += bytes([len(b)]) + b
     return out + b"\x00"
 
-def nxdomain(qdata, qend):
-    """NXDOMAIN AA con SOA de la zona (minimum=0 → sin caché negativa)."""
-    soa_name = enc_name(ZONE)
-    mname    = enc_name("ns-check.xdp.es")
-    rname    = enc_name("hostmaster.xdp.es")
-    rdata    = mname + rname + struct.pack("!IIIII", int(time.time()), 7200, 900, 1209600, 0)
-    return (qdata[:2]
-            + struct.pack("!HHHHH", 0x8503, 1, 0, 1, 0)   # QR|AA|RD, rcode=3 (NXDOMAIN)
-            + qdata[12:qend]                              # eco de la sección question
-            + soa_name + struct.pack("!HHIH", 6, 1, 0, len(rdata))
-            + rdata)
+QT_A, QT_NS, QT_SOA, QT_AAAA = 1, 2, 6, 28
+ZONE_TTL = 60
+
+def _soa_rr():
+    rd = (enc_name("ns-check.xdp.es") + enc_name("hostmaster.xdp.es")
+          + struct.pack("!IIIII", int(time.time()), 7200, 900, 1209600, 0))
+    return enc_name(ZONE) + struct.pack("!HHIH", QT_SOA, 1, ZONE_TTL, len(rd)) + rd
+
+def _ns_rr():
+    rd = enc_name("ns-check.xdp.es")
+    return enc_name(ZONE) + struct.pack("!HHIH", QT_NS, 1, ZONE_TTL, len(rd)) + rd
+
+def _glue_rrs():
+    a = (enc_name("ns-check.xdp.es") + struct.pack("!HHIH", QT_A, 1, ZONE_TTL, 4)
+         + socket.inet_aton(GATE_IP))
+    aaaa = (enc_name("ns-check.xdp.es") + struct.pack("!HHIH", QT_AAAA, 1, ZONE_TTL, 16)
+            + socket.inet_pton(socket.AF_INET6, GATE_IP6))
+    return a + aaaa
+
+def _resp(qdata, qsec_end, rcode=0, an=0, ns=0, ar=0, ans=b"", auth=b"", add=b""):
+    flags = 0x8500 | (rcode & 0x0F)                       # QR|AA|RD, RA=0
+    return (qdata[:2] + struct.pack("!HHHHH", flags, 1, an, ns, ar)
+            + qdata[12:qsec_end] + ans + auth + add)
 
 def handle_dns(data, src_ip):
     if len(data) < 12:
@@ -128,17 +141,26 @@ def handle_dns(data, src_ip):
             return None
     except Exception:
         return None
+    qtype = struct.unpack("!H", data[qend:qend + 2])[0]
+    qsec_end = qend + 4
     q = qname.rstrip(".").lower()
-    if q.endswith("." + ZONE):
+    if not (q == ZONE or q.endswith("." + ZONE)):
+        return _resp(data, qsec_end, rcode=3, ns=1, auth=_soa_rr())    # NXDOMAIN fuera de zona
+    if q != ZONE:                                                      # subdominio -> posible token
         token = q[: -(len(ZONE) + 1)]
         if TOKEN_RE.match(token):
             record(token, src_ip)
-    return nxdomain(data, qend + 4)
+    # Autoritativo sano: SOA/NS en el ápice y NODATA (NOERROR) en el resto de la zona.
+    # NUNCA NXDOMAIN dentro de la zona: unbound (harden-below-nxdomain + qname-min) trataría
+    # la delegación como rota y devolvería SERVFAIL sin llegar a observar el token.
+    if q == ZONE and qtype == QT_SOA:
+        return _resp(data, qsec_end, an=1, ans=_soa_rr())
+    if q == ZONE and qtype == QT_NS:
+        return _resp(data, qsec_end, an=1, ar=2, ans=_ns_rr(), add=_glue_rrs())
+    return _resp(data, qsec_end, ns=1, auth=_soa_rr())                 # NODATA (NOERROR)
 
 # ---------- listeners DNS ----------
-def udp_loop():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.bind((GATE_IP, 53))
+def udp_loop(s):
     while True:
         data, addr = s.recvfrom(4096)
         try:
@@ -148,11 +170,7 @@ def udp_loop():
         except Exception:
             pass
 
-def tcp_loop():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((GATE_IP, 53))
-    s.listen(16)
+def tcp_loop(s):
     while True:
         conn, addr = s.accept()
         threading.Thread(target=tcp_session, args=(conn, addr), daemon=True).start()
@@ -213,7 +231,41 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+def bind_gate(retries=60, delay=2):
+    """Bindea UDP+TCP en IPv4 (GATE_IP) e IPv6 (GATE_IP6), puerto 53, desde el
+    hilo principal. Es todo-o-nada por intento: ns-check publica A+AAAA, así que
+    ambas familias deben responder o la delegación queda coja en una de ellas.
+    Si alguna IP dedicada aún no está asignada al arrancar (carrera con la red),
+    reintenta en el propio proceso ~2 min antes de rendirse. No sale de inmediato:
+    con RestartSec=100ms y StartLimitBurst=5, systemd abandonaría en <1 s."""
+    targets = [(socket.AF_INET, GATE_IP), (socket.AF_INET6, GATE_IP6)]
+    for attempt in range(retries):
+        made = []
+        try:
+            for family, ip in targets:
+                udp = socket.socket(family, socket.SOCK_DGRAM); made.append(("udp", udp))
+                tcp = socket.socket(family, socket.SOCK_STREAM); made.append(("tcp", tcp))
+                for s in (udp, tcp):
+                    if family == socket.AF_INET6:
+                        s.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 1)
+                tcp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                udp.bind((ip, 53))
+                tcp.bind((ip, 53))
+                tcp.listen(16)
+            return made
+        except OSError as e:
+            for _, s in made:
+                try: s.close()
+                except Exception: pass
+            print(f"bind gate:53 failed ({e}); retry {attempt+1}/{retries} in {delay}s",
+                  file=sys.stderr, flush=True)
+            time.sleep(delay)
+    print(f"gate sockets unavailable after {retries} tries; exiting",
+          file=sys.stderr, flush=True)
+    sys.exit(1)
+
 if __name__ == "__main__":
-    threading.Thread(target=udp_loop, daemon=True).start()
-    threading.Thread(target=tcp_loop, daemon=True).start()
+    for kind, s in bind_gate():
+        loop = udp_loop if kind == "udp" else tcp_loop
+        threading.Thread(target=loop, args=(s,), daemon=True).start()
     ThreadingHTTPServer(("127.0.0.1", 8088), Handler).serve_forever()
