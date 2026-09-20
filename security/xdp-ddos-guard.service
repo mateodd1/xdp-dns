@@ -1,0 +1,14 @@
+[Unit]
+Description=XDP DNS and web pre-conntrack flood protection
+After=nftables.service netfilter-persistent.service
+Before=caddy.service blocky.service blocky-lite.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/xdp-ddos-guard apply
+ExecReload=/usr/local/sbin/xdp-ddos-guard apply
+ExecStop=/usr/local/sbin/xdp-ddos-guard remove
+
+[Install]
+WantedBy=multi-user.target
