@@ -41,9 +41,10 @@ lite.xdp.es {
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 		X-Content-Type-Options "nosniff"
-		Access-Control-Allow-Origin "*"
-		Access-Control-Allow-Methods "GET, POST, OPTIONS"
-		Access-Control-Allow-Headers "Content-Type, Accept"
+		# Preserve upstream CORS; provide defaults only when absent.
+		?Access-Control-Allow-Origin "*"
+		?Access-Control-Allow-Methods "GET, POST, OPTIONS"
+		?Access-Control-Allow-Headers "Content-Type, Accept"
 	}
 }
 
@@ -92,9 +93,10 @@ dns.xdp.es {
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 		X-Content-Type-Options "nosniff"
-		Access-Control-Allow-Origin "*"
-		Access-Control-Allow-Methods "GET, POST, OPTIONS"
-		Access-Control-Allow-Headers "Content-Type, Accept"
+		# Preserve upstream CORS; provide defaults only when absent.
+		?Access-Control-Allow-Origin "*"
+		?Access-Control-Allow-Methods "GET, POST, OPTIONS"
+		?Access-Control-Allow-Headers "Content-Type, Accept"
 	}
 }
 
