@@ -48,6 +48,37 @@ lite.xdp.es {
 	}
 }
 
+# Node-pinned Ohz Lite DoH. The common hostname above remains balanced.
+lite1.xdp.es {
+	tls /etc/xdp-tls/fullchain.pem /etc/xdp-tls/privkey.pem
+
+	handle /dns-query* {
+		reverse_proxy 127.0.0.1:4012 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	handle /.well-known/acme-challenge/* {
+		root * /var/www/acme
+		file_server
+	}
+
+	handle {
+		redir https://xdp.es{uri} permanent
+	}
+
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		# Preserve upstream CORS; provide defaults only when absent.
+		?Access-Control-Allow-Origin "*"
+		?Access-Control-Allow-Methods "GET, POST, OPTIONS"
+		?Access-Control-Allow-Headers "Content-Type, Accept"
+	}
+}
+
 # Dedicated DoH & DoT Subdomain (dns.xdp.es) - EXCLUSIVELY FOR DNS QUERIES
 dns.xdp.es {
 	tls /etc/xdp-tls/fullchain.pem /etc/xdp-tls/privkey.pem
@@ -85,6 +116,56 @@ dns.xdp.es {
 	}
 
 	# Any non-DNS request on dns.xdp.es is redirected immediately to the canonical web domain xdp.es
+	handle {
+		redir https://xdp.es{uri} permanent
+	}
+
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		# Preserve upstream CORS; provide defaults only when absent.
+		?Access-Control-Allow-Origin "*"
+		?Access-Control-Allow-Methods "GET, POST, OPTIONS"
+		?Access-Control-Allow-Headers "Content-Type, Accept"
+	}
+}
+
+# Node-pinned Ohz AdBlock DoH. The common hostname above remains balanced.
+dns1.xdp.es {
+	tls /etc/xdp-tls/fullchain.pem /etc/xdp-tls/privkey.pem
+
+	handle /block-ota/dns-query* {
+		rewrite * /dns-query
+		reverse_proxy 127.0.0.1:4001 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	handle /dns-query* {
+		reverse_proxy 127.0.0.1:4010 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	handle /.well-known/dns-query* {
+		reverse_proxy 127.0.0.1:4010 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	handle /probe/* {
+		reverse_proxy 127.0.0.1:8090
+	}
+
+	handle /.well-known/acme-challenge/* {
+		root * /var/www/acme
+		file_server
+	}
+
 	handle {
 		redir https://xdp.es{uri} permanent
 	}
@@ -274,7 +355,7 @@ xdp.es {
 
 	@home path / /index.html
 	handle @home {
-		header Cache-Control "public, max-age=60, must-revalidate"
+		header Cache-Control "no-cache, must-revalidate"
 		rewrite * /index.html
 		file_server
 	}

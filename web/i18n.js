@@ -615,6 +615,14 @@ function getLanguage() {
 
 function t(key, lang) {
     const activeLang = lang || getLanguage();
+    if (key === 'std.title') {
+        const mode = (typeof currentDnsMode !== 'undefined' ? currentDnsMode : (document.body && document.body.dataset && document.body.dataset.dnsMode) || 'adblock');
+        return mode === 'standard' ? (activeLang === 'es' ? 'DNS Estándar' : 'Standard DNS') : (activeLang === 'es' ? 'DNS Adblock' : 'Adblock DNS');
+    }
+    if (key === 'std.desc') {
+        const mode = (typeof currentDnsMode !== 'undefined' ? currentDnsMode : (document.body && document.body.dataset && document.body.dataset.dnsMode) || 'adblock');
+        return mode === 'standard' ? (activeLang === 'es' ? 'Resolución DNS estándar con validación DNSSEC.' : 'Standard DNS resolution with DNSSEC validation.') : (activeLang === 'es' ? 'Resolución DNS con filtrado Adblock y validación DNSSEC.' : 'Adblock DNS resolution with DNSSEC validation.');
+    }
     const dict = translations[activeLang] || translations.es;
     if (dict && dict[key]) return dict[key];
     if (translations.es && translations.es[key]) return translations.es[key];

@@ -77,18 +77,7 @@ function setDnsMode(mode) {
     if (dohProfileLabel) dohProfileLabel.textContent = mode === 'standard' ? 'xdp.es Standard DoH DNS' : 'xdp.es AdBlock DoH DNS';
     if (dotProfileLabel) dotProfileLabel.textContent = mode === 'standard' ? 'xdp.es Standard DoT DNS' : 'xdp.es AdBlock DoT DNS';
 
-    const stdTitle = document.getElementById('std-dns-title');
-    const stdDesc = document.getElementById('std-dns-desc');
-    const titleKey = mode === 'standard' ? 'std.title_standard' : 'std.title_adblock';
-    const descKey = mode === 'standard' ? 'std.desc_standard' : 'std.desc_adblock';
-    if (stdTitle) {
-        stdTitle.setAttribute('data-i18n', titleKey);
-        stdTitle.innerText = (window.i18n && window.i18n.t(titleKey)) || (mode === 'standard' ? 'DNS Estándar' : 'DNS Adblock');
-    }
-    if (stdDesc) {
-        stdDesc.setAttribute('data-i18n', descKey);
-        stdDesc.innerText = (window.i18n && window.i18n.t(descKey)) || (mode === 'standard' ? 'Resolución DNS estándar con validación DNSSEC.' : 'Resolución DNS con filtrado Adblock y validación DNSSEC.');
-    }
+    updatePlainDnsCard(mode);
 
     const dohCard = document.querySelector('[data-agent-protocol="doh"]');
     const dotCard = document.querySelector('[data-agent-protocol="dot"]');
@@ -99,9 +88,26 @@ function setDnsMode(mode) {
 
 }
 
+function updatePlainDnsCard(mode) {
+    const activeMode = mode || currentDnsMode;
+    const stdTitle = document.getElementById('std-dns-title') || document.querySelector('#heading-standard-dns span:not(.badge)');
+    const stdDesc = document.getElementById('std-dns-desc') || document.querySelector('[data-agent-protocol="dns-plain"] .desc');
+    const titleKey = activeMode === 'standard' ? 'std.title_standard' : 'std.title_adblock';
+    const descKey = activeMode === 'standard' ? 'std.desc_standard' : 'std.desc_adblock';
+    if (stdTitle) {
+        stdTitle.setAttribute('data-i18n', titleKey);
+        stdTitle.innerText = (window.i18n && window.i18n.t(titleKey)) || (activeMode === 'standard' ? 'DNS Estándar' : 'DNS Adblock');
+    }
+    if (stdDesc) {
+        stdDesc.setAttribute('data-i18n', descKey);
+        stdDesc.innerText = (window.i18n && window.i18n.t(descKey)) || (activeMode === 'standard' ? 'Resolución DNS estándar con validación DNSSEC.' : 'Resolución DNS con filtrado Adblock y validación DNSSEC.');
+    }
+}
+
 window.addEventListener('langchange', () => {
     document.querySelectorAll('[data-platform-guide]').forEach(panel => delete panel.dataset.adblockTemplate);
     setDnsMode(currentDnsMode);
+    updatePlainDnsCard(currentDnsMode);
 });
 
 function copyEndpoint(text, wrapper) {
