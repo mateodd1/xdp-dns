@@ -6,6 +6,8 @@ const DNS_MODES = {
         dot: 'dns.xdp.es',
         ipv4: '85.208.114.51',
         ipv6: '2a0e:97c0:c40::51',
+        ipv4Secondary: '51.170.52.10',
+        ipv6Secondary: '2603:c027:8703:d400::10',
         dohProfile: 'dns_xdp_es_doh.mobileconfig',
         dotProfile: 'dns_xdp_es_dot.mobileconfig',
         stamp: 'sdns://AgMAAAAAAAAADTg1LjIwOC4xMTQuNTEACmRucy54ZHAuZXMKL2Rucy1xdWVyeQ'
@@ -15,6 +17,8 @@ const DNS_MODES = {
         dot: 'lite.xdp.es',
         ipv4: '85.208.114.52',
         ipv6: '2a0e:97c0:c40::52',
+        ipv4Secondary: '51.170.54.40',
+        ipv6Secondary: '2603:c027:8703:d400::40',
         dohProfile: 'lite_xdp_es_doh.mobileconfig',
         dotProfile: 'lite_xdp_es_dot.mobileconfig',
         stamp: 'sdns://AgcAAAAAAAAADTg1LjIwOC4xMTQuNTIAC2xpdGUueGRwLmVzCi9kbnMtcXVlcnk'
@@ -59,6 +63,10 @@ function setDnsMode(mode) {
     document.getElementById('dot-hostname-value').textContent = selected.dot;
     document.getElementById('ipv4-value').textContent = selected.ipv4;
     document.getElementById('ipv6-value').textContent = selected.ipv6;
+    const secondaryIpv4 = document.getElementById('ipv4-secondary-value');
+    const secondaryIpv6 = document.getElementById('ipv6-secondary-value');
+    if (secondaryIpv4) secondaryIpv4.textContent = selected.ipv4Secondary;
+    if (secondaryIpv6) secondaryIpv6.textContent = selected.ipv6Secondary;
 
     const dohProfileLink = document.getElementById('profile-doh-link');
     const dotProfileLink = document.getElementById('profile-dot-link');
@@ -68,6 +76,19 @@ function setDnsMode(mode) {
     if (dotProfileLink) dotProfileLink.href = selected.dotProfile;
     if (dohProfileLabel) dohProfileLabel.textContent = mode === 'standard' ? 'xdp.es Standard DoH DNS' : 'xdp.es AdBlock DoH DNS';
     if (dotProfileLabel) dotProfileLabel.textContent = mode === 'standard' ? 'xdp.es Standard DoT DNS' : 'xdp.es AdBlock DoT DNS';
+
+    const stdTitle = document.getElementById('std-dns-title');
+    const stdDesc = document.getElementById('std-dns-desc');
+    const titleKey = mode === 'standard' ? 'std.title_standard' : 'std.title_adblock';
+    const descKey = mode === 'standard' ? 'std.desc_standard' : 'std.desc_adblock';
+    if (stdTitle) {
+        stdTitle.setAttribute('data-i18n', titleKey);
+        stdTitle.innerText = (window.i18n && window.i18n.t(titleKey)) || (mode === 'standard' ? 'DNS Estándar' : 'DNS Adblock');
+    }
+    if (stdDesc) {
+        stdDesc.setAttribute('data-i18n', descKey);
+        stdDesc.innerText = (window.i18n && window.i18n.t(descKey)) || (mode === 'standard' ? 'Resolución DNS estándar con validación DNSSEC.' : 'Resolución DNS con filtrado Adblock y validación DNSSEC.');
+    }
 
     const dohCard = document.querySelector('[data-agent-protocol="doh"]');
     const dotCard = document.querySelector('[data-agent-protocol="dot"]');

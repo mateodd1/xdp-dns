@@ -25,8 +25,12 @@ const translations = {
         // Protocols
         "doh.desc": "Cifrado de extremo a extremo a través de HTTPS.",
         "dot.desc": "Protocolo estándar de DNS sobre TLS.",
-        "std.title": "DNS Estándar",
-        "std.desc": "Resolución DNS estándar con validación DNSSEC.",
+        "std.title": "DNS Adblock",
+        "std.title_adblock": "DNS Adblock",
+        "std.title_standard": "DNS Estándar",
+        "std.desc": "Resolución DNS con filtrado Adblock y validación DNSSEC.",
+        "std.desc_adblock": "Resolución DNS con filtrado Adblock y validación DNSSEC.",
+        "std.desc_standard": "Resolución DNS estándar con validación DNSSEC.",
 
         // Apple Profiles
         "profiles.title": "Perfiles Apple",
@@ -323,8 +327,12 @@ const translations = {
         // Protocols
         "doh.desc": "End-to-end encryption over HTTPS.",
         "dot.desc": "Standard protocol for DNS over TLS.",
-        "std.title": "Standard DNS",
-        "std.desc": "Standard DNS resolution with DNSSEC validation.",
+        "std.title": "Adblock DNS",
+        "std.title_adblock": "Adblock DNS",
+        "std.title_standard": "Standard DNS",
+        "std.desc": "Adblock DNS resolution with DNSSEC validation.",
+        "std.desc_adblock": "Adblock DNS resolution with DNSSEC validation.",
+        "std.desc_standard": "Standard DNS resolution with DNSSEC validation.",
 
         // Apple Profiles
         "profiles.title": "Apple Profiles",
