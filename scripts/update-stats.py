@@ -37,6 +37,10 @@ HISTORY_DB_FILE = "/root/xpd-dns/scripts/history.sqlite3"
 EVADE_STATS_FILE = "/root/xpd-dns/scripts/evade_stats.json"
 EVADE_METRICS_URL = "http://127.0.0.1:5339/stats"
 CACHE_COUNTER_SOURCE = "unbound-v1"
+# ASN labels are supplementary. Slow external DNS lookups must never prevent
+# the query counters and the node snapshot from being published.
+ASN_LOOKUP_BUDGET_SECONDS = 10
+asn_lookup_deadline = None
 UNBOUND_CONTROL_COMMANDS = {
     "main": [
         "/usr/sbin/unbound-control",
@@ -353,8 +357,8 @@ def resolve_asn(ip_str):
         ).strip().strip('"')
 
         if not res:
-            cache_asn(ip_str, {"name": f"IP ({ip_str})", "asn": "0", "country": ""})
-            return asn_cache[ip_str]["name"], "0", ""
+            # A missing Cymru reply can be temporary. Try again on a later run.
+            return f"IP ({ip_str})", "0", ""
 
         asn = res.split("|")[0].strip()
 
@@ -390,7 +394,8 @@ def resolve_asn(ip_str):
 
     except Exception:
         fallback = f"AS-Unknown ({ip_str})"
-        cache_asn(ip_str, {"name": fallback, "asn": "0", "country": ""})
+        # DNS timeouts are transient; retry on a later collection instead of
+        # permanently caching an unknown label.
         return fallback, "0", ""
 
 KNOWN_ISP_ASNS = {
@@ -603,6 +608,8 @@ def aggregate_client_asns(client_ips, allow_lookup=True):
             continue
 
         if allow_lookup:
+            if ip not in asn_cache and asn_lookup_deadline is not None and time.monotonic() >= asn_lookup_deadline:
+                continue
             asn_name, asn_num, country = resolve_asn(ip)
         else:
             cached = asn_cache.get(ip)
@@ -1140,6 +1147,7 @@ def build_window_stats(history, window_seconds):
     }
 
 def main():
+    global asn_lookup_deadline
     raw_payloads = fetch_metrics()
     if not raw_payloads:
         print("Warning: unable to scrape all Blocky metrics")
@@ -1154,6 +1162,8 @@ def main():
     if cache_counters is None:
         print("Warning: unable to collect all Unbound cache counters")
         return
+
+    asn_lookup_deadline = time.monotonic() + ASN_LOOKUP_BUDGET_SECONDS
 
     raw_now = merge_raw_metrics(parsed)
     raw_now["cached"] = float(sum(cache_counters.values()))
