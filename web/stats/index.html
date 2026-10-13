@@ -2016,6 +2016,19 @@
             }
         }
 
+        function setTotalCounter(element, value) {
+            if (!element) return;
+            const count = Number(value || 0);
+            const exactCount = count.toLocaleString('es-ES');
+            element.innerText = count >= 1000000 ? `${(count / 1000000).toLocaleString('es-ES', {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1,
+                useGrouping: false
+            })} M` : exactCount;
+            element.title = exactCount;
+            element.setAttribute('aria-label', exactCount);
+        }
+
         function updateStatsUI(data) {
             if (!data) return;
             const freshness = document.getElementById('stats-freshness');
@@ -2037,7 +2050,7 @@
             const elSubCached24 = document.getElementById('sub-cached-24h');
             const elLatency24 = document.getElementById('val-latency-24h');
 
-            if (elTotal24) elTotal24.innerText = Number(s24.total || 0).toLocaleString();
+            setTotalCounter(elTotal24, s24.total);
             if (elBlocked24) elBlocked24.innerText = Number(s24.blocked || 0).toLocaleString();
             if (elSubBlocked24) elSubBlocked24.innerText = `${s24.blocked_pct || 0}%`;
             if (elEvaded24) elEvaded24.innerText = Number(s24.evaded || 0).toLocaleString();
@@ -2059,7 +2072,7 @@
             const elSubCached30 = document.getElementById('sub-cached-30d');
             const elLatency30 = document.getElementById('val-latency-30d');
 
-            if (elTotal30) elTotal30.innerText = Number(s30.total || 0).toLocaleString();
+            setTotalCounter(elTotal30, s30.total);
             if (elBlocked30) elBlocked30.innerText = Number(s30.blocked || 0).toLocaleString();
             if (elSubBlocked30) elSubBlocked30.innerText = `${s30.blocked_pct || 0}%`;
             if (elEvaded30) elEvaded30.innerText = Number(s30.evaded || 0).toLocaleString();
