@@ -1210,6 +1210,7 @@
             <button type="button" class="tab-btn active" data-interval="24h" onclick="switchTab('24h')" data-agent-tab="interval-24h" data-i18n="stats.tab_24h">24 Horas</button>
             <button type="button" class="tab-btn" data-interval="30d" onclick="switchTab('30d')" data-agent-tab="interval-30d" data-i18n="stats.tab_30d">30 Días</button>
         </div>
+        <p id="stats-freshness" role="status" style="text-align:center;padding:1rem"></p>
 
         <main>
             <!-- 24 Hours Pane -->
@@ -2017,6 +2018,9 @@
 
         function updateStatsUI(data) {
             if (!data) return;
+            const freshness = document.getElementById('stats-freshness');
+            const staleNodes = (data._meta?.nodes || []).filter(n => n.status !== 'fresh');
+            if (freshness) freshness.textContent = data._meta?.partial ? 'Datos parciales: ' + staleNodes.map(n => n.node_id + ' (' + (n.age_seconds == null ? 'sin datos' : Math.floor(n.age_seconds / 60) + ' min') + ')').join(', ') : '';
             const s24 = data.stats_24h || {};
             const s30 = data.stats_30d || {};
 
